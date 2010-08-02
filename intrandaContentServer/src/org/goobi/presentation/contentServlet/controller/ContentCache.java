@@ -26,8 +26,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.comparator.LastModifiedFileComparator;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 
@@ -74,13 +76,27 @@ public class ContentCache {
 
 		/* check cache folder size */
 		if (isCacheSizeExceeded()) {
-			long currentSize = FileUtils.sizeOfDirectory(cacheFolder);
-			long maxSize = maxSizeInMB * 1024 * 1024;
-			throw new CacheException("Given maximum size of cache (" + maxSize + " byte) already exeeded ("
-					+ currentSize + " byte)");
+//			long currentSize = FileUtils.sizeOfDirectory(cacheFolder);
+//			long maxSize = maxSizeInMB * 1024 * 1024;
+			cleanCache();
+//			throw new CacheException("Given maximum size of cache (" + maxSize + " byte) already exeeded ("
+//					+ currentSize + " byte)");
 		}
 	}
 
+	public void cleanCache(){
+		long limit = (long) ((maxSizeInMB * 1024 * 1024) * 0.75);
+		File[] files = cacheFolder.listFiles();
+        Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR);
+        for (int i = 0; i < files.length; i++) {
+            File file = files[i];
+			FileUtils.deleteQuietly(file);
+            if (FileUtils.sizeOfDirectory(cacheFolder)< limit){
+            	return;
+            }
+        }
+	}
+	
 	/*************************************************************************************
 	 * check if file with given id exists in cache
 	 * 
@@ -90,7 +106,7 @@ public class ContentCache {
 	 ************************************************************************************/
 	public boolean cacheContains(String inId, String suffix) {
 		File file = getFileForId(inId, suffix);
-		return file.exists();
+		return file.exists() && file.length()>0;
 	}
 
 	/*************************************************************************************
@@ -156,6 +172,11 @@ public class ContentCache {
 	public boolean isCacheSizeExceeded() throws CacheException {
 		long currentSize = FileUtils.sizeOfDirectory(cacheFolder);
 		long maxSize = maxSizeInMB * 1024 * 1024;
+		
+		if (currentSize >= maxSize){
+			cleanCache();
+			currentSize = FileUtils.sizeOfDirectory(cacheFolder);
+		}
 		return (currentSize >= maxSize);
 	}
 

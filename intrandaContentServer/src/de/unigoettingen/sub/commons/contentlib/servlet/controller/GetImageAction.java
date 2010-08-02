@@ -514,7 +514,7 @@ public class GetImageAction extends GetAction {
 				hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
 			}
 
-			System.out.println("sessionid " + myId + " md5 version is " + hexString.toString());
+			//System.out.println("sessionid " + myId + " md5 version is " + hexString.toString());
 			myId = hexString + "";
 
 		} catch (NoSuchAlgorithmException nsae) {
