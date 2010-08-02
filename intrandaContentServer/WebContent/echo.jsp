@@ -14,7 +14,7 @@
 	Enumeration<String> errors = request.getAttributeNames();
 	while (errors.hasMoreElements()) {
 		String label = (String) errors.nextElement();
-		String value = (String) request.getAttribute(label);
+		Object value = request.getAttribute(label);
 		if (label.equals("error")) {
 			out.print("<p style=\"color:red;font-weight:bold\">" + value + "</p>");
 		}
@@ -37,7 +37,7 @@
 		Enumeration<String> params = request.getParameterNames();
 		while (params.hasMoreElements()) {
 			String label = (String) params.nextElement();
-			String value = request.getParameter(label);
+			Object value = request.getParameter(label);
 			out.print("<tr class=\"row-b\"><td>" + label + "</td><td>" + value + "</td></tr>");
 		}
 	%>

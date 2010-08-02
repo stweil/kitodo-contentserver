@@ -26,7 +26,6 @@ import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Iterator;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -46,6 +45,10 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.sun.imageio.plugins.jpeg.JPEGImageReader;
+import com.sun.imageio.plugins.jpeg.JPEGImageReaderSpi;
+import com.sun.imageio.plugins.jpeg.JPEGImageWriter;
+import com.sun.imageio.plugins.jpeg.JPEGImageWriterSpi;
 import com.sun.media.jai.codec.ByteArraySeekableStream;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageInterpreterException;
@@ -81,15 +84,16 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 		ImageInputStream iis = null;
 		InputStream inputStream = null;
 
-		Iterator<ImageReader> it = ImageIO.getImageReadersByFormatName("jpeg");
-		if (it.hasNext()) {
-			imagereader = (ImageReader) it.next();
-		} else {
-			// ERROR - no ImageReader was found
-			logger.error("Imagereader for JPEG couldn't be found");
-			throw new ImageInterpreterException(
-					"Imagereader for JPEG format couldn't be found!");
-		}
+//		Iterator<ImageReader> it = ImageIO.getImageReadersByFormatName("jpeg");
+//		if (it.hasNext()) {
+//			imagereader = (ImageReader) it.next();
+		imagereader = new JPEGImageReader(new JPEGImageReaderSpi());
+//		} else {
+//			// ERROR - no ImageReader was found
+//			logger.error("Imagereader for JPEG couldn't be found");
+//			throw new ImageInterpreterException(
+//					"Imagereader for JPEG format couldn't be found!");
+//		}
 
 		// read the stream and store it in a byte array
 		this.readImageStream(inStream);
@@ -243,10 +247,11 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 			ImageOutputStream imageOutStream = ImageIO
 					.createImageOutputStream(outStream);
 
-			Iterator<ImageWriter> writerIter = ImageIO
-					.getImageWritersByFormatName("jpg");
-			ImageWriter writer = writerIter.next(); // get writer from ImageIO
-
+//			Iterator<ImageWriter> writerIter = ImageIO
+//					.getImageWritersByFormatName("jpg");
+//			ImageWriter writer = writerIter.next(); // get writer from ImageIO
+			ImageWriter writer = new JPEGImageWriter(new JPEGImageWriterSpi());
+			
 			// create metadata by creating an XML tree
 			ImageWriteParam writerParam = writer.getDefaultWriteParam();
 			ImageTypeSpecifier its = new ImageTypeSpecifier(noAlphaBi);
