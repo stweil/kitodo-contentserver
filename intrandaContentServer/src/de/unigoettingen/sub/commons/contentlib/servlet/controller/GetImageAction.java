@@ -242,7 +242,7 @@ public class GetImageAction extends GetAction {
 			 */
 			if (cc != null && !cc.isCacheSizeExceeded()) {
 				logger.info("write file to cache and servlet response: " + cc.getFileForId(myUniqueID, targetExtension));
-//				new CacheOutputStream(wi, cc.getFileForId( myUniqueID, targetExtension), output);
+				//				new CacheOutputStream(wi, cc.getFileForId( myUniqueID, targetExtension), output);
 				FileOutputStream fos = new FileOutputStream(cc.getFileForId(myUniqueID, targetExtension));
 				wi.writeToStream(fos, output);
 			} else {
@@ -493,15 +493,14 @@ public class GetImageAction extends GetAction {
 		String myId = "";
 		Map<String, String[]> myIdMap = request.getParameterMap();
 		for (String s : myIdMap.keySet()) {
-			myId += s;
-			String[] v = myIdMap.get(s);
-			for (String val : v) {
-				myId += val;
+			if (!s.equalsIgnoreCase("ignoreCache")) {
+				myId += s;
+				String[] v = myIdMap.get(s);
+				for (String val : v) {
+					myId += val;
+				}
 			}
 		}
-		
-
-		
 
 		try {
 			byte[] defaultBytes = myId.getBytes("UTF-8");
@@ -514,14 +513,14 @@ public class GetImageAction extends GetAction {
 			for (int i = 0; i < messageDigest.length; i++) {
 				hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
 			}
-			
+
 			System.out.println("sessionid " + myId + " md5 version is " + hexString.toString());
 			myId = hexString + "";
 
 		} catch (NoSuchAlgorithmException nsae) {
 
 		} catch (UnsupportedEncodingException e) {
-			
+
 		}
 		return myId;
 
