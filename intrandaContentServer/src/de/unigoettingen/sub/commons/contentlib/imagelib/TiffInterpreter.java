@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -268,7 +269,7 @@ public class TiffInterpreter extends AbstractImageInterpreter implements
 	 * @param outStream
 	 * @throws ParameterNotSupportedException
 	 */
-	public void writeToStream(OutputStream outStream) {
+	public void writeToStream(FileOutputStream fos, OutputStream outStream) {
 		if (this.renderedimage == null) { // no image available
 			return;
 		}
@@ -320,6 +321,14 @@ public class TiffInterpreter extends AbstractImageInterpreter implements
 			ios.flush();
 			iwriter.dispose();
 			ios.close();
+			if (fos != null) {
+				ImageOutputStream imageToFile = ImageIO
+				.createImageOutputStream(fos);
+				iwriter.setOutput(imageToFile);
+				iwriter.write(null, new IIOImage(bi, null, null), wparam);
+				imageToFile.flush();
+				imageToFile.close();
+			}
 		} catch (IOException e) {
 			logger.error("IOException occured", e);
 		}

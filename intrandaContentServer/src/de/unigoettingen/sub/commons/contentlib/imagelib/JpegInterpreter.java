@@ -23,6 +23,7 @@ package de.unigoettingen.sub.commons.contentlib.imagelib;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -234,7 +235,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 	 * @param outStream
 	 *            the {@link OutputStream} to write to
 	 ************************************************************************************/
-	public void writeToStream(OutputStream outStream) {
+	public void writeToStream(FileOutputStream fos, OutputStream outStream) {
 		if (this.renderedimage == null) { // no image available
 			return;
 		}
@@ -290,9 +291,20 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 
 			IIOImage iioImage = new IIOImage(noAlphaBi, null, iomd);
 			writer.write(null, iioImage, writerParam);
-
 			writer.endWriteSequence();
 			imageOutStream.flush();
+
+			if (fos != null) {
+				ImageOutputStream imageToFile = ImageIO
+				.createImageOutputStream(fos);
+				writer.setOutput(imageToFile);
+				writer.prepareWriteSequence(null);
+				writer.write(null, iioImage, writerParam);
+				writer.endWriteSequence();
+				imageToFile.flush();
+				imageToFile.close();
+			}
+			
 			writer.dispose();
 			imageOutStream.close();
 
@@ -300,6 +312,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 			logger.error("IOException occured", e);
 		}
 	}
+	
 
 	/************************************************************************************
 	 * set metadata to image

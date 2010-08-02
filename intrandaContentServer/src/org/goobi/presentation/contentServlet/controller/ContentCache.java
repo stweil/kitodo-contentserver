@@ -88,8 +88,8 @@ public class ContentCache {
 	 *            ID as String (no file name, no file extension)
 	 * @return - true, if file exists
 	 ************************************************************************************/
-	public boolean cacheContains(String inId) {
-		File file = getFileForId(inId);
+	public boolean cacheContains(String inId, String suffix) {
+		File file = getFileForId(inId, suffix);
 		return file.exists();
 	}
 
@@ -100,13 +100,13 @@ public class ContentCache {
 	 * @param inId ID as String (no file name, no file extension)
 	 * @throws CacheException
 	 ************************************************************************************/
-	public void writeToStream(OutputStream out, String inId) throws CacheException {
-		if (!cacheContains(inId))
+	public void writeToStream(OutputStream out, String inId, String suffix) throws CacheException {
+		if (!cacheContains(inId, suffix))
 			throw new CacheException("File already exists in cache.");
 		/* --------------------------------
 		 * File exists and can be read?
 		 * --------------------------------*/
-		File file = getFileForId(inId);
+		File file = getFileForId(inId, suffix);
 		if (!file.exists() || !file.canRead()) {
 			throw new CacheException("File with given ID (" + inId + ") can not be read. (" + file.getAbsolutePath()
 					+ ")");
@@ -138,9 +138,9 @@ public class ContentCache {
 	 * @param inId
 	 * @throws CacheException
 	 ************************************************************************************/
-	public void delete(String inId) throws CacheException {
-		File file = getFileForId(inId);
-		if (cacheContains(inId)) {
+	public void delete(String inId, String suffix) throws CacheException {
+		File file = getFileForId(inId, suffix);
+		if (cacheContains(inId, suffix)) {
 			if (!file.delete()) {
 				throw new CacheException("File " + file.getAbsolutePath() + " can not be deleted.");
 			}
@@ -165,7 +165,7 @@ public class ContentCache {
 	 * @param inId 
 	 * @return File for given ID from cache
 	 ************************************************************************************/
-	public File getFileForId(String inId) {
-		return new File(cacheFolder, inId + ".pdf");
+	public File getFileForId(String inId, String suffix) {
+		return new File(cacheFolder, inId + "." +  suffix);
 	}
 }

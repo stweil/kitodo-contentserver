@@ -106,7 +106,7 @@ public class GetErrorReportAction extends GetAction {
 		 * -------------------------------- write target image to stream
 		 * --------------------------------
 		 */
-		wi.writeToStream(response.getOutputStream());
+		wi.writeToStream(null, response.getOutputStream());
 		inputFileStream.close();
 	}
 

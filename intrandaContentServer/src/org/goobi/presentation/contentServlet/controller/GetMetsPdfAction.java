@@ -52,16 +52,6 @@ import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfWriter;
 
-import de.unigoettingen.sub.commons.simplemets.METSParser;
-import de.unigoettingen.sub.commons.simplemets.SimplePDFMetadataExtractor;
-import de.unigoettingen.sub.commons.simplemets.SimpleStructureMetadataExtractor;
-import de.unigoettingen.sub.commons.simplemets.exceptions.MetsException;
-import de.unigoettingen.sub.commons.util.datasource.Structure;
-import de.unigoettingen.sub.commons.util.datasource.UrlImage;
-import de.unigoettingen.sub.commons.contentlib.servlet.ServletWatermark;
-import de.unigoettingen.sub.commons.contentlib.servlet.Util;
-import de.unigoettingen.sub.commons.contentlib.servlet.controller.Action;
-import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibPdfException;
@@ -70,7 +60,17 @@ import de.unigoettingen.sub.commons.contentlib.imagelib.ImageManipulator;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFManager;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFTitlePage;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFTitlePageLine;
-//TODO: GDZ: Try to merge this with GetPdfAction
+import de.unigoettingen.sub.commons.contentlib.servlet.ServletWatermark;
+import de.unigoettingen.sub.commons.contentlib.servlet.Util;
+import de.unigoettingen.sub.commons.contentlib.servlet.controller.Action;
+import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
+import de.unigoettingen.sub.commons.simplemets.METSParser;
+import de.unigoettingen.sub.commons.simplemets.SimplePDFMetadataExtractor;
+import de.unigoettingen.sub.commons.simplemets.SimpleStructureMetadataExtractor;
+import de.unigoettingen.sub.commons.simplemets.exceptions.MetsException;
+import de.unigoettingen.sub.commons.util.datasource.Structure;
+import de.unigoettingen.sub.commons.util.datasource.UrlImage;
+
 /************************************************************************************
  * pdf action for all kinds of simple pdf handlings first of all validate all
  * request parameters, and than interprete all request parameters for correct
@@ -130,9 +130,9 @@ public class GetMetsPdfAction implements Action {
 			}
 
 			/* if cache should not be ignored and cache contains file, write it back to stream */
-			if (!ignoreCache && cc.cacheContains(myUniqueID)) {
+			if (!ignoreCache && cc.cacheContains(myUniqueID, "pdf")) {
 				logger.debug("get file from cache: " + myUniqueID);
-				cc.writeToStream(response.getOutputStream(), myUniqueID);
+				cc.writeToStream(response.getOutputStream(), myUniqueID, "pdf");
 				return;
 			} else if (ignoreCache == false) {
 				logger.debug("file not found in cache: " + myUniqueID);
@@ -221,7 +221,7 @@ public class GetMetsPdfAction implements Action {
 
 			setPdfManagerDefaults(request, config, pdfmanager);
 
-			//TODO: Create a utility method for stuff like this
+			
 			/* --------------------------------
 			 * set pdf meta data
 			 * --------------------------------*/
@@ -301,14 +301,14 @@ public class GetMetsPdfAction implements Action {
 			 * --------------------------------*/
 			/* remove file from cache, if cache should be used and file present */
 			if (cc != null) {
-				cc.delete(myUniqueID);
+				cc.delete(myUniqueID, "pdf");
 			}
 			/* if cache size is exceeded write it to response stream only */
 			if (cc != null && !cc.isCacheSizeExceeded()) {
 				logger.info("write file to cache and servlet response: "
-						+ cc.getFileForId(myUniqueID));
+						+ cc.getFileForId(myUniqueID, "pdf"));
 				myOutStream = new CacheOutputStream(
-						cc.getFileForId(myUniqueID), response.getOutputStream());
+						cc.getFileForId(myUniqueID, "pdf"), response.getOutputStream());
 			} else if (cc == null) {
 				logger.info("file will not be written to cache, cache is deactivated in configuration");
 			} else if (cc.isCacheSizeExceeded()) {
@@ -364,8 +364,8 @@ public class GetMetsPdfAction implements Action {
 			/* on errors remove incomplete file from cache */
 			myOutStream.flush();
 			myOutStream.close();
-			if (cc != null && cc.cacheContains(myUniqueID)) {
-				cc.delete(myUniqueID);
+			if (cc != null && cc.cacheContains(myUniqueID, "pdf")) {
+				cc.delete(myUniqueID, "pdf");
 			}
 		}
 	}

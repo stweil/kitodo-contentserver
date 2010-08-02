@@ -27,8 +27,7 @@ import javax.servlet.ServletException;
 
 import de.unigoettingen.sub.commons.contentlib.servlet.controller.Action;
 import de.unigoettingen.sub.commons.contentlib.servlet.controller.ContentServer;
-import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
-import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
+import de.unigoettingen.sub.commons.contentlib.servlet.controller.GetImageAction;
 
 /************************************************************************************
  * simple contentserver class for requesting images
@@ -38,7 +37,7 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
  ************************************************************************************/
 public class GoobiContentServer extends ContentServer {
 	private static final long serialVersionUID = 1L;
-	private static ContentCache cc;
+//	private static ContentCache cc;
 
 	/************************************************************************************
 	 * default constructor for initialization
@@ -46,28 +45,13 @@ public class GoobiContentServer extends ContentServer {
 	@Override
 	public void init() throws ServletException {
 		super.init();
-		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
-		try {
-			/* initialize ContentCache only, if set in configuration */
-			if (config.getContentCacheUse()) {
-				cc = new ContentCache(config.getContentCachePath(), config.getContentCacheSize());
-			}
-		} catch (CacheException e) {
-			throw new ServletException("ContentCache for GoobiContentServer can not be initialized", e);
-		}
+		
 		actions = new HashMap<String, Class<? extends Action>>();
 		actions.put("metsimage", GetMetsImageAction.class);
 		actions.put("pdf", GetMetsPdfAction.class);
 		actions.put("multipdf", GetPdfMultiMetsAction.class);
+		actions.put("image", GetImageAction.class);
 	}
 
-	/*************************************************************************************
-	 * Getter for ContentCache
-	 *
-	 * @return the cc
-	 *************************************************************************************/
-	public static ContentCache getContentCache() {
-		return cc;
-	}
 
 }

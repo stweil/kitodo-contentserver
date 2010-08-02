@@ -55,9 +55,12 @@
 	* if repository path is empty, in the servlet request has to be a complete url 
 	* sample: <defaultRepositoryPath value="file:/home/goobi/imageRepository/" /> 
 	*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	<!-- for digiverso -->
+ <defaultRepositoryPathImages
+		value="file:/C:/digiverso/tiff/" /> 
+  <!-- for ucc 
 	<defaultRepositoryPathImages
-		value="file:/C:/digiverso/tiff/PPN62402461X/" />
-  
+		value="file:/" />-->
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * default color for highlighting inside the image as RGB
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -114,6 +117,6 @@
     *
     * sample: <contentCache useCache="false" path="/home/goobi/gcsCache" size="300"/>
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <contentCache useCache="false" path="C:/Goobi/cache" size="30" useShortFileNames="false"/>
+    <contentCache useCache="true" path="C:/digiverso/cache/" size="30" useShortFileNames="false"/>
     		
 </config>

@@ -33,118 +33,103 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import de.unigoettingen.sub.commons.simplemets.METSParser;
-import de.unigoettingen.sub.commons.simplemets.exceptions.MetsException;
+import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
 import de.unigoettingen.sub.commons.contentlib.servlet.controller.Action;
 import de.unigoettingen.sub.commons.contentlib.servlet.controller.GetImageAction;
 import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
-import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
+import de.unigoettingen.sub.commons.simplemets.METSParser;
+import de.unigoettingen.sub.commons.simplemets.exceptions.MetsException;
 
 /************************************************************************************
- * mets image action for all kinds of image handlings for some image file from a
- * mets file with given id and given filegroup, first of all validate all
- * request parameters, and than interprete all request parameters for correct
- * image handling
+ * mets image action for all kinds of image handlings for some image file from a mets file with given id and given filegroup, first of all validate
+ * all request parameters, and than interprete all request parameters for correct image handling
  * 
  * @version 20.03.2009
  * @author Steffen Hankiewicz
  ************************************************************************************/
 public class GetMetsImageAction implements Action {
-	private static final Logger logger = Logger
-			.getLogger(GetMetsImageAction.class);
+	private static final Logger logger = Logger.getLogger(GetMetsImageAction.class);
 
 	/************************************************************************************
-	 * exectute mets handling and requesting image with given id from mets file
-	 * for further image processing
+	 * exectute mets handling and requesting image with given id from mets file for further image processing
 	 * 
 	 * @param request
 	 *            {@link HttpServletRequest} of ServletRequest
 	 * @param response
-	 *            {@link HttpServletResponse} for writing to response output
-	 *            stream
+	 *            {@link HttpServletResponse} for writing to response output stream
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 * @throws MetsException
 	 * @throws ContentLibException
 	 * @throws ServletException
 	 ************************************************************************************/
-	public void run(ServletContext servletContext, HttpServletRequest request,
-			HttpServletResponse response) throws MetsException,
-			URISyntaxException, IOException, ServletException,
-			ContentLibException {
+	public void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws MetsException,
+			URISyntaxException, IOException, ServletException, ContentLibException {
 		/* first of all validation */
 		validateParameters(request);
 
-		/* --------------------------------
-		 * get central configuration and retrieve source image from url
-		 * --------------------------------*/
-		ContentServerConfiguration config = ContentServerConfiguration
-				.getInstance();
+		/*
+		 * -------------------------------- get central configuration and retrieve source image from url --------------------------------
+		 */
+		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
 
-		/* --------------------------------
-		 * parse mets file and get url from requested image div id
-		 * --------------------------------*/
+		/*
+		 * -------------------------------- parse mets file and get url from requested image div id --------------------------------
+		 */
 		String metsFile = request.getParameter("metsFile");
 		String pageid = request.getParameter("divID");
 		URL fullMetsPath = new URL(config.getRepositoryPathMets() + metsFile);
 		logger.debug("mets file to parse: " + fullMetsPath);
 
-		/* --------------------------------
-		 * open METS file and check if filegroup is defined in request parameter, 
-		 * else take it from config file
-		 * --------------------------------*/
+		/*
+		 * -------------------------------- open METS file and check if filegroup is defined in request parameter, else take it from config file
+		 * --------------------------------
+		 */
 		METSParser metsparser = new METSParser(fullMetsPath, true);
 		String strMetsFileGroup = request.getParameter("metsFileGroup");
 		if (strMetsFileGroup == null) {
-			metsparser.setFilegroupsuseattributevalue(config
-					.getDefaultMetsFileGroup());
+			metsparser.setFilegroupsuseattributevalue(config.getDefaultMetsFileGroup());
 		} else {
 			metsparser.setFilegroupsuseattributevalue(strMetsFileGroup);
 		}
 
-		/* --------------------------------
-		 * get url for image
-		 * --------------------------------*/
+		/*
+		 * -------------------------------- get url for image --------------------------------
+		 */
 		URL fileUrl = metsparser.getURLForSingleDiv(pageid);
 		logger.debug("requested image url " + fileUrl.toString());
 
-		/* --------------------------------
-		 * forward request to image handling action
-		 * --------------------------------*/
+		/*
+		 * -------------------------------- forward request to image handling action --------------------------------
+		 */
 		request.setAttribute("sourcepath", fileUrl.toString());
 		GetImageAction imageAction = new GetImageAction();
 		imageAction.run(servletContext, request, response);
 	}
 
 	/************************************************************************************
-	 * validate all parameters of request for mets handling, throws
-	 * IllegalArgumentException if one request parameter is not valid
+	 * validate all parameters of request for mets handling, throws IllegalArgumentException if one request parameter is not valid
 	 * 
 	 * @param request
 	 *            {@link HttpServletRequest} of ServletRequest
 	 * @throws IllegalArgumentException
 	 ************************************************************************************/
-	public void validateParameters(HttpServletRequest request)
-			throws IllegalArgumentException {
-		ContentServerConfiguration config = ContentServerConfiguration
-				.getInstance();
+	public void validateParameters(HttpServletRequest request) throws IllegalArgumentException {
+		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
 
-		/* validate repository  */
+		/* validate repository */
 		if (config.getRepositoryPathMets() == null) {
 			throw new IllegalArgumentException("no repository url defined");
 		}
 
 		/* divID has to be not blank */
 		if (StringUtils.isBlank(request.getParameter("divID"))) {
-			throw new IllegalArgumentException(
-					"parameter divID can not be null or empty");
+			throw new IllegalArgumentException("parameter divID can not be null or empty");
 		}
 
 		/* metsFile has to be not blank */
 		if (StringUtils.isBlank(request.getParameter("metsFile"))) {
-			throw new IllegalArgumentException(
-					"parameter metsFile can not be null or empty");
+			throw new IllegalArgumentException("parameter metsFile can not be null or empty");
 		}
 	}
-
 }

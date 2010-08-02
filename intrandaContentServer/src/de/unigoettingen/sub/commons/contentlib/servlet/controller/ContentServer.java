@@ -31,6 +31,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.goobi.presentation.contentServlet.controller.ContentCache;
+
+import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
+import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 
 /************************************************************************************
  * simple contentserver class for requesting images
@@ -41,6 +45,7 @@ import org.apache.log4j.Logger;
 public class ContentServer extends HttpServlet {
 	private static final Logger logger = Logger.getLogger(ContentServer.class);
 	protected Map<String, Class<? extends Action>> actions = null;
+	private static ContentCache cc;
 	
 	private static final long serialVersionUID = 1L;
 
@@ -50,6 +55,15 @@ public class ContentServer extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		super.init();
+		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
+		try {
+			/* initialize ContentCache only, if set in configuration */
+			if (config.getContentCacheUse()) {
+				cc = new ContentCache(config.getContentCachePath(), config.getContentCacheSize());
+			}
+		} catch (CacheException e) {
+			throw new ServletException("ContentCache for GoobiContentServer can not be initialized", e);
+		}
 		actions = new HashMap<String, Class<? extends Action>>();
 		actions.put("image", GetImageAction.class);
 		actions.put("pdf", GetPdfAction.class);
@@ -137,4 +151,14 @@ public class ContentServer extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		doGet(req, resp);
 	}
+	
+	/*************************************************************************************
+	 * Getter for ContentCache
+	 *
+	 * @return the cc
+	 *************************************************************************************/
+	public static ContentCache getContentCache() {
+		return cc;
+	}
+
 }

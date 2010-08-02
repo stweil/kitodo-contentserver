@@ -23,6 +23,7 @@ package de.unigoettingen.sub.commons.contentlib.imagelib;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,7 +34,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
@@ -240,7 +240,7 @@ public class JpegTwoThousandInterpreter extends AbstractImageInterpreter
 	 * @param outStream
 	 *            the {@link OutputStream} to write to
 	 ************************************************************************************/
-	public void writeToStream(OutputStream outStream) {
+	public void writeToStream(FileOutputStream fos, OutputStream outStream) {
 
 		if (this.renderedimage == null) { // no image available
 			return;
@@ -284,6 +284,15 @@ public class JpegTwoThousandInterpreter extends AbstractImageInterpreter
 
 			// writer.endWriteSequence();
 			imageOutStream.flush();
+			if (fos != null) {
+				ImageOutputStream imageToFile = ImageIO
+				.createImageOutputStream(fos);
+				writer.setOutput(imageToFile);
+				writer.write(null, iioImage, writerParam);
+				imageToFile.flush();
+				imageToFile.close();
+			}
+			
 			writer.dispose();
 			imageOutStream.close();
 

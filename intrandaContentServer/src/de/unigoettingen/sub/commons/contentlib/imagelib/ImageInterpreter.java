@@ -22,6 +22,7 @@
 package de.unigoettingen.sub.commons.contentlib.imagelib;
 
 import java.awt.image.RenderedImage;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.ParameterNotSupportedException;
@@ -152,7 +153,10 @@ public interface ImageInterpreter {
 	 * @param outStream
 	 *            the out stream
 	 */
-	public void writeToStream(OutputStream outStream);
+	public void writeToStream(FileOutputStream  fos, OutputStream outStream);
+	
+	
+	
 
 	/**
 	 * Gets the writer compression type.

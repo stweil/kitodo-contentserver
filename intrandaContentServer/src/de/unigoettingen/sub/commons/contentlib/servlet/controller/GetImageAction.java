@@ -24,20 +24,29 @@ package de.unigoettingen.sub.commons.contentlib.servlet.controller;
 import java.awt.Color;
 import java.awt.image.RenderedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.log4j.Logger;
+import org.goobi.presentation.contentServlet.controller.ContentCache;
+import org.goobi.presentation.contentServlet.controller.GoobiContentServer;
 
+import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ContentLibUtil;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageFileFormat;
@@ -47,8 +56,7 @@ import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
 import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 
 /************************************************************************************
- * Image action for all kinds of image handlings first of all validate all
- * request parameters, and than interprete all request parameters for correct
+ * Image action for all kinds of image handlings first of all validate all request parameters, and than interprete all request parameters for correct
  * image handling
  * 
  * @version 02.01.2009 
@@ -58,173 +66,191 @@ public class GetImageAction extends GetAction {
 	private static final Logger logger = Logger.getLogger(GetImageAction.class);
 
 	/************************************************************************************
-	 * exectute all image actions (rotation, scaling etc.) and send image back
-	 * to output stream of the servlet, after setting correct mime type
+	 * exectute all image actions (rotation, scaling etc.) and send image back to output stream of the servlet, after setting correct mime type
 	 * 
 	 * @param request
 	 *            {@link HttpServletRequest} of ServletRequest
 	 * @param response
-	 *            {@link HttpServletResponse} for writing to response output
-	 *            stream
+	 *            {@link HttpServletResponse} for writing to response output stream
 	 * @throws IOException
 	 * @throws ServletException
 	 * @throws ContentLibException
 	 * @throws URISyntaxException
 	 ************************************************************************************/
-	public void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentLibException,
-			URISyntaxException {
+	public void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException,
+			ContentLibException, URISyntaxException {
 		super.run(servletContext, request, response);
 
 		/*
-		 * -------------------------------- get central configuration
-		 * --------------------------------
+		 * -------------------------------- get central configuration --------------------------------
 		 */
 		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
 		URI sourceImageUrl = new URI(config.getRepositoryPathImages() + request.getParameter("sourcepath"));
-
-		/*
-		 * -------------------------------- if there is an internal request from
-		 * goobiContentServer, you have to overwrite the sourcepath with given
-		 * attribute for image url --------------------------------
-		 */
-		if (request.getAttribute("sourcepath") != null) {
-			sourceImageUrl = new URI((String) request.getAttribute("sourcepath"));
-		}
-		logger.debug("source image:" + sourceImageUrl);
-
-		/*
-		 * -------------------------------- retrieve source image from url
-		 * --------------------------------
-		 */
-		ImageManager sourcemanager = new ImageManager(sourceImageUrl.toURL());
-		logger.debug("imageManager initialized");
-
-		/*
-		 * -------------------------------- set the defaults
-		 * --------------------------------
-		 */
-		int angle = 0;
-		int scaleX = 100;
-		int scaleY = 100;
-		int scaleType = ImageManager.SCALE_BY_PERCENT;
-		LinkedList<String> highlightCoordinateList = null;
-		Color highlightColor = null;
-		Watermark myWatermark = null;
-		logger.debug("Variables set");
-
-		/*
-		 * -------------------------------- rotate
-		 * --------------------------------
-		 */
-		if (request.getParameterMap().containsKey("rotate")) {
-			angle = Integer.parseInt(request.getParameter("rotate"));
-			logger.debug("rotate image:" + angle);
-		}
-
-		/*
-		 * -------------------------------- scale: scale the image to some
-		 * percent value --------------------------------
-		 */
-		if (request.getParameterMap().containsKey("scale")) {
-			scaleX = Integer.parseInt(request.getParameter("scale"));
-			scaleY = scaleX;
-			scaleType = ImageManager.SCALE_BY_PERCENT;
-			logger.debug("scale image to percent:" + scaleX);
-		}
-
-		/*
-		 * -------------------------------- width: scale image to fixed width
-		 * --------------------------------
-		 */
-		if (request.getParameterMap().containsKey("width")) {
-			scaleX = Integer.parseInt(request.getParameter("width"));
-			scaleY = 0;
-			scaleType = ImageManager.SCALE_BY_WIDTH;
-			logger.debug("scale image to width:" + scaleX);
-		}
-
-		/*
-		 * -------------------------------- height: scale image to fixed height
-		 * --------------------------------
-		 */
-		if (request.getParameterMap().containsKey("height")) {
-			scaleY = Integer.parseInt(request.getParameter("height"));
-			scaleX = 0;
-			scaleType = ImageManager.SCALE_BY_HEIGHT;
-			logger.debug("scale image to height:" + scaleY);
-		}
-
-		/*
-		 * -------------------------------- highlight
-		 * --------------------------------
-		 */
-		if (request.getParameterMap().containsKey("highlight")) {
-			highlightCoordinateList = new LinkedList<String>();
-			String highlight = request.getParameter("highlight");
-			StrTokenizer areas = new StrTokenizer(highlight, "$");
-			for (String area : areas.getTokenArray()) {
-				StrTokenizer coordinates = new StrTokenizer(area, ",");
-				highlightCoordinateList.add(coordinates.getContent());
-			}
-			highlightColor = config.getDefaultHighlightColor();
-		}
-
-		/*
-		 * -------------------------------- insert watermark, if it should be
-		 * used --------------------------------
-		 */
-		if (config.getWatermarkUse()) {
-			File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
-			myWatermark = new Watermark(watermarkfile);
-		}
-
-		/*
-		 * -------------------------------- prepare target
-		 * --------------------------------
-		 */
-		RenderedImage targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor, myWatermark, true,
-				ImageManager.BOTTOM);
+		ServletOutputStream output = response.getOutputStream();
+		ContentCache cc = GoobiContentServer.getContentCache();
+		String myUniqueID = getContentCacheIdForRequest(request, config);
 		String targetExtension = request.getParameter("format");
-		ImageFileFormat targetFormat = ImageFileFormat.getImageFileFormatFromFileExtension(targetExtension);
-		ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read
-																		// file
+		try {
+			boolean ignoreCache = false;
+			/* check if cache should be ignored */
+			if (request.getParameter("ignoreCache") != null) {
+				String ignore = request.getParameter("ignoreCache").trim();
+				ignoreCache = Boolean.parseBoolean(ignore);
+			}
+			if (cc == null || !config.getContentCacheUse()) {
+				ignoreCache = true;
+				cc = null;
+				logger.debug("cache deactivated via configuration");
+			}
+			if (!ignoreCache && cc.cacheContains(myUniqueID, targetExtension)) {
+				logger.debug("get file from cache: " + myUniqueID);
+				cc.writeToStream(output, myUniqueID, targetExtension);
+				return;
+			} else if (ignoreCache == false) {
+				logger.debug("file not found in cache: " + myUniqueID);
+			}
 
-		/*
-		 * -------------------------------- set file name and attachment header
-		 * from parameter or from configuration --------------------------------
-		 */
-		StringBuilder targetFileName = new StringBuilder();
-		if (config.getSendImageAsAttachment()) {
-			targetFileName.append("attachment; ");
+			/*
+			 * -------------------------------- if there is an internal request from goobiContentServer, you have to overwrite the sourcepath with
+			 * given attribute for image url --------------------------------
+			 */
+			if (request.getAttribute("sourcepath") != null) {
+				sourceImageUrl = new URI((String) request.getAttribute("sourcepath"));
+			}
+			logger.debug("source image:" + sourceImageUrl);
+
+			/*
+			 * -------------------------------- retrieve source image from url --------------------------------
+			 */
+			ImageManager sourcemanager = new ImageManager(sourceImageUrl.toURL());
+			logger.debug("imageManager initialized");
+
+			/*
+			 * -------------------------------- set the defaults --------------------------------
+			 */
+			int angle = 0;
+			int scaleX = 100;
+			int scaleY = 100;
+			int scaleType = ImageManager.SCALE_BY_PERCENT;
+			LinkedList<String> highlightCoordinateList = null;
+			Color highlightColor = null;
+			Watermark myWatermark = null;
+			logger.debug("Variables set");
+
+			/*
+			 * -------------------------------- rotate --------------------------------
+			 */
+			if (request.getParameterMap().containsKey("rotate")) {
+				angle = Integer.parseInt(request.getParameter("rotate"));
+				logger.debug("rotate image:" + angle);
+			}
+
+			/*
+			 * -------------------------------- scale: scale the image to some percent value --------------------------------
+			 */
+			if (request.getParameterMap().containsKey("scale")) {
+				scaleX = Integer.parseInt(request.getParameter("scale"));
+				scaleY = scaleX;
+				scaleType = ImageManager.SCALE_BY_PERCENT;
+				logger.debug("scale image to percent:" + scaleX);
+			}
+
+			/*
+			 * -------------------------------- width: scale image to fixed width --------------------------------
+			 */
+			if (request.getParameterMap().containsKey("width")) {
+				scaleX = Integer.parseInt(request.getParameter("width"));
+				scaleY = 0;
+				scaleType = ImageManager.SCALE_BY_WIDTH;
+				logger.debug("scale image to width:" + scaleX);
+			}
+
+			/*
+			 * -------------------------------- height: scale image to fixed height --------------------------------
+			 */
+			if (request.getParameterMap().containsKey("height")) {
+				scaleY = Integer.parseInt(request.getParameter("height"));
+				scaleX = 0;
+				scaleType = ImageManager.SCALE_BY_HEIGHT;
+				logger.debug("scale image to height:" + scaleY);
+			}
+
+			/*
+			 * -------------------------------- highlight --------------------------------
+			 */
+			if (request.getParameterMap().containsKey("highlight")) {
+				highlightCoordinateList = new LinkedList<String>();
+				String highlight = request.getParameter("highlight");
+				StrTokenizer areas = new StrTokenizer(highlight, "$");
+				for (String area : areas.getTokenArray()) {
+					StrTokenizer coordinates = new StrTokenizer(area, ",");
+					highlightCoordinateList.add(coordinates.getContent());
+				}
+				highlightColor = config.getDefaultHighlightColor();
+			}
+
+			/*
+			 * -------------------------------- insert watermark, if it should be used --------------------------------
+			 */
+			if (config.getWatermarkUse()) {
+				File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
+				myWatermark = new Watermark(watermarkfile);
+			}
+
+			/*
+			 * -------------------------------- prepare target --------------------------------
+			 */
+			RenderedImage targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor,
+					myWatermark, true, ImageManager.BOTTOM);
+
+			ImageFileFormat targetFormat = ImageFileFormat.getImageFileFormatFromFileExtension(targetExtension);
+			ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read
+																			// file
+
+			/*
+			 * -------------------------------- set file name and attachment header from parameter or from configuration
+			 * --------------------------------
+			 */
+			StringBuilder targetFileName = new StringBuilder();
+			if (config.getSendImageAsAttachment()) {
+				targetFileName.append("attachment; ");
+			}
+			targetFileName.append("filename=");
+
+			if (request.getParameter("targetFileName") != null) {
+				targetFileName.append(request.getParameter("targetFileName"));
+			} else {
+				String filename = ContentLibUtil.getCustomizedFileName(config.getDefaultFileNameImages(), "." + targetFormat.getFileExtension());
+				targetFileName.append(filename);
+			}
+			response.setHeader("Content-Disposition", targetFileName.toString());
+			response.setContentType(targetFormat.getMimeType());
+
+			/*
+			 * -------------------------------- resolution --------------------------------
+			 */
+			if (request.getParameter("resolution") != null) {
+				wi.setXResolution(Float.parseFloat(request.getParameter("resolution")));
+				wi.setYResolution(Float.parseFloat(request.getParameter("resolution")));
+			} else {
+				wi.setXResolution(config.getDefaultResolution());
+				wi.setYResolution(config.getDefaultResolution());
+			}
+
+			/*
+			 * -------------------------------- write target image to stream --------------------------------
+			 */
+			if (cc != null && !cc.isCacheSizeExceeded()) {
+				logger.info("write file to cache and servlet response: " + cc.getFileForId(myUniqueID, targetExtension));
+//				new CacheOutputStream(wi, cc.getFileForId( myUniqueID, targetExtension), output);
+				FileOutputStream fos = new FileOutputStream(cc.getFileForId(myUniqueID, targetExtension));
+				wi.writeToStream(fos, output);
+			} else {
+				wi.writeToStream(null, output);
+			}
+		} catch (CacheException e) {
+			logger.warn("CacheException", e);
 		}
-		targetFileName.append("filename=");
-
-		if (request.getParameter("targetFileName") != null) {
-			targetFileName.append(request.getParameter("targetFileName"));
-		} else {
-			String filename = ContentLibUtil.getCustomizedFileName(config.getDefaultFileNameImages(), "." + targetFormat.getFileExtension());
-			targetFileName.append(filename);
-		}
-		response.setHeader("Content-Disposition", targetFileName.toString());
-		response.setContentType(targetFormat.getMimeType());
-
-		/*
-		 * -------------------------------- resolution
-		 * --------------------------------
-		 */
-		if (request.getParameter("resolution") != null) {
-			wi.setXResolution(Float.parseFloat(request.getParameter("resolution")));
-			wi.setYResolution(Float.parseFloat(request.getParameter("resolution")));
-		} else {
-			wi.setXResolution(config.getDefaultResolution());
-			wi.setYResolution(config.getDefaultResolution());
-		}
-
-		/*
-		 * -------------------------------- write target image to stream
-		 * --------------------------------
-		 */
-		wi.writeToStream(response.getOutputStream());
 
 	}
 
@@ -261,10 +287,10 @@ public class GetImageAction extends GetAction {
 	// File(sourceImageUrl));
 	//
 	// try {
-	//			
+	//
 	// ImageManager sourcemanager = new ImageManager(sourceImageUrl.toURL());
 	// ImageInterpreter ii = sourcemanager.getMyInterpreter();
-	//						
+	//
 	// /* --------------------------------
 	// * read image
 	// * --------------------------------*/
@@ -292,14 +318,14 @@ public class GetImageAction extends GetAction {
 	// logger.debug("scale image:" + scale);
 	// ri = im.scaleInterpolationBilinear(ri, scale, scale);
 	// }
-	//			
+	//
 	// /* --------------------------------
 	// * scalewidth
 	// * --------------------------------*/
 	// if (request.getParameterMap().containsKey("scalewidth")) {
 	// float scalewidth = Float.parseFloat(request.getParameter("scalewidth"));
 	// logger.debug("scale image width:" + scalewidth);
-	//				
+	//
 	// }
 	//
 	// /* --------------------------------
@@ -336,7 +362,7 @@ public class GetImageAction extends GetAction {
 	// // merge rendered image of watermark with image
 	// ri = im.mergeImages(ri, wmRi, ImageManipulator.VERTICALLY);
 	// }
-	//			
+	//
 	// /* --------------------------------
 	// * set file name and attachment header from parameter or from
 	// configuration
@@ -381,8 +407,7 @@ public class GetImageAction extends GetAction {
 	// }
 
 	/************************************************************************************
-	 * validate all parameters of request for image handling, throws
-	 * IllegalArgumentException if one request parameter is not valid
+	 * validate all parameters of request for image handling, throws IllegalArgumentException if one request parameter is not valid
 	 * 
 	 * @param request
 	 *            {@link HttpServletRequest} of ServletRequest
@@ -456,4 +481,49 @@ public class GetImageAction extends GetAction {
 
 	} // end method
 
+	/*************************************************************************************
+	 * generate an ID for a pdf file, to cache it under an unique name
+	 * 
+	 * @param request
+	 *            the current {@link HttpServletRequest}
+	 * @param inConfig
+	 *            current internal {@link ContentServerConfiguration} objekt
+	 ************************************************************************************/
+	private String getContentCacheIdForRequest(HttpServletRequest request, ContentServerConfiguration inConfig) {
+		String myId = "";
+		Map<String, String[]> myIdMap = request.getParameterMap();
+		for (String s : myIdMap.keySet()) {
+			myId += s;
+			String[] v = myIdMap.get(s);
+			for (String val : v) {
+				myId += val;
+			}
+		}
+		
+
+		
+
+		try {
+			byte[] defaultBytes = myId.getBytes("UTF-8");
+			MessageDigest algorithm = MessageDigest.getInstance("MD5");
+			algorithm.reset();
+			algorithm.update(defaultBytes);
+			byte messageDigest[] = algorithm.digest();
+
+			StringBuffer hexString = new StringBuffer();
+			for (int i = 0; i < messageDigest.length; i++) {
+				hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
+			}
+			
+			System.out.println("sessionid " + myId + " md5 version is " + hexString.toString());
+			myId = hexString + "";
+
+		} catch (NoSuchAlgorithmException nsae) {
+
+		} catch (UnsupportedEncodingException e) {
+			
+		}
+		return myId;
+
+	}
 }
