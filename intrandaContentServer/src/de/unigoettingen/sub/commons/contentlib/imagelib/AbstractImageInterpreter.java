@@ -159,6 +159,7 @@ public class AbstractImageInterpreter {
 	 * overloaded by the specific ImageInterpreter class
 	 */
 	public void createByteStreamFromRenderedImage() {
+		// TODO FIXME overwrite this in stupid ugly JpegInterpreter #steffen  
 	}
 
 	/**
