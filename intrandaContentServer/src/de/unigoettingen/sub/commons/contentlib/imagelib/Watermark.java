@@ -55,7 +55,7 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
  ******************************************************************************/
 public class Watermark {
 	protected static final Logger logger = Logger.getLogger(Watermark.class);
-
+	private String replacedWatermarkText = null;
 	protected BufferedImage watermarkImage; // BUfferedImage to draw components
 	// into
 	protected int width = 0;
@@ -94,10 +94,17 @@ public class Watermark {
 		watermarkImage = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_RGB);
 
 	}
-	
-	public Watermark(InputStream is) throws WatermarkException  {
+
+	public Watermark(InputStream is) throws WatermarkException {
 		this.readConfiguration(is);
 
+		watermarkImage = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_RGB);
+
+	}
+
+	public Watermark(File watermarkfile, String parameter) throws WatermarkException {
+		replacedWatermarkText = parameter;
+		this.readConfiguration(watermarkfile);
 		watermarkImage = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_RGB);
 
 	}
@@ -184,8 +191,7 @@ public class Watermark {
 	}
 
 	/***************************************************************************
-	 * returns the rendered result of the {@link Watermark} as a
-	 * {@link RenderedImage}
+	 * returns the rendered result of the {@link Watermark} as a {@link RenderedImage}
 	 * 
 	 * @return the Watermark as RenderedImage
 	 **************************************************************************/
@@ -210,7 +216,7 @@ public class Watermark {
 		ti.setYResolution(72f);
 		ti.setColordepth(8);
 		ti.setSamplesperpixel(3);
-		ti.writeToStream(null,outputFileStream);
+		ti.writeToStream(null, outputFileStream);
 	}
 
 	/***************************************************************************
@@ -227,14 +233,13 @@ public class Watermark {
 		try {
 			InputStream is = new FileInputStream(inFile);
 			this.readConfiguration(is);
-			
+
 		} catch (IOException ioe) {
 			logger.error("Can't read XML configuration for Watermark:" + inFile.getAbsolutePath() + " due to " + ioe.getMessage());
 			throw new WatermarkException("Can't read XML configuration for Watermark:" + inFile.getAbsolutePath(), ioe);
 		}
 	}
-	
-	
+
 	public void readConfiguration(InputStream is) throws WatermarkException {
 
 		Document xmldoc = null;
@@ -243,7 +248,6 @@ public class Watermark {
 			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 			docBuilderFactory.setValidating(false);
 			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-
 
 			xmldoc = docBuilder.parse(is);
 
@@ -307,6 +311,9 @@ public class Watermark {
 					watermarkImage.setParent_watermark(this);
 				} else if ((singlenode.getNodeType() == Node.ELEMENT_NODE) && (singlenode.getNodeName().startsWith("text"))) {
 					WatermarkText watermarkText = new WatermarkText(singlenode);
+					if (replacedWatermarkText != null) {
+						watermarkText.setContent(replacedWatermarkText);
+					}
 					allWatermarkComponents.add(watermarkText);
 					watermarkText.setParent_watermark(this);
 				} else if ((singlenode.getNodeType() == Node.ELEMENT_NODE) && (singlenode.getNodeName().startsWith("box"))) {
@@ -379,7 +386,5 @@ public class Watermark {
 	protected BufferedImage getWatermarkImage() {
 		return watermarkImage;
 	}
-
-
 
 }

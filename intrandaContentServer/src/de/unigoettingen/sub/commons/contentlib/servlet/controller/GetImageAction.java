@@ -192,9 +192,15 @@ public class GetImageAction extends GetAction {
 			/*
 			 * -------------------------------- insert watermark, if it should be used --------------------------------
 			 */
-			if (config.getWatermarkUse()) {
-				File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
-				myWatermark = new Watermark(watermarkfile);
+			if (!request.getParameterMap().containsKey("ignoreWatermark")) {
+				if (config.getWatermarkUse()) {
+					File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
+					if (request.getParameterMap().containsKey("watermarkText")) {
+						myWatermark = new Watermark(watermarkfile, request.getParameter("watermarkText"));
+					} else {
+						myWatermark = new Watermark(watermarkfile);
+					}
+				}
 			}
 
 			/*
@@ -242,7 +248,7 @@ public class GetImageAction extends GetAction {
 			 */
 			if (cc != null && !cc.isCacheSizeExceeded()) {
 				logger.info("write file to cache and servlet response: " + cc.getFileForId(myUniqueID, targetExtension));
-				//				new CacheOutputStream(wi, cc.getFileForId( myUniqueID, targetExtension), output);
+				// new CacheOutputStream(wi, cc.getFileForId( myUniqueID, targetExtension), output);
 				FileOutputStream fos = new FileOutputStream(cc.getFileForId(myUniqueID, targetExtension));
 				wi.writeToStream(fos, output);
 			} else {
@@ -514,7 +520,7 @@ public class GetImageAction extends GetAction {
 				hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
 			}
 
-			//System.out.println("sessionid " + myId + " md5 version is " + hexString.toString());
+			// System.out.println("sessionid " + myId + " md5 version is " + hexString.toString());
 			myId = hexString + "";
 
 		} catch (NoSuchAlgorithmException nsae) {

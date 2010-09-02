@@ -55,12 +55,12 @@
 	* if repository path is empty, in the servlet request has to be a complete url 
 	* sample: <defaultRepositoryPath value="file:/home/goobi/imageRepository/" /> 
 	*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-	<!-- for digiverso
+	<!-- for digiverso-->
  <defaultRepositoryPathImages
-		value="file:/C:/digiverso/tiff/" />  -->
-  <!-- for ucc -->
+		value="file:/C:/digiverso/tiff/" />  
+  <!-- for ucc 
 	<defaultRepositoryPathImages
-		value="file:/" />
+		value="file:/" />-->
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * default color for highlighting inside the image as RGB
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -71,7 +71,7 @@
     * configuration if watermark should be used and url for watermark content configuration file
     * sample: <watermark use="true" configFile="file:/home/goobi/config/watermarkconfig.xml" />
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-	<watermark use="false" configFile="file:/D:/Eclipse%20Run/WorkspaceGoobi/ContentServer/watermarkconfig.xml" />
+	<watermark use="true" configFile="file:/C:/digiverso/watermarkconfig.xml" />
   
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * configuration for the error watermark if message should not be shown on jsp echo page 
@@ -117,6 +117,6 @@
     *
     * sample: <contentCache useCache="false" path="/home/goobi/gcsCache" size="300"/>
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <contentCache useCache="true" path="C:/digiverso/cache/" size="30" useShortFileNames="false"/>
+    <contentCache useCache="false" path="C:/digiverso/cache/" size="30" useShortFileNames="false"/>
     		
 </config>
