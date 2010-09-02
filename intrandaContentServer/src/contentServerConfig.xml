@@ -40,7 +40,7 @@
 	*	- pagesize						   default page size for pdf generation; possible values are 'A4', 'original' and 'A4Box' 
     * sample: <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="true" metsFileGroup="DEFAULT" writeAsPdfA="true" pagesize="A4"/> 
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="true" metsFileGroup="LOCAL" writeAsPdfA="true" pagesize="A4"/>
+    <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="false" metsFileGroup="LOCAL" writeAsPdfA="true" pagesize="A4"/>
     
     <!--########################################################## 
     *#############################################################
@@ -55,12 +55,12 @@
 	* if repository path is empty, in the servlet request has to be a complete url 
 	* sample: <defaultRepositoryPath value="file:/home/goobi/imageRepository/" /> 
 	*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-	<!-- for digiverso -->
+	<!-- for digiverso
  <defaultRepositoryPathImages
-		value="file:/C:/digiverso/tiff/" /> 
-  <!-- for ucc 
+		value="file:/C:/digiverso/tiff/" />  -->
+  <!-- for ucc -->
 	<defaultRepositoryPathImages
-		value="file:/" />-->
+		value="file:/" />
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * default color for highlighting inside the image as RGB
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->

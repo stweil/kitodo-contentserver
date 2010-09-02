@@ -210,7 +210,7 @@ public class Watermark {
 		ti.setYResolution(72f);
 		ti.setColordepth(8);
 		ti.setSamplesperpixel(3);
-		ti.writeToStream(outputFileStream);
+		ti.writeToStream(null,outputFileStream);
 	}
 
 	/***************************************************************************

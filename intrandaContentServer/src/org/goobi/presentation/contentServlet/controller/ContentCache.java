@@ -84,6 +84,7 @@ public class ContentCache {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void cleanCache(){
 		long limit = (long) ((maxSizeInMB * 1024 * 1024) * 0.75);
 		File[] files = cacheFolder.listFiles();

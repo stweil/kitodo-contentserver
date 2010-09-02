@@ -22,6 +22,7 @@
 package de.unigoettingen.sub.commons.contentlib.imagelib;
 
 import java.awt.image.RenderedImage;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -159,7 +160,6 @@ public class AbstractImageInterpreter {
 	 * overloaded by the specific ImageInterpreter class
 	 */
 	public void createByteStreamFromRenderedImage() {
-		// TODO FIXME overwrite this in stupid ugly JpegInterpreter #steffen  
 	}
 
 	/**
@@ -170,8 +170,7 @@ public class AbstractImageInterpreter {
 	 * @param outStream
 	 */
 
-	public void writeToStream(OutputStream outStream) {
-
+	public void writeToStream(FileOutputStream fos, OutputStream outStream) {
 		if (rawbytes == null) {
 			// create stream
 			createByteStreamFromRenderedImage();

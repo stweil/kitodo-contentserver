@@ -435,7 +435,7 @@ public class PDFManager {
 								ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
 								jpint.setXResolution(myInterpreter.getXResolution());
 								jpint.setYResolution(myInterpreter.getYResolution());
-								jpint.writeToStream(bytesoutputstream);
+								jpint.writeToStream(null, bytesoutputstream);
 
 								byte[] returnbyteArray = bytesoutputstream
 										.toByteArray();
@@ -466,7 +466,7 @@ public class PDFManager {
 								e.printStackTrace();
 							}
 							
-							jpint.writeToStream(bytesoutputstream);
+							jpint.writeToStream(null,bytesoutputstream);
 
 							byte[] returnbyteArray = bytesoutputstream
 									.toByteArray();
@@ -499,7 +499,7 @@ public class PDFManager {
 								logger.warn("Can't create TIFF G4 compressed image for embedding into PDF", e);
 							}
 							
-							tiffint.writeToStream(bytesoutputstream);
+							tiffint.writeToStream(null,bytesoutputstream);
 
 							byte[] returnbyteArray = bytesoutputstream
 									.toByteArray();
@@ -524,7 +524,7 @@ public class PDFManager {
 								ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
 								jpint.setXResolution(myInterpreter.getXResolution());
 								jpint.setYResolution(myInterpreter.getYResolution());
-								jpint.writeToStream(bytesoutputstream);
+								jpint.writeToStream(null,bytesoutputstream);
 
 								byte[] returnbyteArray = bytesoutputstream
 										.toByteArray();
@@ -1471,14 +1471,14 @@ public class PDFManager {
 		this.pdftitlepage = pdftitlepage;
 	}
 
-	/**
-	 * Checks if is always use rendered image.
-	 * 
-	 * @return the alwaysUseRenderedImage
-	 */
-	private boolean isAlwaysUseRenderedImage() {
-		return alwaysUseRenderedImage;
-	}
+//	/**
+//	 * Checks if is always use rendered image.
+//	 * 
+//	 * @return the alwaysUseRenderedImage
+//	 */
+//	private boolean isAlwaysUseRenderedImage() {
+//		return alwaysUseRenderedImage;
+//	}
 
 	/**
 	 * Checks if is always compress to jpeg.

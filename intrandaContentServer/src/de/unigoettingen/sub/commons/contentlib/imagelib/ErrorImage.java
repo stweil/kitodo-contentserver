@@ -86,7 +86,7 @@ public class ErrorImage {
 		ti.setYResolution(72f);
 		ti.setColordepth(8);
 		ti.setSamplesperpixel(3);
-		ti.writeToStream(ostream);
+		ti.writeToStream(null, ostream);
 	}
 
 }

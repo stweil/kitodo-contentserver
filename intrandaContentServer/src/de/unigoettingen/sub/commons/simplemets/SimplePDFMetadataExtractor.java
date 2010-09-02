@@ -31,8 +31,8 @@ import gov.loc.mods.v3.NamePartType;
 import gov.loc.mods.v3.NameType;
 import gov.loc.mods.v3.PlaceTermType;
 import gov.loc.mods.v3.RoleType;
-import gov.loc.mods.v3.TitleInfoType;
 import gov.loc.mods.v3.RoleType.RoleTerm;
+import gov.loc.mods.v3.TitleInfoType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -188,7 +188,7 @@ public class SimplePDFMetadataExtractor implements MetadataExtractor {
 			// check if the parent div has a mptr element
 			DivType parentDiv = metsparser.getParentDiv(inDiv);
 
-			logger.debug("parent found: parent type is:" + parentDiv.getTYPE());
+//			logger.debug("parent found: parent type is:" + parentDiv.getTYPE());
 
 			if (parentDiv == null) {
 				// no parent div; can't really be, as it is NOT the uppermost
