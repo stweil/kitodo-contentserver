@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<watermark width="600" height="80" color="CCCCCC">
+ <!--     <box x="30" y="50" height="65" width="180" color="555555"/>-->
+    <image x="35" y="15" origin="left" url="http://dfg-viewer.de/fileadmin/images/dfgviewer_dfglogo.png"/>
+    <image x="35" y="15" origin="right" url="http://dfg-viewer.de/fileadmin/images/dfgviewer_dfglogo.png"/>
+    <text x="200" y="30" fontname="Arial" fonsize="26" fontcolor="CCCCCC" origin="center">Beispieltext</text>
+</watermark>
