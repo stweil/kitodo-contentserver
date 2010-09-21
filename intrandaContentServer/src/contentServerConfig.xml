@@ -71,7 +71,7 @@
     * configuration if watermark should be used and url for watermark content configuration file
     * sample: <watermark use="true" configFile="file:/home/goobi/config/watermarkconfig.xml" />
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-	<watermark use="true" configFile="file:/C:/digiverso/watermarkconfig.xml" />
+<watermark use="true" configFile="file:/C:/Eclipse/workspace/intrandaContentServer/src/watermark_example_config.xml" />
   
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * configuration for the error watermark if message should not be shown on jsp echo page 

@@ -206,8 +206,10 @@ public class GetImageAction extends GetAction {
 			/*
 			 * -------------------------------- prepare target --------------------------------
 			 */
+			// change to true if watermark should scale
+			
 			RenderedImage targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor,
-					myWatermark, true, ImageManager.BOTTOM);
+					myWatermark, false, ImageManager.BOTTOM);
 
 			ImageFileFormat targetFormat = ImageFileFormat.getImageFileFormatFromFileExtension(targetExtension);
 			ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read

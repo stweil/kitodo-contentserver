@@ -174,6 +174,24 @@ public class Watermark {
 	protected void setWidth(int width) {
 		this.width = width;
 	}
+	
+	/**
+	 * @param width
+	 *            the width to set
+	 */
+	protected void overrideWidth(int width) {
+		this.width = width;
+		watermarkImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		for (WatermarkComponent wc : allWatermarkComponents) {
+			if (wc instanceof WatermarkBox)  {
+				((WatermarkBox) wc).setHeight(height); 
+				((WatermarkBox) wc).setWidth(width); 
+				break;
+			}
+		}
+	}
+
+	
 
 	/**
 	 * @return the height
@@ -187,8 +205,25 @@ public class Watermark {
 	 *            the height to set
 	 */
 	protected void setHeight(int height) {
-		this.height = height;
+		this.height = height;	
+		watermarkImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		for (WatermarkComponent wc : allWatermarkComponents) {
+			if (wc instanceof WatermarkBox)  {
+				((WatermarkBox) wc).setHeight(height); 
+				((WatermarkBox) wc).setWidth(width); 
+				break;
+			}
+		}
 	}
+	
+	/**
+	 * @param height
+	 *            the height to set
+	 */
+	protected void overrideHeight(int height) {
+		this.height = height;	
+	}
+
 
 	/***************************************************************************
 	 * returns the rendered result of the {@link Watermark} as a {@link RenderedImage}

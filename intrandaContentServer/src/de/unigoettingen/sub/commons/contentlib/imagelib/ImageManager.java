@@ -484,9 +484,9 @@ public class ImageManager {
 				// watermark is get as big as image
 				if ((watermarkposition == ImageManager.TOP)
 						|| (watermarkposition == ImageManager.BOTTOM)) {
-					inWatermark.setWidth(outImage.getWidth());
+					inWatermark.overrideWidth(outImage.getWidth());
 				} else {
-					inWatermark.setHeight(outImage.getHeight());
+					inWatermark.overrideHeight(outImage.getHeight());
 				}
 				watermarkRi = inWatermark.getRenderedImage();
 			}
