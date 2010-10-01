@@ -21,7 +21,9 @@
  */
 package de.unigoettingen.sub.commons.contentlib.servlet.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import org.apache.commons.lang.text.StrTokenizer;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibPdfException;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ContentLibUtil;
+import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFBookmark;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFManager;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFPage;
@@ -72,7 +75,7 @@ public class GetPdfAction extends GetAction {
 	public void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentLibException,
 			URISyntaxException {
 		super.run(servletContext, request, response);
-
+		Watermark myWatermark = null;
 		/*
 		 * -------------------------------- get central configuration and
 		 * retrieve source image from url --------------------------------
@@ -146,6 +149,15 @@ public class GetPdfAction extends GetAction {
 			pdfmanager.setImageNames(nameMap);
 		}
 
+		if (config.getWatermarkUse()) {
+			File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
+			if (request.getParameterMap().containsKey("watermarkText")) {
+				myWatermark = new Watermark(watermarkfile, request.getParameter("watermarkText"));
+			} else {
+				myWatermark = new Watermark(watermarkfile);
+			}
+		}
+		
 		/*
 		 * -------------------------------- define conversion parameters from
 		 * request or from configuration --------------------------------
@@ -212,7 +224,7 @@ public class GetPdfAction extends GetAction {
 		 * --------------------------------
 		 */
 		try {
-			pdfmanager.createPDF(response.getOutputStream(), PDFManager.PDF_ORIGPAGESIZE);
+			pdfmanager.createPDF(response.getOutputStream(), PDFManager.PDF_ORIGPAGESIZE, myWatermark);
 		} catch (URISyntaxException e) {
 			throw new ContentLibPdfException("error while creating pdf file", e);
 		}

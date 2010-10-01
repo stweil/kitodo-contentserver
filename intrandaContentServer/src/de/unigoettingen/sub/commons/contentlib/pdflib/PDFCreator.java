@@ -29,7 +29,6 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-//TODO: GDZ Remove Iterators
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,10 +52,10 @@ import com.lowagie.text.pdf.PdfPageLabels;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.SimpleBookmark;
 
-//TODO: Remove dependency to simplemets
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageInterpreterException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManagerException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.PDFManagerException;
+import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
 import de.unigoettingen.sub.commons.contentlib.pdflib.DocumentPart.DocumentPartType;
 import de.unigoettingen.sub.commons.simplemets.METSParser;
 import de.unigoettingen.sub.commons.simplemets.MetadataExtractor;
@@ -69,7 +68,7 @@ public class PDFCreator {
 	private static final Logger logger = Logger.getLogger(PDFCreator.class);
 
 	public void createPDF(OutputStream out, LinkedList<DocumentPart> metsparts, PDFConfiguration pdfconfig,
-			MetadataExtractor inMetadataExtractor, StructureMetadataExtractor inBookmarkExtractor)
+			MetadataExtractor inMetadataExtractor, StructureMetadataExtractor inBookmarkExtractor, Watermark myWatermark)
 			throws ImageManagerException, FileNotFoundException, IOException, PDFManagerException,
 			ImageInterpreterException, URISyntaxException, MetsException {
 
@@ -305,7 +304,7 @@ public class PDFCreator {
 			pdfmanager.setIccprofile(iccprofile);
 		}	
 
-		pdfmanager.createPDF(out, pdfconfig.getPagesize());
+		pdfmanager.createPDF(out, pdfconfig.getPagesize(), myWatermark);
 	}
 
 	private void changeBookmarksPagenumber(PDFBookmark b, Integer i) {

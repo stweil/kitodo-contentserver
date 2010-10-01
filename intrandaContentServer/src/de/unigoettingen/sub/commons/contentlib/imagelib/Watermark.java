@@ -179,7 +179,7 @@ public class Watermark {
 	 * @param width
 	 *            the width to set
 	 */
-	protected void overrideWidth(int width) {
+	public void overrideWidth(int width) {
 		this.width = width;
 		watermarkImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		for (WatermarkComponent wc : allWatermarkComponents) {
@@ -206,6 +206,15 @@ public class Watermark {
 	 */
 	protected void setHeight(int height) {
 		this.height = height;	
+		
+	}
+	
+	/**
+	 * @param height
+	 *            the height to set
+	 */
+	public void overrideHeight(int height) {
+		this.height = height;
 		watermarkImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		for (WatermarkComponent wc : allWatermarkComponents) {
 			if (wc instanceof WatermarkBox)  {
@@ -214,14 +223,6 @@ public class Watermark {
 				break;
 			}
 		}
-	}
-	
-	/**
-	 * @param height
-	 *            the height to set
-	 */
-	protected void overrideHeight(int height) {
-		this.height = height;	
 	}
 
 

@@ -55,8 +55,10 @@ import com.lowagie.text.pdf.PdfWriter;
 import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibPdfException;
+import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ContentLibUtil;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageManipulator;
+import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFManager;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFTitlePage;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFTitlePageLine;
@@ -81,7 +83,8 @@ import de.unigoettingen.sub.commons.util.datasource.UrlImage;
  ************************************************************************************/
 public class GetMetsPdfAction implements Action {
 	private static final Logger logger = Logger.getLogger(GetMetsPdfAction.class);
-
+	private Watermark myWatermark = null;
+	
 	/************************************************************************************
 	 * exectute mets handling and generation of pdf file and send pdf back to
 	 * output stream of the servlet, after setting correct mime type
@@ -109,6 +112,14 @@ public class GetMetsPdfAction implements Action {
 		 * get central configuration and retrieve source image from url
 		 * --------------------------------*/
 		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
+		if (config.getWatermarkUse()) {
+			File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
+			if (request.getParameterMap().containsKey("watermarkText")) {
+				myWatermark = new Watermark(watermarkfile, request.getParameter("watermarkText"));
+			} else {
+				myWatermark = new Watermark(watermarkfile);
+			}
+		}
 		OutputStream myOutStream = response.getOutputStream();
 		ContentCache cc = GoobiContentServer.getContentCache();
 		String myUniqueID = getContentCacheIdForRequest(request, config);
@@ -315,7 +326,7 @@ public class GetMetsPdfAction implements Action {
 				logger.info("file will not be written to cache, maximum cache size exceeded defined configuration");
 			}
 			/* write to stream */
-			pdfmanager.createPDF(myOutStream, getPageSize(request));
+			pdfmanager.createPDF(myOutStream, getPageSize(request), myWatermark);
 		} catch (Exception e) {
 			logger.error("error while pdf generation (" + e.getClass().getName() + ")", e);
 			Document pdfdoc = new Document();
@@ -388,6 +399,22 @@ public class GetMetsPdfAction implements Action {
 		pdfmanager.setAlwaysUseRenderedImage(config.getPdfDefaultAlwaysUseRenderedImage());
 		pdfmanager.setAlwaysCompressToJPEG(config.getPdfDefaultAlwaysCompressToJPEG());
 
+		if (config.getWatermarkUse()) {
+			try {
+			File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
+			if (request.getParameterMap().containsKey("watermarkText")) {
+					myWatermark = new Watermark(watermarkfile, request.getParameter("watermarkText"));
+			} else {
+				myWatermark = new Watermark(watermarkfile);
+			}
+			} catch (WatermarkException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		/* --------------------------------
 		 * set ICC profile 
 		 * --------------------------------*/

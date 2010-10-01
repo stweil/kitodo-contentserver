@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <watermark width="500" height="80" color="CCCCCC">
  <!--     <box x="30" y="50" height="65" width="180" color="555555"/>-->
-    <image x="35" y="15" origin="left" url="http://dfg-viewer.de/fileadmin/images/dfgviewer_dfglogo.png"/>
-    <image x="35" y="15" origin="right" url="http://dfg-viewer.de/fileadmin/images/dfgviewer_dfglogo.png"/>
-    <text x="200" y="30" fontname="Arial" fonsize="26" fontcolor="000000" origin="center">Beispieltext</text>
+    <image x="0" y="0" origin="left" url="http://www.spiegel.de/static/sys/v9/spiegelonline_logo.png"/>
+    <image x="35" y="15" origin="left" url="http://www.spiegel.de/static/sys/v9/spiegelonline_logo.png"/>
+    <text y="50" fontname="Arial" fontsize="10" fontcolor="000000" origin="center">Beispieltext</text>
 </watermark>

@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -46,22 +47,23 @@ import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfWriter;
 
-import de.unigoettingen.sub.commons.simplemets.SimplePDFMetadataExtractor;
-import de.unigoettingen.sub.commons.simplemets.SimpleStructureMetadataExtractor;
-import de.unigoettingen.sub.commons.simplemets.StructureMetadataExtractor;
-import de.unigoettingen.sub.commons.simplemets.exceptions.MetsException;
-import de.unigoettingen.sub.commons.contentlib.servlet.ServletWatermark;
-import de.unigoettingen.sub.commons.contentlib.servlet.Util;
-import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ContentLibUtil;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageManipulator;
+import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
+import de.unigoettingen.sub.commons.contentlib.pdflib.DocumentPart;
+import de.unigoettingen.sub.commons.contentlib.pdflib.DocumentPart.DocumentPartType;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFConfiguration;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFCreator;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFTitlePage;
-import de.unigoettingen.sub.commons.contentlib.pdflib.DocumentPart;
-import de.unigoettingen.sub.commons.contentlib.pdflib.DocumentPart.DocumentPartType;
+import de.unigoettingen.sub.commons.contentlib.servlet.ServletWatermark;
+import de.unigoettingen.sub.commons.contentlib.servlet.Util;
+import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
+import de.unigoettingen.sub.commons.simplemets.SimplePDFMetadataExtractor;
+import de.unigoettingen.sub.commons.simplemets.SimpleStructureMetadataExtractor;
+import de.unigoettingen.sub.commons.simplemets.StructureMetadataExtractor;
+import de.unigoettingen.sub.commons.simplemets.exceptions.MetsException;
 
 /************************************************************************************
  * pdf multi mets action for pdf creation of multiple mets files
@@ -102,7 +104,7 @@ public class GetPdfMultiMetsAction extends GetMetsPdfAction {
 		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
 		OutputStream myOutStream = response.getOutputStream();
 		setTargetNameAndMimeType(request, response, config);
-		
+		Watermark myWatermark = null;
 		/* get mets filegroup from request or from configuration */
 		String strMetsFileGroup = request.getParameter("metsFileGroup");
 		if (strMetsFileGroup == null) {
@@ -110,6 +112,16 @@ public class GetPdfMultiMetsAction extends GetMetsPdfAction {
 		} 
 		
 		try {
+			if (config.getWatermarkUse()) {
+				
+				File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
+				if (request.getParameterMap().containsKey("watermarkText")) {
+						myWatermark = new Watermark(watermarkfile, request.getParameter("watermarkText"));
+				} else {
+					myWatermark = new Watermark(watermarkfile);
+				}
+				
+			}
 			// defining the DocumentPart-List
 			LinkedList<DocumentPart> documentparts = new LinkedList<DocumentPart>();
 
@@ -167,7 +179,7 @@ public class GetPdfMultiMetsAction extends GetMetsPdfAction {
 			boolean pdfa = Boolean.parseBoolean(getParameterFromRequestOrConfig("writeAsPdfA", request));
 			pdfconfig.setWriteAsPdfA(pdfa);
 			
-			pdfcreator.createPDF(myOutStream, documentparts, pdfconfig, spme, bmke);
+			pdfcreator.createPDF(myOutStream, documentparts, pdfconfig, spme, bmke, myWatermark);
 		} catch (Exception e) {
 			logger.error("error while multiple files to pdf generation (" + e.getClass().getName() + ")", e);
 			Document pdfdoc = new Document();
