@@ -278,7 +278,7 @@ public class PDFManager {
 			throw new PDFManagerException("No URLs for images available, HashMap is null or empty");
 		}
 		// set the page sizes
-		pdfdoc = setPDFPageSizeForFirstPage(pagesizemode, pagesize);
+		pdfdoc = setPDFPageSizeForFirstPage(pagesizemode, pagesize, 80);
 
 		writer = createPDFWriter(out, writer, pdfdoc);
 
@@ -357,7 +357,6 @@ public class PDFManager {
 
 		logger.debug("iterate over " + imageURLs.size() + " pages.");
 		float scalefactor = 1; // scaling factor of the image
-		// TODO: Use the given page size, not some hardcoded values
 		int page_w = 210; // default page size for A4
 		int page_h = 290; //
 
@@ -427,17 +426,23 @@ public class PDFManager {
 						}
 					} else if (preferredEmbeddingType == PDFManager.EMBEDD_JPEG) {
 						// it is NOT embeddable
-
+						//
 						// ImageManager sourcemanager = new ImageManager(url);
 						// RenderedImage ri = sourcemanager.scaleImageByPixel(200, 200, 3, 0, null, null,
 						// myWatermark, false, ImageManager.BOTTOM);
 						// myInterpreter = sourcemanager.getMyInterpreter();
 						RenderedImage ri = myInterpreter.getRenderedImage();
 
-						// TODO klappt noch nicht						
-//						ri = addwatermark(ri, myWatermark, 2);
-						// END TODO
+						//TODO: scale bitonal images here for correct watermarks
+//						if ( myInterpreter.getColordepth() == 1) {
+//							ri=ImageManipulator.scaleInterpolationBilinear(ri, 0.1f, 0.1f);
+//						}
 						
+						if (myWatermark != null) {
+							ri = addwatermark(ri, myWatermark, 2);
+							myInterpreter.setHeight(myInterpreter.getHeight() + myWatermark.getRenderedImage().getHeight());
+						}
+
 						if (myInterpreter.getColordepth() > 1) {
 							// compress image if greyscale or color
 							JpegInterpreter jpint = new JpegInterpreter(ri);
@@ -524,7 +529,11 @@ public class PDFManager {
 						// image couldn't be embedded yet, try using the JPEG
 						// or RenderedImage if bitonal
 						RenderedImage ri = myInterpreter.getRenderedImage();
-
+						if (myWatermark != null) {
+							
+							ri = addwatermark(ri, myWatermark, 2);
+							myInterpreter.setHeight(myInterpreter.getHeight() + myWatermark.getRenderedImage().getHeight());
+						}
 						if (myInterpreter.getColordepth() > 1) {
 							// compress image if greyscale or color
 							JpegInterpreter jpint = new JpegInterpreter(ri);
@@ -545,9 +554,9 @@ public class PDFManager {
 
 				} catch (BadElementException e) {
 					throw new PDFManagerException("Can't create a PDFImage from a Buffered Image.", e);
-//				} catch (ImageManipulatorException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
+				} catch (ImageManipulatorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
 				// place the image on the page
@@ -555,7 +564,7 @@ public class PDFManager {
 					// calculate the image width and height in points, create
 					// the rectangle in points
 					float image_w_points = (myInterpreter.getWidth() / myInterpreter.getXResolution()) * 72;
-					float image_h_points = (myInterpreter.getHeight() / myInterpreter.getYResolution()) * 72;
+					float image_h_points = ((myInterpreter.getHeight()) / myInterpreter.getYResolution()) * 72;
 					Rectangle rect = new Rectangle(image_w_points, image_h_points);
 
 					logger.debug("creating original page sized PDF page:" + image_w_points + " x " + image_h_points);
@@ -762,6 +771,7 @@ public class PDFManager {
 
 	private RenderedImage addwatermark(RenderedImage outImage, Watermark inWatermark, Integer watermarkposition) throws ImageManipulatorException {
 		RenderedImage watermarkRi = null;
+		int orginalSize = outImage.getHeight();
 		if (inWatermark != null) {
 			// watermark is get as big as image
 			if ((watermarkposition == ImageManager.TOP) || (watermarkposition == ImageManager.BOTTOM)) {
@@ -785,6 +795,9 @@ public class PDFManager {
 				outImage = ImageManipulator.mergeImages(outImage, watermarkRi, MergingMode.VERTICALLY);
 			}
 		}
+
+		// ImageManipulator.scaleCoordinates(inCoordinates, scalex, scaley)
+
 		return outImage;
 	}
 
@@ -887,7 +900,7 @@ public class PDFManager {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	private Document setPDFPageSizeForFirstPage(int pagesizemode, Rectangle pagesize) throws ImageInterpreterException, IOException {
+	private Document setPDFPageSizeForFirstPage(int pagesizemode, Rectangle pagesize, int footer) throws ImageInterpreterException, IOException {
 
 		Document pdfdoc;
 		boolean isTitlePage = false;
@@ -896,7 +909,7 @@ public class PDFManager {
 		if ((pagesizemode == PDF_ORIGPAGESIZE) && (pdftitlepage == null)) {
 			logger.debug("Page size of the first page is size of first image");
 
-			// TODO: GDZ: Check if this changes the order of the Pages
+			// GDZ: Check if this changes the order of the Pages
 			// What if 0000002 ist intentionaly before 00000001 ?
 
 			// page size is set to size of first page of the document
