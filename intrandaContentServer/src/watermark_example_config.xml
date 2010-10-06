@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <watermark width="500" height="80" color="CCCCCC">
  <!--     <box x="30" y="50" height="65" width="180" color="555555"/>-->
-    <image x="0" y="0" origin="left" url="http://www.spiegel.de/static/sys/v9/spiegelonline_logo.png"/>
-    <image x="35" y="15" origin="left" url="http://www.spiegel.de/static/sys/v9/spiegelonline_logo.png"/>
-    <text y="50" fontname="Arial" fontsize="10" fontcolor="000000" origin="center">Beispieltext</text>
+    <image x="0" y="0" origin="left" url="http://localhost:8080/ics/images/watermark/background.jpg"/>
+    <image x="15" y="15" origin="left" url="http://localhost:8080/ics/images/watermark/intranda.png"/>
+    <image x="15" y="25" origin="right" url="http://localhost:8080/ics/images/watermark/dfg.png"/>
+
+    <text y="50" fontname="Arial" fontsize="20" fontcolor="CCCCCC" origin="center">Beispieltext</text>
 </watermark>

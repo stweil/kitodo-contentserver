@@ -39,11 +39,14 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 import com.lowagie.text.BadElementException;
+import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.FontFactory;
+import com.lowagie.text.HeaderFooter;
 import com.lowagie.text.Image;
 import com.lowagie.text.PageSize;
+import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfArray;
 import com.lowagie.text.pdf.PdfBoolean;
@@ -83,10 +86,13 @@ import de.unigoettingen.sub.commons.util.datasource.Structure;
 import de.unigoettingen.sub.commons.util.datasource.UrlImage;
 
 /**
- * ***************************************************************************** PDFManager controls the generation of pdf files from images.
+ * *****************************************************************************
+ * PDFManager controls the generation of pdf files from images.
  * 
  * @version 06.01.2009 
- * @author Markus Enders ****************************************************************************
+ * @author Markus Enders
+ *         ********************************************************
+ *         ********************
  */
 // TODO: This should use the ImageSource interface
 public class PDFManager {
@@ -181,7 +187,8 @@ public class PDFManager {
 	// PDFA
 
 	/** The always use rendered image. */
-	Boolean alwaysUseRenderedImage = false; // uses rendered Image and embedd this into PDF
+	Boolean alwaysUseRenderedImage = false; // uses rendered Image and embedd
+											// this into PDF
 
 	/** The always compress to jpeg. */
 	Boolean alwaysCompressToJPEG = false;
@@ -208,20 +215,25 @@ public class PDFManager {
 	String httpproxypassword = null;
 
 	/**
-	 * ************************************************************************* The PDFManager class organizes all pdf generation handlings depending
-	 * on its parameters the images get compressed, is written as pdf/a etc.
+	 * *************************************************************************
+	 * The PDFManager class organizes all pdf generation handlings depending on
+	 * its parameters the images get compressed, is written as pdf/a etc.
 	 * 
-	 * The {@link Integer} for the images in HashMap has to start at 1 for references of image names
+	 * The {@link Integer} for the images in HashMap has to start at 1 for
+	 * references of image names
 	 * ************************************************************************
 	 */
 	public PDFManager() {
 	}
 
 	/**
-	 * ************************************************************************* Constructor for {@link PDFManager}.
+	 * *************************************************************************
+	 * Constructor for {@link PDFManager}.
 	 * 
 	 * @param inPages
-	 *            a {@link Map} with {@link PdfPage} ************************************************************************
+	 *            a {@link Map} with {@link PdfPage}
+	 *            **************************************************************
+	 *            **********
 	 */
 	public PDFManager(Map<Integer, UrlImage> inPages) {
 		imageURLs = inPages;
@@ -229,13 +241,16 @@ public class PDFManager {
 	}
 
 	/**
-	 * ************************************************************************* Constructor for {@link PDFManager}.
+	 * *************************************************************************
+	 * Constructor for {@link PDFManager}.
 	 * 
 	 * @param inPages
 	 *            a {@link Map} with {@link PdfPage}
 	 * @param inPdfa
-	 *            a boolean set to true, if the pdf should be written in pdf/a mode
-	 *            ************************************************************************
+	 *            a boolean set to true, if the pdf should be written in pdf/a
+	 *            mode
+	 *            **********************************************************
+	 *            **************
 	 */
 	public PDFManager(Map<Integer, UrlImage> inPages, boolean inPdfa) {
 		this.pdfa = inPdfa;
@@ -244,10 +259,13 @@ public class PDFManager {
 	}
 
 	/**
-	 * ************************************************************************* Creates a PDF, which is streams to the OutputStream out. Pagesize
-	 * mode may have the following values:<br/>
-	 * <b>PDF_ORIGPAGESIZE</b> - every page has the size of the image <b>PDF_A4PAGESIZE</b> - every page has A4 size, the page image is horizontally
-	 * centered <b>PDF_A4PAGESIZE_BOX</b> - same as PDF_A4PAGESIZE, but a small,black bounding box is drawn around the original page.
+	 * *************************************************************************
+	 * Creates a PDF, which is streams to the OutputStream out. Pagesize mode
+	 * may have the following values:<br/>
+	 * <b>PDF_ORIGPAGESIZE</b> - every page has the size of the image
+	 * <b>PDF_A4PAGESIZE</b> - every page has A4 size, the page image is
+	 * horizontally centered <b>PDF_A4PAGESIZE_BOX</b> - same as PDF_A4PAGESIZE,
+	 * but a small,black bounding box is drawn around the original page.
 	 * 
 	 * @param out
 	 *            the out
@@ -265,7 +283,8 @@ public class PDFManager {
 	 * @throws ImageInterpreterException
 	 *             the image interpreter exception
 	 * @throws URISyntaxException
-	 *             ************************************************************************
+	 *             *************************************************************
+	 *             ***********
 	 */
 	public void createPDF(OutputStream out, int pagesizemode, Watermark myWatermark) throws ImageManagerException, FileNotFoundException,
 			IOException, PDFManagerException, ImageInterpreterException, URISyntaxException {
@@ -418,7 +437,8 @@ public class PDFManager {
 
 					// if the bytestream is directly embeddable
 					if (preferredEmbeddingType == PDFManager.EMBEDD_ORIGBYTESTREAM) {
-						// should be embedded, but is it the bytestream embeddable?
+						// should be embedded, but is it the bytestream
+						// embeddable?
 						if (myInterpreter.pdfBytestreamEmbeddable()) {
 							pdfImage = Image.getInstance(myInterpreter.getImageByteStream());
 						} else {
@@ -427,21 +447,28 @@ public class PDFManager {
 					} else if (preferredEmbeddingType == PDFManager.EMBEDD_JPEG) {
 						// it is NOT embeddable
 						//
-						// ImageManager sourcemanager = new ImageManager(url);
-						// RenderedImage ri = sourcemanager.scaleImageByPixel(200, 200, 3, 0, null, null,
-						// myWatermark, false, ImageManager.BOTTOM);
-						// myInterpreter = sourcemanager.getMyInterpreter();
-						RenderedImage ri = myInterpreter.getRenderedImage();
-
-						//TODO: scale bitonal images here for correct watermarks
-//						if ( myInterpreter.getColordepth() == 1) {
-//							ri=ImageManipulator.scaleInterpolationBilinear(ri, 0.1f, 0.1f);
-//						}
-						
-						if (myWatermark != null) {
-							ri = addwatermark(ri, myWatermark, 2);
-							myInterpreter.setHeight(myInterpreter.getHeight() + myWatermark.getRenderedImage().getHeight());
+						RenderedImage ri = null;
+						if (myInterpreter.getColordepth() == 1) {
+							emergencyCase = true;
+							// ImageManager sourcemanager = new
+							// ImageManager(url);
+							// ri = sourcemanager.scaleImageByPixel(1000, 0,
+							// ImageManager.SCALE_BY_WIDTH, 0, null, null,
+							// myWatermark, false, ImageManager.BOTTOM);
+							// myInterpreter = sourcemanager.getMyInterpreter();
+						} else {
+							ri = myInterpreter.getRenderedImage();
+							if (myWatermark != null) {
+								ri = addwatermark(ri, myWatermark, 2);
+								myInterpreter.setHeight(myInterpreter.getHeight() + myWatermark.getRenderedImage().getHeight());
+							}
 						}
+						// TODO: scale bitonal images here for correct
+						// watermarks
+						// if ( myInterpreter.getColordepth() == 1) {
+						// ri=ImageManipulator.scaleInterpolationBilinear(ri,
+						// 0.1f, 0.1f);
+						// }
 
 						if (myInterpreter.getColordepth() > 1) {
 							// compress image if greyscale or color
@@ -475,7 +502,8 @@ public class PDFManager {
 									jpint.setWriterCompressionValue(80);
 								}
 							} catch (ParameterNotSupportedException e) {
-								// should never happen, as the JPEG200 Interpreter supports this
+								// should never happen, as the JPEG200
+								// Interpreter supports this
 								logger.debug("Can't create JPEG2000 stream for PDF; compression parameter not supported!");
 								e.printStackTrace();
 							}
@@ -507,7 +535,8 @@ public class PDFManager {
 							try {
 								tiffint.setWriterCompressionType(TiffInterpreter.COMPRESSION_CCITTFAX4);
 							} catch (ParameterNotSupportedException e) {
-								// should never happen, as the TiffInterpreter supports this
+								// should never happen, as the TiffInterpreter
+								// supports this
 								// kind of compression
 								logger.warn("Can't create TIFF G4 compressed image for embedding into PDF", e);
 							}
@@ -528,11 +557,19 @@ public class PDFManager {
 						logger.warn("Couldn't use preferred method for embedding the image. Instead had to use JPEG or RenderedImage");
 						// image couldn't be embedded yet, try using the JPEG
 						// or RenderedImage if bitonal
-						RenderedImage ri = myInterpreter.getRenderedImage();
-						if (myWatermark != null) {
-							
-							ri = addwatermark(ri, myWatermark, 2);
-							myInterpreter.setHeight(myInterpreter.getHeight() + myWatermark.getRenderedImage().getHeight());
+						RenderedImage ri = null;
+						if (preferredEmbeddingType == embeddBitonalImage) {
+
+							ImageManager sourcemanager = new ImageManager(url);
+							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, myWatermark, false,
+									ImageManager.BOTTOM);
+							myInterpreter = sourcemanager.getMyInterpreter();
+						} else {
+							ri = myInterpreter.getRenderedImage();
+							if (myWatermark != null) {
+								ri = addwatermark(ri, myWatermark, 2);
+								myInterpreter.setHeight(myInterpreter.getHeight() + myWatermark.getRenderedImage().getHeight());
+							}
 						}
 						if (myInterpreter.getColordepth() > 1) {
 							// compress image if greyscale or color
@@ -549,6 +586,20 @@ public class PDFManager {
 							// need to go via RenderedImage
 							BufferedImage buffImage = ImageManipulator.fromRenderedToBuffered(ri);
 							pdfImage = Image.getInstance(buffImage, null, false);
+
+							JpegInterpreter jpint = new JpegInterpreter(myWatermark.getRenderedImage());
+							ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
+							jpint.setXResolution(myInterpreter.getXResolution());
+							jpint.setYResolution(myInterpreter.getYResolution());
+							jpint.writeToStream(null, bytesoutputstream);
+							byte[] returnbyteArray = bytesoutputstream.toByteArray();
+							Image blaImage = Image.getInstance(returnbyteArray);
+							Chunk c = new Chunk(blaImage, 200, 200);
+							Phrase p = new Phrase(c);
+							HeaderFooter hf = new HeaderFooter(p, false);
+							pdfdoc.setFooter(hf);
+							// pdfdoc.setPageSize(arg0)
+
 						}
 					}
 
@@ -886,7 +937,8 @@ public class PDFManager {
 	}
 
 	/**
-	 * Sets the default size of the page and creates the pdf document (com.lowagie.text.Document) instance.
+	 * Sets the default size of the page and creates the pdf document
+	 * (com.lowagie.text.Document) instance.
 	 * 
 	 * @param pagesizemode
 	 *            the pagesizemode
@@ -983,15 +1035,18 @@ public class PDFManager {
 	}
 
 	/**
-	 * ************************************************************************* Sets all the bookmarks which have the same page name for this page.
-	 * Te hierachical relationships between bookmarks are recognized
+	 * *************************************************************************
+	 * Sets all the bookmarks which have the same page name for this page. Te
+	 * hierachical relationships between bookmarks are recognized
 	 * 
 	 * @param writer
 	 *            the writer
 	 * @param pdfdestination
 	 *            The PDF destination of the page
 	 * @param pagenumber
-	 *            the name of the page ************************************************************************
+	 *            the name of the page
+	 *            ******************************************
+	 *            ******************************
 	 */
 	private void setBookmarksForPage(PdfWriter writer, PdfDestination pdfdestination, Integer pagenumber) {
 		PdfContentByte cb = writer.getDirectContent();
@@ -1025,7 +1080,8 @@ public class PDFManager {
 	}
 
 	/**
-	 * ************************************************************************* checks all children of a bookmark and see if any of them fits to the
+	 * *************************************************************************
+	 * checks all children of a bookmark and see if any of them fits to the
 	 * appropriate page name/ page number.
 	 * 
 	 * @param parent
@@ -1033,7 +1089,8 @@ public class PDFManager {
 	 * @param pdfdestination
 	 *            the pdfdestination
 	 * @param pagenumber
-	 *            ************************************************************************
+	 *            **************************************************************
+	 *            **********
 	 */
 	private void checkChildrenBookmarks(PDFBookmark parent, PdfDestination pdfdestination, Integer pagenumber) {
 		for (PDFBookmark child : parent.getChildren()) {
@@ -1070,12 +1127,15 @@ public class PDFManager {
 	}
 
 	/**
-	 * ************************************************************************* find parent {@link PDFBookmark} from given {@link PDFBookmark}.
+	 * *************************************************************************
+	 * find parent {@link PDFBookmark} from given {@link PDFBookmark}.
 	 * 
 	 * @param inBookmark
 	 *            given {@link PDFBookmark}
 	 * 
-	 * @return parent {@link PDFBookmark} ************************************************************************
+	 * @return parent {@link PDFBookmark}
+	 *         *****************************************************************
+	 *         *******
 	 */
 	private PDFBookmark findParentBookmark(PDFBookmark inBookmark) {
 		for (PDFBookmark rootBookmark : structureList) {
@@ -1094,15 +1154,17 @@ public class PDFManager {
 	}
 
 	/**
-	 * ************************************************************************* find parent {@link PDFBookmark} in branch from given
-	 * {@link PDFBookmark}.
+	 * *************************************************************************
+	 * find parent {@link PDFBookmark} in branch from given {@link PDFBookmark}.
 	 * 
 	 * @param inBookmark
 	 *            given {@link PDFBookmark}
 	 * @param topBookmark
 	 *            given {@link PDFBookmark}
 	 * 
-	 * @return parent {@link PDFBookmark} ************************************************************************
+	 * @return parent {@link PDFBookmark}
+	 *         *****************************************************************
+	 *         *******
 	 */
 	private PDFBookmark findParentInBranch(PDFBookmark inBookmark, PDFBookmark topBookmark) {
 		for (PDFBookmark checkBM : topBookmark.getChildren()) {
@@ -1164,9 +1226,12 @@ public class PDFManager {
 	}
 
 	/**
-	 * ************************************************************************* create a {@link Rectangle} for DIN A4 format.
+	 * *************************************************************************
+	 * create a {@link Rectangle} for DIN A4 format.
 	 * 
-	 * @return {@link Rectangle} with A4 size ************************************************************************
+	 * @return {@link Rectangle} with A4 size
+	 *         ***********************************
+	 *         *************************************
 	 */
 	private Rectangle setA4pagesize() {
 		int page_w = 210; // dimensions of the page; A4 in mm
@@ -1180,133 +1245,177 @@ public class PDFManager {
 	}
 
 	/**
-	 * ************************************************************************* Getter for creator.
+	 * *************************************************************************
+	 * Getter for creator.
 	 * 
-	 * @return the creator ************************************************************************
+	 * @return the creator
+	 *         ******************************************************
+	 *         ******************
 	 */
 	public String getCreator() {
 		return creator;
 	}
 
 	/**
-	 * ************************************************************************* Setter for creator.
+	 * *************************************************************************
+	 * Setter for creator.
 	 * 
 	 * @param creator
-	 *            the creator to set ************************************************************************
+	 *            the creator to set
+	 *            ********************************************
+	 *            ****************************
 	 */
 	public void setCreator(String creator) {
 		this.creator = creator;
 	}
 
 	/**
-	 * ************************************************************************* Getter for author.
+	 * *************************************************************************
+	 * Getter for author.
 	 * 
-	 * @return the author ************************************************************************
+	 * @return the author
+	 *         *******************************************************
+	 *         *****************
 	 */
 	public String getAuthor() {
 		return author;
 	}
 
 	/**
-	 * ************************************************************************* Setter for author.
+	 * *************************************************************************
+	 * Setter for author.
 	 * 
 	 * @param author
-	 *            the author to set ************************************************************************
+	 *            the author to set
+	 *            *********************************************
+	 *            ***************************
 	 */
 	public void setAuthor(String author) {
 		this.author = author;
 	}
 
 	/**
-	 * ************************************************************************* Getter for title.
+	 * *************************************************************************
+	 * Getter for title.
 	 * 
-	 * @return the title ************************************************************************
+	 * @return the title
+	 *         ********************************************************
+	 *         ****************
 	 */
 	public String getTitle() {
 		return title;
 	}
 
 	/**
-	 * ************************************************************************* Setter for title.
+	 * *************************************************************************
+	 * Setter for title.
 	 * 
 	 * @param title
-	 *            the title to set ************************************************************************
+	 *            the title to set
+	 *            **********************************************
+	 *            **************************
 	 */
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
 	/**
-	 * ************************************************************************* Getter for subject.
+	 * *************************************************************************
+	 * Getter for subject.
 	 * 
-	 * @return the subject ************************************************************************
+	 * @return the subject
+	 *         ******************************************************
+	 *         ******************
 	 */
 	public String getSubject() {
 		return subject;
 	}
 
 	/**
-	 * ************************************************************************* Setter for subject.
+	 * *************************************************************************
+	 * Setter for subject.
 	 * 
 	 * @param subject
-	 *            the subject to set ************************************************************************
+	 *            the subject to set
+	 *            ********************************************
+	 *            ****************************
 	 */
 	public void setSubject(String subject) {
 		this.subject = subject;
 	}
 
 	/**
-	 * ************************************************************************* Getter for keyword.
+	 * *************************************************************************
+	 * Getter for keyword.
 	 * 
-	 * @return the keyword ************************************************************************
+	 * @return the keyword
+	 *         ******************************************************
+	 *         ******************
 	 */
 	public String getKeyword() {
 		return keyword;
 	}
 
 	/**
-	 * ************************************************************************* Setter for keyword.
+	 * *************************************************************************
+	 * Setter for keyword.
 	 * 
 	 * @param keyword
-	 *            the keyword to set ************************************************************************
+	 *            the keyword to set
+	 *            ********************************************
+	 *            ****************************
 	 */
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
 	}
 
 	/**
-	 * ************************************************************************* Getter for imageNames.
+	 * *************************************************************************
+	 * Getter for imageNames.
 	 * 
-	 * @return the imageNames ************************************************************************
+	 * @return the imageNames
+	 *         ***************************************************
+	 *         *********************
 	 */
 	public Map<Integer, String> getImageNames() {
 		return imageNames;
 	}
 
 	/**
-	 * ************************************************************************* Sets Image names. The HashMap contains an integer number as a string
-	 * for identifying the page number and the name of the page. The {@link Integer} for the image has to start at 1.
+	 * *************************************************************************
+	 * Sets Image names. The HashMap contains an integer number as a string for
+	 * identifying the page number and the name of the page. The {@link Integer}
+	 * for the image has to start at 1.
 	 * 
 	 * @param imageNames
-	 *            the imageNames to set, first page Integer must start with 1 ************************************************************************
+	 *            the imageNames to set, first page Integer must start with 1
+	 *            ***
+	 *            ************************************************************
+	 *            *********
 	 */
 	public void setImageNames(Map<Integer, String> imageNames) {
 		this.imageNames = imageNames;
 	}
 
 	/**
-	 * ************************************************************************* Getter for imageURLs.
+	 * *************************************************************************
+	 * Getter for imageURLs.
 	 * 
-	 * @return the imageURLs ************************************************************************
+	 * @return the imageURLs
+	 *         ****************************************************
+	 *         ********************
 	 */
 	public Map<Integer, UrlImage> getImageURLs() {
 		return this.imageURLs;
 	}
 
 	/**
-	 * ************************************************************************* Getter for urlWatermark.
+	 * *************************************************************************
+	 * Getter for urlWatermark.
 	 * 
-	 * @return the urlWatermark ************************************************************************
+	 * @return the urlWatermark
+	 *         *************************************************
+	 *         ***********************
 	 */
 	public String getUrlWatermark() {
 		return urlWatermark;
@@ -1323,45 +1432,58 @@ public class PDFManager {
 	}
 
 	/**
-	 * ************************************************************************* Setter for urlWatermark.
+	 * *************************************************************************
+	 * Setter for urlWatermark.
 	 * 
 	 * @param urlWatermark
-	 *            the urlWatermark to set ************************************************************************
+	 *            the urlWatermark to set
+	 *            ***************************************
+	 *            *********************************
 	 */
 	public void setUrlWatermark(String urlWatermark) {
 		this.urlWatermark = urlWatermark;
 	}
 
 	/**
-	 * ************************************************************************* Getter for url_metadatafile.
+	 * *************************************************************************
+	 * Getter for url_metadatafile.
 	 * 
-	 * @return the url_metadatafile ************************************************************************
+	 * @return the url_metadatafile
+	 *         *********************************************
+	 *         ***************************
 	 */
 	public String getUrlMetadatafile() {
 		return urlMetadatafile;
 	}
 
 	/**
-	 * ************************************************************************* Setter for urlMetadatafile.
+	 * *************************************************************************
+	 * Setter for urlMetadatafile.
 	 * 
 	 * @param urlMetadatafile
-	 *            the urlMetadatafile to set ************************************************************************
+	 *            the urlMetadatafile to set
+	 *            ************************************
+	 *            ************************************
 	 */
 	public void setUrlMetadatafile(String urlMetadatafile) {
 		this.urlMetadatafile = urlMetadatafile;
 	}
 
 	/**
-	 * ************************************************************************* Getter for xmpHeader.
+	 * *************************************************************************
+	 * Getter for xmpHeader.
 	 * 
-	 * @return the xmpHeader ************************************************************************
+	 * @return the xmpHeader
+	 *         ****************************************************
+	 *         ********************
 	 */
 	public String getXmpHeader() {
 		return xmpHeader;
 	}
 
 	/**
-	 * ************************************************************************* Setter for xmpHeader.
+	 * *************************************************************************
+	 * Setter for xmpHeader.
 	 * 
 	 * @param xmpHeader
 	 *            the xmp header
@@ -1371,16 +1493,20 @@ public class PDFManager {
 	}
 
 	/**
-	 * ************************************************************************* Getter for rootBookmarkList.
+	 * *************************************************************************
+	 * Getter for rootBookmarkList.
 	 * 
-	 * @return the rootBookmarkList ************************************************************************
+	 * @return the rootBookmarkList
+	 *         *********************************************
+	 *         ***************************
 	 */
 	public List<? extends Structure> getStructureList() {
 		return structureList;
 	}
 
 	/**
-	 * ************************************************************************* Setter for rootBookmarkList.
+	 * *************************************************************************
+	 * Setter for rootBookmarkList.
 	 * 
 	 * @param structureList
 	 *            the structure list
@@ -1390,7 +1516,8 @@ public class PDFManager {
 	}
 
 	/**
-	 * This is the only mandatory method which must be called before createPDF is called and the PDF is created. The HashMap must contain a String for
+	 * This is the only mandatory method which must be called before createPDF
+	 * is called and the PDF is created. The HashMap must contain a String for
 	 * order (an integer number as a string) and the URL
 	 * 
 	 * @param imageURLs
@@ -1401,7 +1528,8 @@ public class PDFManager {
 	}
 
 	/**
-	 * A PDF file may consists of several parts. These parts may have their own title page. The integer contains the pagenumber before the appropriate
+	 * A PDF file may consists of several parts. These parts may have their own
+	 * title page. The integer contains the pagenumber before the appropriate
 	 * title page is added to the PDF.
 	 * 
 	 * @return the pdftitlepages
@@ -1421,19 +1549,25 @@ public class PDFManager {
 	}
 
 	/**
-	 * ************************************************************************* Getter for pdftitlepage.
+	 * *************************************************************************
+	 * Getter for pdftitlepage.
 	 * 
-	 * @return the pdftitlepage ************************************************************************
+	 * @return the pdftitlepage
+	 *         *************************************************
+	 *         ***********************
 	 */
 	public PDFTitlePage getPdftitlepage() {
 		return pdftitlepage;
 	}
 
 	/**
-	 * ************************************************************************* Setter for pdftitlepage.
+	 * *************************************************************************
+	 * Setter for pdftitlepage.
 	 * 
 	 * @param pdftitlepage
-	 *            the pdftitlepage to set ************************************************************************
+	 *            the pdftitlepage to set
+	 *            ***************************************
+	 *            *********************************
 	 */
 	public void setPdftitlepage(PDFTitlePage pdftitlepage) {
 		this.pdftitlepage = pdftitlepage;
@@ -1463,7 +1597,8 @@ public class PDFManager {
 	 * @param alwaysUseRenderedImage
 	 *            the alwaysUseRenderedImage to set
 	 */
-	// TODO: there is a bug in here, since it only works correctly if this method is called before setAlwaysCompressToJPEG
+	// TODO: there is a bug in here, since it only works correctly if this
+	// method is called before setAlwaysCompressToJPEG
 	public void setAlwaysUseRenderedImage(boolean alwaysUseRenderedImage) {
 		this.alwaysUseRenderedImage = alwaysUseRenderedImage;
 
