@@ -52,6 +52,7 @@ public class ImageManager {
 	public static final Integer SCALE_BY_HEIGHT = 2;
 	public static final Integer SCALE_BY_PERCENT = 3;
 	public static final Integer SCALE_BY_RESOLUTION = 4;
+	public static final Integer SCALE_TO_BOX = 5;
 
 	public static final Integer DPI_DEFAULT = 100;
 	public static final Integer DPI_DISPLAY = 72;
@@ -364,8 +365,29 @@ public class ImageManager {
 					"Can't get RenderedImage from ImageInterpreter");
 		}
 
+		if (externalscalemethod == SCALE_TO_BOX) {
+			// pixely = neue höhe
+			// pixelx = neue breite
+			internalScaling_x = (float) pixelx
+			/ (float) myInterpreter.getWidth();
+			internalScaling_y = (float) pixely
+			/ (float) myInterpreter.getHeight();
+			
+			logger.debug("x: " + internalScaling_x + " y: " +internalScaling_y);
+			if (internalScaling_x > internalScaling_y) {
+				
+				internalScaling_x = internalScaling_y;
+			} else {
+				internalScaling_y = internalScaling_x;
+			}
+			logger.debug("new values: " + internalScaling_x);
+			logger.debug("new x " + + myInterpreter.getWidth() * internalScaling_x);
+			logger.debug("new y " + myInterpreter.getHeight() * internalScaling_y);
+			
+		}
+		
 		// calculate internal scaling factor
-		if (externalscalemethod == SCALE_BY_WIDTH) {
+		else if (externalscalemethod == SCALE_BY_WIDTH) {
 			internalScaling_x = (float) pixelx
 					/ (float) myInterpreter.getWidth();
 			if (pixely == 0) {
@@ -392,9 +414,9 @@ public class ImageManager {
 			float intpercentx = ((float) pixelx / 100);
 			float intpercenty = ((float) pixely / 100);
 
-			internalScaling_x = (DPI_DEFAULT / xres);
+			internalScaling_x = (myInterpreter.getXResolution() / xres);
 			internalScaling_x = internalScaling_x * intpercentx;
-			internalScaling_y = (DPI_DEFAULT / yres);
+			internalScaling_y = (myInterpreter.getXResolution() / yres);
 			internalScaling_y = internalScaling_y * intpercenty;
 
 		} else {

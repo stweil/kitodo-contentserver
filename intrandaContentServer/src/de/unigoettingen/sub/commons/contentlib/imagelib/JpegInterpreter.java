@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Iterator;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -62,50 +63,47 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.ParameterNotSupportedE
  * @author Steffen Hankiewicz
  * @author Markus Enders
  ************************************************************************************/
-public class JpegInterpreter extends AbstractImageInterpreter implements
-		ImageInterpreter {
-	private static final Logger logger = Logger
-			.getLogger(JpegInterpreter.class);
+public class JpegInterpreter extends AbstractImageInterpreter implements ImageInterpreter {
+	private static final Logger logger = Logger.getLogger(JpegInterpreter.class);
 
 	int defaultXResolution = 100;
 	int defaultYResolution = 100;
 	int writerCompressionValue = 80;
 
 	/************************************************************************************
-	 * Constructor for {@link JpegInterpreter} to read an jpeg image from given
-	 * {@link InputStream}
+	 * Constructor for {@link JpegInterpreter} to read an jpeg image from given {@link InputStream}
 	 * 
 	 * @param inStream
 	 *            {@link InputStream}
 	 * @throws ImageInterpreterException
 	 ************************************************************************************/
-	public JpegInterpreter(InputStream inStream)
-			throws ImageInterpreterException {
+	public JpegInterpreter(InputStream inStream) throws ImageInterpreterException {
 		ImageReader imagereader = null; // ImageReader to read the class
 		ImageInputStream iis = null;
 		InputStream inputStream = null;
 
-//		Iterator<ImageReader> it = ImageIO.getImageReadersByFormatName("jpeg");
-//		if (it.hasNext()) {
-//			imagereader = (ImageReader) it.next();
-		imagereader = new JPEGImageReader(new JPEGImageReaderSpi());
-//		} else {
-//			// ERROR - no ImageReader was found
-//			logger.error("Imagereader for JPEG couldn't be found");
-//			throw new ImageInterpreterException(
-//					"Imagereader for JPEG format couldn't be found!");
-//		}
+		Iterator<ImageReader> it = ImageIO.getImageReadersByFormatName("jpeg");
+		if (it.hasNext()) {
+			imagereader = (ImageReader) it.next();
+		} else {
+			imagereader = new JPEGImageReader(new JPEGImageReaderSpi());
+		}
+		// } else {
+		// // ERROR - no ImageReader was found
+		// logger.error("Imagereader for JPEG couldn't be found");
+		// throw new ImageInterpreterException(
+		// "Imagereader for JPEG format couldn't be found!");
+		// }
 
 		// read the stream and store it in a byte array
 		this.readImageStream(inStream);
 		byte imagebytes[] = this.getImageByteStream();
-		//		
+		//
 		try {
 			inputStream = new ByteArraySeekableStream(imagebytes);
 		} catch (IOException e1) {
 			logger.error("Can't transform the image's byte array to stream");
-			ImageInterpreterException iie = new ImageInterpreterException(
-					"Can't transform the image's byte array to stream");
+			ImageInterpreterException iie = new ImageInterpreterException("Can't transform the image's byte array to stream");
 			throw iie;
 		}
 
@@ -124,15 +122,10 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 
 		} catch (IOException ioe) {
 			logger.error("Can't read jpeg image", ioe);
-			throw new ImageInterpreterException("Can't read the input stream",
-					ioe);
+			throw new ImageInterpreterException("Can't read the input stream", ioe);
 		} catch (Exception e) {
-			logger
-					.error("something went wrong during reading of jpeg image",
-							e);
-			throw new ImageInterpreterException(
-					"Something went wrong while reading the JPEG from input stream",
-					e);
+			logger.error("something went wrong during reading of jpeg image", e);
+			throw new ImageInterpreterException("Something went wrong while reading the JPEG from input stream", e);
 		}
 
 		// get all metadata of the image, color depth etc...
@@ -193,7 +186,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 			this.samplesPerPixel = Integer.parseInt(samplesperpixel_str);
 		}
 
-		//TODO: INTRANDA: Remove this, if it's not needed
+		// TODO: INTRANDA: Remove this, if it's not needed
 		// somehow I don't get any result with those xpath expressions. No
 		// matter
 		// what XPATH I define or if I take te domNode directly or create a new
@@ -203,12 +196,12 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 		// // get new metadata
 		// try
 		// {
-		//		        	
+		//
 		// XPath xpath = XPathFactory.newInstance().newXPath();
 		// String n = (String) xpath.evaluate("/javax_imageio_jpeg_image_1.0",
 		// domNode);
 		// System.out.println("XPath result:"+n+"<");
-		//		                
+		//
 		// }catch (XPathExpressionException e){
 		// logger.error(e);
 		// }
@@ -243,16 +236,14 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 			// create a buffered Image, which has no Alpha channel
 			// as JPEG does not support Alpha Channels and the
 			// ImageIO doesn't care - but will create a corrupt JPEG
-			BufferedImage noAlphaBi = ImageManipulator
-					.fromRenderedToBufferedNoAlpha(renderedimage);
-			ImageOutputStream imageOutStream = ImageIO
-					.createImageOutputStream(outStream);
+			BufferedImage noAlphaBi = ImageManipulator.fromRenderedToBufferedNoAlpha(renderedimage);
+			ImageOutputStream imageOutStream = ImageIO.createImageOutputStream(outStream);
 
-//			Iterator<ImageWriter> writerIter = ImageIO
-//					.getImageWritersByFormatName("jpg");
-//			ImageWriter writer = writerIter.next(); // get writer from ImageIO
+			// Iterator<ImageWriter> writerIter = ImageIO
+			// .getImageWritersByFormatName("jpg");
+			// ImageWriter writer = writerIter.next(); // get writer from ImageIO
 			ImageWriter writer = new JPEGImageWriter(new JPEGImageWriterSpi());
-			
+
 			// create metadata by creating an XML tree
 			ImageWriteParam writerParam = writer.getDefaultWriteParam();
 			ImageTypeSpecifier its = new ImageTypeSpecifier(noAlphaBi);
@@ -295,8 +286,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 			imageOutStream.flush();
 
 			if (fos != null) {
-				ImageOutputStream imageToFile = ImageIO
-				.createImageOutputStream(fos);
+				ImageOutputStream imageToFile = ImageIO.createImageOutputStream(fos);
 				writer.setOutput(imageToFile);
 				writer.prepareWriteSequence(null);
 				writer.write(null, iioImage, writerParam);
@@ -304,7 +294,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 				imageToFile.flush();
 				imageToFile.close();
 			}
-			
+
 			writer.dispose();
 			imageOutStream.close();
 
@@ -312,7 +302,6 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 			logger.error("IOException occured", e);
 		}
 	}
-	
 
 	/************************************************************************************
 	 * set metadata to image
@@ -334,12 +323,9 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 				for (int k = 0; k < childNodes.getLength(); k++) {
 					if (childNodes.item(k).getNodeName().equals("app0JFIF")) {
 						// get the attributes resUnits, Xdensity, and Ydensity
-						Node resUnitsNode = getAttributeByName(childNodes
-								.item(k), "resUnits");
-						Node XdensityNode = getAttributeByName(childNodes
-								.item(k), "Xdensity");
-						Node YdensityNode = getAttributeByName(childNodes
-								.item(k), "Ydensity");
+						Node resUnitsNode = getAttributeByName(childNodes.item(k), "resUnits");
+						Node XdensityNode = getAttributeByName(childNodes.item(k), "Xdensity");
+						Node YdensityNode = getAttributeByName(childNodes.item(k), "Ydensity");
 
 						// overwrite values for that node
 						resUnitsNode.setNodeValue("1"); // it's dpi
@@ -372,8 +358,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 	}
 
 	/**
-	 * Indicates wether the image's bytestream is directly embeddable. jpegs are
-	 * always embeddable
+	 * Indicates wether the image's bytestream is directly embeddable. jpegs are always embeddable
 	 * 
 	 * @return true if pdf bytes are embeddable
 	 */
@@ -388,8 +373,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 	 *            given {@link Node}
 	 ************************************************************************************/
 	private String getNumLines(Node domNode) {
-		Node markerSequenceNode = getFirstElementByName(domNode,
-				"markerSequence");
+		Node markerSequenceNode = getFirstElementByName(domNode, "markerSequence");
 		if (markerSequenceNode == null) {
 			return null; // markerSequence element not available
 		}
@@ -414,8 +398,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 	 *            given {@link Node}
 	 ************************************************************************************/
 	private String getSamplesPerLine(Node domNode) {
-		Node markerSequenceNode = getFirstElementByName(domNode,
-				"markerSequence");
+		Node markerSequenceNode = getFirstElementByName(domNode, "markerSequence");
 		if (markerSequenceNode == null) {
 			return null; // markerSequence element not available
 		}
@@ -515,8 +498,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 	 *            given {@link Node}
 	 ************************************************************************************/
 	private String getSamplePrecision(Node domNode) {
-		Node markerSequenceNode = getFirstElementByName(domNode,
-				"markerSequence");
+		Node markerSequenceNode = getFirstElementByName(domNode, "markerSequence");
 		if (markerSequenceNode == null) {
 			return null; // markerSequence element not available
 		}
@@ -541,8 +523,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 	 *            given {@link Node}
 	 ************************************************************************************/
 	private String getNumFrames(Node domNode) {
-		Node markerSequenceNode = getFirstElementByName(domNode,
-				"markerSequence");
+		Node markerSequenceNode = getFirstElementByName(domNode, "markerSequence");
 		if (markerSequenceNode == null) {
 			return null; // markerSequence element not available
 		}
@@ -575,8 +556,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 		while (i < list.getLength()) {
 			Node n = list.item(i);
 
-			if ((n.getNodeType() == org.w3c.dom.Element.ELEMENT_NODE)
-					&& (n.getNodeName().equals(elementName))) {
+			if ((n.getNodeType() == org.w3c.dom.Element.ELEMENT_NODE) && (n.getNodeName().equals(elementName))) {
 				return n;
 			}
 
@@ -586,8 +566,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 	}
 
 	/************************************************************************************
-	 * get Dom {@link Node} of attribute from parent {@link Node} with given
-	 * name
+	 * get Dom {@link Node} of attribute from parent {@link Node} with given name
 	 * 
 	 * @param inNode
 	 *            the parent {@link Node}
@@ -599,11 +578,9 @@ public class JpegInterpreter extends AbstractImageInterpreter implements
 		return nnm.getNamedItem(attributeName);
 	}
 
-	public void setWriterCompressionValue(int inWriterCompressionValue)
-			throws ParameterNotSupportedException {
+	public void setWriterCompressionValue(int inWriterCompressionValue) throws ParameterNotSupportedException {
 		if ((inWriterCompressionValue < 0) || (inWriterCompressionValue > 100)) {
-			ParameterNotSupportedException pnse = new ParameterNotSupportedException(
-					"Value for JPEG compression must be between 0 and 100");
+			ParameterNotSupportedException pnse = new ParameterNotSupportedException("Value for JPEG compression must be between 0 and 100");
 			throw pnse;
 		}
 		writerCompressionValue = inWriterCompressionValue;

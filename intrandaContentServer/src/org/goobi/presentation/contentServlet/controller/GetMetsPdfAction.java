@@ -153,6 +153,9 @@ public class GetMetsPdfAction implements Action {
 			 * if Cache is not used, parse mets file name and add it to repository path
 			 * --------------------------------*/
 			String metsFile = request.getParameter("metsFile");
+			if (!metsFile.endsWith(".xml")) {
+				metsFile += ".xml";
+			}
 			URL fullMetsPath = new URL(config.getRepositoryPathMets() + metsFile);
 			logger.debug("mets file to parse: " + fullMetsPath);
 

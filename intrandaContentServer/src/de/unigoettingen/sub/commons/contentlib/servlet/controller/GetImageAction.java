@@ -155,10 +155,16 @@ public class GetImageAction extends GetAction {
 				logger.debug("scale image to percent:" + scaleX);
 			}
 
+			if (request.getParameterMap().containsKey("width") && request.getParameterMap().containsKey("height")) {
+				scaleX = Integer.parseInt(request.getParameter("width"));
+				scaleY = Integer.parseInt(request.getParameter("height"));
+				scaleType = ImageManager.SCALE_TO_BOX;
+			}
+			
 			/*
 			 * -------------------------------- width: scale image to fixed width --------------------------------
 			 */
-			if (request.getParameterMap().containsKey("width")) {
+			else if (request.getParameterMap().containsKey("width")) {
 				scaleX = Integer.parseInt(request.getParameter("width"));
 				scaleY = 0;
 				scaleType = ImageManager.SCALE_BY_WIDTH;
@@ -168,7 +174,7 @@ public class GetImageAction extends GetAction {
 			/*
 			 * -------------------------------- height: scale image to fixed height --------------------------------
 			 */
-			if (request.getParameterMap().containsKey("height")) {
+			else if (request.getParameterMap().containsKey("height")) {
 				scaleY = Integer.parseInt(request.getParameter("height"));
 				scaleX = 0;
 				scaleType = ImageManager.SCALE_BY_HEIGHT;

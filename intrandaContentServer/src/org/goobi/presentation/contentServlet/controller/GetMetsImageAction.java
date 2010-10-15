@@ -77,6 +77,9 @@ public class GetMetsImageAction implements Action {
 		 * -------------------------------- parse mets file and get url from requested image div id --------------------------------
 		 */
 		String metsFile = request.getParameter("metsFile");
+		if (!metsFile.endsWith(".xml")) {
+			metsFile += ".xml";
+		}
 		String pageid = request.getParameter("divID");
 		URL fullMetsPath = new URL(config.getRepositoryPathMets() + metsFile);
 		logger.debug("mets file to parse: " + fullMetsPath);
