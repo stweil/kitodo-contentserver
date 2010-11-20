@@ -69,7 +69,7 @@ public class ErrorImage {
 		Watermark newImage = new Watermark(backgroundImage.getHeight(), backgroundImage.getWidth());
 
 		// add BackgroundImage
-		WatermarkImage wi = new WatermarkImage(backgroundImage);
+		WatermarkImage wi = new WatermarkImage(0,backgroundImage);
 		wi.setX(0);
 		wi.setY(0);
 		newImage.addWatermarkComponent(wi);

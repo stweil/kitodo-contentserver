@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,13 +50,19 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
 /*******************************************************************************
  * Watermark class
  * 
- * @version 26.01.2009
+ * @version 20.11.2010
  * @author Steffen Hankiewicz
  * @author Markus Enders
+ * @author Igor Toker
  ******************************************************************************/
 public class Watermark {
 	protected static final Logger logger = Logger.getLogger(Watermark.class);
 	private String replacedWatermarkText = null;
+	/**
+	 * Hashmap, that has id of component as a key and value of the text/imageurl
+	 * to replace as value.
+	 */
+	private HashMap<Integer, String> replacedWatermarkComponents = new HashMap<Integer, String>();
 	protected BufferedImage watermarkImage; // BUfferedImage to draw components
 	// into
 	protected int width = 0;
@@ -84,7 +91,7 @@ public class Watermark {
 		watermarkImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
 		// set white background
-		WatermarkBox wb = new WatermarkBox(width, height, backgroundColor);
+		WatermarkBox wb = new WatermarkBox(0, width, height, backgroundColor);
 		this.addWatermarkComponent(wb);
 	}
 
@@ -107,6 +114,21 @@ public class Watermark {
 		this.readConfiguration(watermarkfile);
 		watermarkImage = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_RGB);
 
+	}
+
+	/***************************************************************************************************************
+	 * TODO JavaDoc
+	 * 
+	 * @param watermarkArgs
+	 *            {@link HashMap} key - id of component, value - text to change
+	 * @param watermarkfile
+	 *            {@link String} configuration file
+	 * @throws WatermarkException
+	 ***************************************************************************************************************/
+	public Watermark(HashMap<Integer, String> watermarkArgs, File watermarkfile) throws WatermarkException {
+		setReplacedWatermarkComponents(watermarkArgs);
+		this.readConfiguration(watermarkfile);
+		watermarkImage = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_RGB);
 	}
 
 	/***************************************************************************
@@ -174,7 +196,7 @@ public class Watermark {
 	protected void setWidth(int width) {
 		this.width = width;
 	}
-	
+
 	/**
 	 * @param width
 	 *            the width to set
@@ -183,15 +205,13 @@ public class Watermark {
 		this.width = width;
 		watermarkImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		for (WatermarkComponent wc : allWatermarkComponents) {
-			if (wc instanceof WatermarkBox)  {
-				((WatermarkBox) wc).setHeight(height); 
-				((WatermarkBox) wc).setWidth(width); 
+			if (wc instanceof WatermarkBox) {
+				((WatermarkBox) wc).setHeight(height);
+				((WatermarkBox) wc).setWidth(width);
 				break;
 			}
 		}
 	}
-
-	
 
 	/**
 	 * @return the height
@@ -205,10 +225,10 @@ public class Watermark {
 	 *            the height to set
 	 */
 	protected void setHeight(int height) {
-		this.height = height;	
-		
+		this.height = height;
+
 	}
-	
+
 	/**
 	 * @param height
 	 *            the height to set
@@ -217,17 +237,17 @@ public class Watermark {
 		this.height = height;
 		watermarkImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		for (WatermarkComponent wc : allWatermarkComponents) {
-			if (wc instanceof WatermarkBox)  {
-				((WatermarkBox) wc).setHeight(height); 
-				((WatermarkBox) wc).setWidth(width); 
+			if (wc instanceof WatermarkBox) {
+				((WatermarkBox) wc).setHeight(height);
+				((WatermarkBox) wc).setWidth(width);
 				break;
 			}
 		}
 	}
 
-
 	/***************************************************************************
-	 * returns the rendered result of the {@link Watermark} as a {@link RenderedImage}
+	 * returns the rendered result of the {@link Watermark} as a
+	 * {@link RenderedImage}
 	 * 
 	 * @return the Watermark as RenderedImage
 	 **************************************************************************/
@@ -329,7 +349,7 @@ public class Watermark {
 				if ((width > 0) && (height > 0)) {
 
 					// set background
-					WatermarkBox wb = new WatermarkBox(width, height, backgroundColor);
+					WatermarkBox wb = new WatermarkBox(0, width, height, backgroundColor);
 					this.addWatermarkComponent(wb);
 				}
 			}
@@ -343,12 +363,18 @@ public class Watermark {
 				if ((singlenode.getNodeType() == Node.ELEMENT_NODE) && (singlenode.getNodeName().startsWith("image"))) {
 					// read configuration
 					WatermarkImage watermarkImage = new WatermarkImage(singlenode);
+					if (replacedWatermarkComponents.containsKey(watermarkImage.getId())) {
+						watermarkImage.loadImageFromUrl(replacedWatermarkComponents.get(watermarkImage.getId()));
+					}
 					allWatermarkComponents.add(watermarkImage);
 					watermarkImage.setParent_watermark(this);
 				} else if ((singlenode.getNodeType() == Node.ELEMENT_NODE) && (singlenode.getNodeName().startsWith("text"))) {
 					WatermarkText watermarkText = new WatermarkText(singlenode);
 					if (replacedWatermarkText != null) {
 						watermarkText.setContent(replacedWatermarkText);
+					}
+					if (replacedWatermarkComponents.containsKey(watermarkText.getId())) {
+						watermarkText.setContent(replacedWatermarkComponents.get(watermarkText.getId()));
 					}
 					allWatermarkComponents.add(watermarkText);
 					watermarkText.setParent_watermark(this);
@@ -421,6 +447,14 @@ public class Watermark {
 	 */
 	protected BufferedImage getWatermarkImage() {
 		return watermarkImage;
+	}
+
+	protected void setReplacedWatermarkComponents(HashMap<Integer, String> replacedWatermarkComponents) {
+		this.replacedWatermarkComponents = replacedWatermarkComponents;
+	}
+
+	protected HashMap<Integer, String> getReplacedWatermarkComponents() {
+		return replacedWatermarkComponents;
 	}
 
 }

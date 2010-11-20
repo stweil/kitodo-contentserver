@@ -42,7 +42,7 @@ public class ServletWatermark extends Watermark {
 		RenderedImage ri1 = si.getRenderedImage();
 		Watermark wm = new Watermark(si.getWidth(), si.getHeight());
 	
-		WatermarkImage wmi = new WatermarkImage(ri1);
+		WatermarkImage wmi = new WatermarkImage(0,ri1);
 		wmi.setX(500);
 		wmi.setY(500);
 		wm.addWatermarkComponent(wmi);
@@ -72,7 +72,7 @@ public class ServletWatermark extends Watermark {
 				tempString = exString.substring(i * maxLength, i * maxLength
 						+ maxLength);
 			}
-			WatermarkText wmt = new WatermarkText(tempString);
+			WatermarkText wmt = new WatermarkText(0,tempString);
 			wmt.setX(10);
 			wmt.setY(60 + ((config.getErrorMessageFontSize() + 5) * i + config
 					.getErrorMessageFontSize()));
@@ -82,13 +82,13 @@ public class ServletWatermark extends Watermark {
 			wm.addWatermarkComponent(wmt);
 		}
 	
-		WatermarkText wmt = new WatermarkText(exName);
+		WatermarkText wmt = new WatermarkText(0,exName);
 		wmt.setX(10);
 		wmt.setY(60);
 		wmt.setFontsize(config.getErrorMessageFontSize());
 		wmt.setFontcolor(new Color(0f, 0f, 0f));
 	
-		WatermarkText wmt1 = new WatermarkText(config.getErrorTitle());
+		WatermarkText wmt1 = new WatermarkText(0,config.getErrorTitle());
 		wmt1.setX(220);
 		wmt1.setY(30);
 		wmt1.setFontsize(config.getErrorTitleFontSize());

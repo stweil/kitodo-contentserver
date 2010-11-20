@@ -40,9 +40,10 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
 /************************************************************************************
  * WatermarkText class
  * 
- * @version 26.01.2009
+ * @version 20.11.2010
  * @author Steffen Hankiewicz
  * @author Markus Enders
+ * @author Igor Toker
  ************************************************************************************/
 public class WatermarkText extends WatermarkComponent {
 	private static final Logger logger = Logger.getLogger(WatermarkText.class);
@@ -54,21 +55,17 @@ public class WatermarkText extends WatermarkComponent {
 	int fontsize = 12;
 	String origin = "left"; // origin of the coordinate system
 
-	/*************************************************************************************
-	 * empty Constructor
-	 ************************************************************************************/
-	public WatermarkText() {
-
-	}
 
 	/*************************************************************************************
 	 * Constructor with inContent as {@link String} for content
 	 ************************************************************************************/
-	public WatermarkText(String inContent) {
+	public WatermarkText(int id, String inContent) {
+		super(id);
 		content = inContent;
 	}
 
 	public WatermarkText(Node configNode) throws WatermarkException {
+		super(configNode);
 		NamedNodeMap nnm = configNode.getAttributes();
 		if (nnm != null) {
 			Node fontnamenode = nnm.getNamedItem("fontname");

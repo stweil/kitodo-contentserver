@@ -34,9 +34,10 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
 /************************************************************************************
  * Implements a filled box. Default color is white.
  * 
- * @version 26.01.2009
+ * @version 20.11.2010
  * @author Steffen Hankiewicz
  * @author Markus Enders
+ * @author Igor Toker
  ************************************************************************************/
 public class WatermarkBox extends WatermarkComponent {
 	private static final Logger logger = Logger.getLogger(WatermarkBox.class);
@@ -48,16 +49,17 @@ public class WatermarkBox extends WatermarkComponent {
 	Color color = new Color(0f, 0f, 0f);
 
 	/*************************************************************************************
-	 *empty Constructor
+	 * empty Constructor
 	 ************************************************************************************/
-	public WatermarkBox() {
-
+	public WatermarkBox(int id) {
+		super(id);
 	}
 
 	/*************************************************************************************
 	 * Constructor for box with given height and width
 	 ************************************************************************************/
-	public WatermarkBox(Integer w, Integer h) {
+	public WatermarkBox(int id, Integer w, Integer h) {
+		super(id);
 		this.width = w;
 		this.height = h;
 	}
@@ -65,13 +67,15 @@ public class WatermarkBox extends WatermarkComponent {
 	/*************************************************************************************
 	 * Constructor for box with given size and color
 	 ************************************************************************************/
-	public WatermarkBox(Integer w, Integer h, Color inColor) {
+	public WatermarkBox(int id, Integer w, Integer h, Color inColor) {
+		super(id);
 		this.width = w;
 		this.height = h;
 		color = inColor;
 	}
 
 	public WatermarkBox(Node configNode) throws WatermarkException {
+		super(configNode);
 		NamedNodeMap nnm = configNode.getAttributes();
 		if (nnm != null) {
 			Node heightnode = nnm.getNamedItem("height");

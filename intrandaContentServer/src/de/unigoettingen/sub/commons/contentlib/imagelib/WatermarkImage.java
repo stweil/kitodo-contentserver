@@ -36,9 +36,10 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
 /************************************************************************************
  * WatermarkImage class
  * 
- * @version 26.01.2009
+ * @version 20.11.2010
  * @author Steffen Hankiewicz
  * @author Markus Enders
+ * @author Igor Toker
  ************************************************************************************/
 public class WatermarkImage extends WatermarkComponent {
 	private static final Logger logger = Logger.getLogger(WatermarkImage.class);
@@ -47,14 +48,8 @@ public class WatermarkImage extends WatermarkComponent {
 	String origin = "left"; // origin of the coordinate system, left or right
 							// upper corner
 
-	/*************************************************************************************
-	 * empty Constructor
-	 ************************************************************************************/
-	public WatermarkImage() {
-
-	}
-
 	public WatermarkImage(Node configNode) throws WatermarkException {
+		super(configNode);
 		NamedNodeMap nnm = configNode.getAttributes();
 		if (nnm != null) {
 			Node urlnode = nnm.getNamedItem("url");
@@ -100,14 +95,7 @@ public class WatermarkImage extends WatermarkComponent {
 
 			// image URL, load the actual image
 			if (urlnode != null) {
-				String value = urlnode.getNodeValue();
-				try {
-					ImageManager im = new ImageManager(new URL(value));
-					ImageInterpreter myInterpreter = im.getMyInterpreter();
-					wImage = myInterpreter.getRenderedImage();
-				} catch (MalformedURLException e) {
-					throw new WatermarkException("URL for watermark image " + value + " is invalid URL", e);
-				}
+				loadImageFromUrl(urlnode.getNodeValue());
 			} else {
 				logger.error("No URL for Watermark Image found");
 				throw new WatermarkException("No URL for Watermark Image found");
@@ -115,10 +103,22 @@ public class WatermarkImage extends WatermarkComponent {
 		}
 	}
 
+	protected void loadImageFromUrl(String value) throws WatermarkException {
+		try {
+			ImageManager im = new ImageManager(new URL(value));
+			ImageInterpreter myInterpreter = im.getMyInterpreter();
+			wImage = myInterpreter.getRenderedImage();
+		} catch (Exception e) {
+			throw new WatermarkException("URL for watermark image " + value + " is invalid URL", e);
+		}
+
+	}
+
 	/*************************************************************************************
 	 * empty Constructor with inImage as RenderedImage
 	 ************************************************************************************/
-	public WatermarkImage(RenderedImage inImage) {
+	public WatermarkImage(int id, RenderedImage inImage) {
+		super(id);
 		wImage = inImage;
 	}
 

@@ -23,15 +23,21 @@ package de.unigoettingen.sub.commons.contentlib.imagelib;
 
 import java.awt.image.BufferedImage;
 
+import org.w3c.dom.Node;
+
+import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
+
 /************************************************************************************
  * WatermarkComponent class
  * 
- * @version 26.01.2009
+ * @version 20.11.2010
  * @author Steffen Hankiewicz
  * @author Markus Enders
+ * @author Igor Toker
  ************************************************************************************/
 public class WatermarkComponent {
 
+	protected int id;
 	Integer x = 0; // coordinates in pixels
 	Integer y = 0; // coordinates in pixels
 	BufferedImage targetImage; // the canvas on which the component is rendered
@@ -41,8 +47,16 @@ public class WatermarkComponent {
 	/*************************************************************************************
 	 * empty Constructor
 	 ************************************************************************************/
-	public WatermarkComponent() {
+	public WatermarkComponent(int id) {
+		this.id = id;
+	}
 
+	public WatermarkComponent(Node configNode) throws WatermarkException {
+		try {
+			this.id = Integer.valueOf(configNode.getAttributes().getNamedItem("id").getNodeValue());
+		} catch (Exception e) {
+			throw new WatermarkException("Can't find id for Watermark Component");
+		}
 	}
 
 	/*************************************************************************************
@@ -115,6 +129,14 @@ public class WatermarkComponent {
 	 */
 	protected void setParent_watermark(Watermark parent_watermark) {
 		this.parent_watermark = parent_watermark;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getId() {
+		return id;
 	}
 
 }
