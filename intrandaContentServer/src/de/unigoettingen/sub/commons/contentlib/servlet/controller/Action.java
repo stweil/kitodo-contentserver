@@ -21,8 +21,10 @@
  */
 package de.unigoettingen.sub.commons.contentlib.servlet.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -30,6 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
+import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
+import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
 
 /************************************************************************************
  * interface for all current and future actions of the image servlet currently
@@ -64,4 +68,6 @@ public interface Action {
 	 * @throws IllegalArgumentException
 	 ************************************************************************************/
 	abstract void validateParameters(HttpServletRequest request) throws IllegalArgumentException;
+
+
 }

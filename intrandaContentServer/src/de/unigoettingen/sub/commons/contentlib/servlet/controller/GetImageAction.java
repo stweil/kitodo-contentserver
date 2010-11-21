@@ -218,7 +218,7 @@ public class GetImageAction extends GetAction {
 			if (!request.getParameterMap().containsKey("ignoreWatermark")) {
 				if (config.getWatermarkUse()) {
 					File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
-					myWatermark = generateWatermark(request, watermarkfile);
+					myWatermark = Watermark.generateWatermark(request, watermarkfile);
 
 				}
 			}
@@ -561,43 +561,5 @@ public class GetImageAction extends GetAction {
 
 	}
 
-	/***************************************************************************************************************
-	 * This method creates watermark.
-	 * 
-	 * @param request
-	 *            {@link HttpServletRequest}
-	 * @param watermarkfile
-	 *            {@link File}
-	 * @return {@link Watermark}
-	 * @throws WatermarkException
-	 ***************************************************************************************************************/
-	private Watermark generateWatermark(HttpServletRequest request, File watermarkfile) throws WatermarkException {
-		Watermark myWatermark = null;
-		HashMap<Integer, String> watermarkArgs = new HashMap<Integer, String>();
-		// search for watermarkText as attribute
-		if (request.getParameterMap().containsKey("watermarkText")) {
-			myWatermark = new Watermark(watermarkfile, request.getParameter("watermarkText"));
-		} else {
-			// search for watermarkid's as attribute
-			for (String key : request.getParameterMap().keySet()) {
-				if (key.contains("watermarkid")) {
-					try {
-						int id = Integer.valueOf(key.substring(11, key.length()));
-						String value = request.getParameter(key);
-						watermarkArgs.put(id, value);
-					} catch (NumberFormatException e) {
-						logger.error("Can't get WatermarkId for parameter: " + key);
-					}
-				}
-			}
-			if (watermarkArgs.size() > 0) {
-				myWatermark = new Watermark(watermarkArgs, watermarkfile);
-			} else {
-				// no arguments for watermark
-				myWatermark = new Watermark(watermarkfile);
-			}
-
-		}
-		return myWatermark;
-	}
+	
 }

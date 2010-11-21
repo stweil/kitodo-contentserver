@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -425,6 +426,46 @@ public class Watermark {
 				throw new WatermarkException("Invalid value for background color of watermark", e);
 			}
 		}
+	}
+	
+	/***************************************************************************************************************
+	 * This method creates watermark.
+	 * 
+	 * @param request
+	 *            {@link HttpServletRequest}
+	 * @param watermarkfile
+	 *            {@link File}
+	 * @return {@link Watermark}
+	 * @throws WatermarkException
+	 ***************************************************************************************************************/
+	public static Watermark generateWatermark(HttpServletRequest request, File watermarkfile) throws WatermarkException {
+		Watermark myWatermark = null;
+		HashMap<Integer, String> watermarkArgs = new HashMap<Integer, String>();
+		// search for watermarkText as attribute
+		if (request.getParameterMap().containsKey("watermarkText")) {
+			myWatermark = new Watermark(watermarkfile, request.getParameter("watermarkText"));
+		} else {
+			// search for watermarkid's as attribute
+			for (String key : request.getParameterMap().keySet()) {
+				if (key.contains("watermarkid")) {
+					try {
+						int id = Integer.valueOf(key.substring(11, key.length()));
+						String value = request.getParameter(key);
+						watermarkArgs.put(id, value);
+					} catch (NumberFormatException e) {
+						//logger.error("Can't get WatermarkId for parameter: " + key);
+					}
+				}
+			}
+			if (watermarkArgs.size() > 0) {
+				myWatermark = new Watermark(watermarkArgs, watermarkfile);
+			} else {
+				// no arguments for watermark
+				myWatermark = new Watermark(watermarkfile);
+			}
+
+		}
+		return myWatermark;
 	}
 
 	/**

@@ -38,6 +38,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
+import sun.awt.image.URLImageSource;
+
 import com.lowagie.text.BadElementException;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
@@ -82,18 +84,17 @@ import de.unigoettingen.sub.commons.contentlib.imagelib.JpegInterpreter;
 import de.unigoettingen.sub.commons.contentlib.imagelib.JpegTwoThousandInterpreter;
 import de.unigoettingen.sub.commons.contentlib.imagelib.TiffInterpreter;
 import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
+import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 import de.unigoettingen.sub.commons.util.datasource.Structure;
 import de.unigoettingen.sub.commons.util.datasource.UrlImage;
 
-/**
- * *****************************************************************************
+/*******************************************************************************
  * PDFManager controls the generation of pdf files from images.
  * 
  * @version 06.01.2009 
  * @author Markus Enders
- *         ********************************************************
- *         ********************
- */
+ * @author Igor Toker
+ ********************************************************************************/
 // TODO: This should use the ImageSource interface
 public class PDFManager {
 
@@ -136,6 +137,8 @@ public class PDFManager {
 
 	/** The Constant EMBEDD_TIFFG4. */
 	public static final int EMBEDD_TIFFG4 = 5;
+
+	private static final String ERROR_PAGE = "file:/Users/itoker/Desktop/ECLIPSE/WORKSPACE/intrandaContentServer/example/errorfile.jpg";
 
 	/** The creator. */
 	private String creator = null;
@@ -379,6 +382,7 @@ public class PDFManager {
 		int page_w = 210; // default page size for A4
 		int page_h = 290; //
 
+
 		for (Integer key : sortedMap.keySet()) {
 			Image pdfImage = null; // PDF-Image
 
@@ -414,7 +418,9 @@ public class PDFManager {
 				// it is an image file which must be inserted
 				URL url = pdfpage.getURL();
 				logger.debug("page:" + key + "  url:" + url.toString());
-
+				if (url.openConnection().getContentLength()==0) {
+					url = new URL(ERROR_PAGE);
+				}
 				ImageInterpreter myInterpreter = ImageFileFormat.getInterpreter(url, httpproxyhost, httpproxyport, httpproxyuser, httpproxypassword);
 
 				// check if image format is directly embeddable

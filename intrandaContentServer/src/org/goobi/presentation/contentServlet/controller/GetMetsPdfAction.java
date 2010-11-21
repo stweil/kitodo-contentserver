@@ -114,11 +114,7 @@ public class GetMetsPdfAction implements Action {
 		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
 		if (config.getWatermarkUse()) {
 			File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
-			if (request.getParameterMap().containsKey("watermarkText")) {
-				myWatermark = new Watermark(watermarkfile, request.getParameter("watermarkText"));
-			} else {
-				myWatermark = new Watermark(watermarkfile);
-			}
+			myWatermark = Watermark.generateWatermark(request, watermarkfile);
 		}
 		OutputStream myOutStream = response.getOutputStream();
 		ContentCache cc = GoobiContentServer.getContentCache();
