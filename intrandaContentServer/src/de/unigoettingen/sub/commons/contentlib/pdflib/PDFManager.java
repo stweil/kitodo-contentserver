@@ -25,6 +25,8 @@ import java.awt.color.ICC_Profile;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,6 +39,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.helpers.Loader;
 
 import sun.awt.image.URLImageSource;
 
@@ -84,6 +87,8 @@ import de.unigoettingen.sub.commons.contentlib.imagelib.JpegInterpreter;
 import de.unigoettingen.sub.commons.contentlib.imagelib.JpegTwoThousandInterpreter;
 import de.unigoettingen.sub.commons.contentlib.imagelib.TiffInterpreter;
 import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
+import de.unigoettingen.sub.commons.contentlib.servlet.ServletWatermark;
+import de.unigoettingen.sub.commons.contentlib.servlet.Util;
 import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 import de.unigoettingen.sub.commons.util.datasource.Structure;
 import de.unigoettingen.sub.commons.util.datasource.UrlImage;
@@ -138,7 +143,7 @@ public class PDFManager {
 	/** The Constant EMBEDD_TIFFG4. */
 	public static final int EMBEDD_TIFFG4 = 5;
 
-	private static final String ERROR_PAGE = "file:/Users/itoker/Desktop/ECLIPSE/WORKSPACE/intrandaContentServer/example/errorfile.jpg";
+	private static final String ERROR_PAGE = Loader.getResource("errorfile.jpg").toExternalForm();
 
 	/** The creator. */
 	private String creator = null;
@@ -382,16 +387,23 @@ public class PDFManager {
 		int page_w = 210; // default page size for A4
 		int page_h = 290; //
 
-
+		
+		
 		for (Integer key : sortedMap.keySet()) {
+			Watermark watermark = myWatermark;
 			Image pdfImage = null; // PDF-Image
-
 			logger.debug("Writing page " + key);
+			//true if the image does not exists
+			boolean errorPage = false;
+			//url of the image that does not exists
+			URL errorUrl = null;
 
+			//------------------------------------------------------------------------------------------------
 			// pagename (physical page
 			// number)
 			// check if we have to create a title page before
 			// this page number
+			//------------------------------------------------------------------------------------------------
 
 			if ((pdftitlepages != null) && (pdftitlepages.get(key) != null)) {
 				// title page available
@@ -418,9 +430,14 @@ public class PDFManager {
 				// it is an image file which must be inserted
 				URL url = pdfpage.getURL();
 				logger.debug("page:" + key + "  url:" + url.toString());
-				if (url.openConnection().getContentLength()==0) {
+
+				// if the image does not exists, use error_page image
+				if (url.openConnection().getContentLength() == 0) {
+					errorUrl = url;
 					url = new URL(ERROR_PAGE);
+					errorPage = true;
 				}
+
 				ImageInterpreter myInterpreter = ImageFileFormat.getInterpreter(url, httpproxyhost, httpproxyport, httpproxyuser, httpproxypassword);
 
 				// check if image format is directly embeddable
@@ -464,10 +481,16 @@ public class PDFManager {
 							// myInterpreter = sourcemanager.getMyInterpreter();
 						} else {
 							ri = myInterpreter.getRenderedImage();
-							if (myWatermark != null) {
-								ri = addwatermark(ri, myWatermark, 2);
-								myInterpreter.setHeight(myInterpreter.getHeight() + myWatermark.getRenderedImage().getHeight());
+							//if there is an error - write error watermark!
+							if (errorPage) {
+								watermark = getNoImageErrorWatermark(errorUrl.toString());
+								ri = addwatermark(ri, watermark, ImageManager.TOP);
+								myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
+							} else if (watermark != null) {
+								ri = addwatermark(ri, watermark, 2);
+								myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
 							}
+
 						}
 						// TODO: scale bitonal images here for correct
 						// watermarks
@@ -567,14 +590,14 @@ public class PDFManager {
 						if (preferredEmbeddingType == embeddBitonalImage) {
 
 							ImageManager sourcemanager = new ImageManager(url);
-							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, myWatermark, false,
+							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, false,
 									ImageManager.BOTTOM);
 							myInterpreter = sourcemanager.getMyInterpreter();
 						} else {
 							ri = myInterpreter.getRenderedImage();
-							if (myWatermark != null) {
-								ri = addwatermark(ri, myWatermark, 2);
-								myInterpreter.setHeight(myInterpreter.getHeight() + myWatermark.getRenderedImage().getHeight());
+							if (watermark != null) {
+								ri = addwatermark(ri, watermark, 2);
+								myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
 							}
 						}
 						if (myInterpreter.getColordepth() > 1) {
@@ -824,6 +847,24 @@ public class PDFManager {
 
 		} // end of while iterator over all pages
 		return pagelabels;
+	}
+
+	/***************************************************************************************************************
+	 * @param errorUrl
+	 *            {@link String} url of the image that does not exists
+	 * @return {@link Watermark} with error message about image that does not
+	 *         exists..
+	 * @throws FileNotFoundException 
+	 * @throws ImageInterpreterException 
+	 ***************************************************************************************************************/
+	private Watermark getNoImageErrorWatermark(String errorUrl) throws FileNotFoundException, ImageInterpreterException {
+		String errorString = "Error: Image: "+errorUrl+" does not exists!";
+		String jpgfile = new File(Util.getBaseFolderAsFile(),
+				"errorfile.jpg").getAbsolutePath();
+		FileInputStream inputFileStream = new FileInputStream(jpgfile);
+		return ServletWatermark.generateErrorWatermark(inputFileStream,
+				errorString);
+		
 	}
 
 	private RenderedImage addwatermark(RenderedImage outImage, Watermark inWatermark, Integer watermarkposition) throws ImageManipulatorException {
