@@ -31,7 +31,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -49,7 +48,6 @@ import org.goobi.presentation.contentServlet.controller.GoobiContentServer;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
-import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ContentLibUtil;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageFileFormat;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageInterpreter;
@@ -91,8 +89,14 @@ public class GetImageAction extends GetAction {
 		 * -------------------------------- get central configuration
 		 * --------------------------------
 		 */
+		URI sourceImageUrl = null;
 		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
-		URI sourceImageUrl = new URI(config.getRepositoryPathImages() + request.getParameter("sourcepath"));
+		if (!request.getParameter("sourcepath").startsWith("file:")&& !request.getParameter("sourcepath").startsWith("http:")) {
+			sourceImageUrl = new URI(config.getRepositoryPathImages() + request.getParameter("sourcepath"));
+		} else {
+			sourceImageUrl = new URI(request.getParameter("sourcepath"));
+		}
+	
 		ServletOutputStream output = response.getOutputStream();
 		ContentCache cc = GoobiContentServer.getContentCache();
 		String myUniqueID = getContentCacheIdForRequest(request, config);
