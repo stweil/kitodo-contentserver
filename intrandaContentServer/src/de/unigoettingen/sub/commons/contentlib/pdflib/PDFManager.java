@@ -96,54 +96,79 @@ import de.unigoettingen.sub.commons.util.datasource.UrlImage;
 /*******************************************************************************
  * PDFManager controls the generation of pdf files from images.
  * 
- * @version 06.01.2009 
+ * @version 20.11.2010
  * @author Markus Enders
  * @author Igor Toker
  ********************************************************************************/
 // TODO: This should use the ImageSource interface
+/**
+ * @author itoker
+ * 
+ */
 public class PDFManager {
 
 	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(PDFManager.class);
-
-	// TODO: Better use a Enum
-	/** The Constant PDF_ORIGPAGESIZE. */
-	public static final int PDF_ORIGPAGESIZE = 1;
-
-	/** The Constant PDF_A4PAGESIZE. */
-	public static final int PDF_A4PAGESIZE = 2;
-
-	/** The Constant PDF_A4PAGESIZE_BOX. */
-	public static final int PDF_A4PAGESIZE_BOX = 3;
-
-	/** The Constant PDF_ORIGPAGESIZE_NAME. */
-	public static final String PDF_ORIGPAGESIZE_NAME = "original";
-
-	/** The Constant PDF_A4PAGESIZE_NAME. */
-	public static final String PDF_A4PAGESIZE_NAME = "A4";
-
-	/** The Constant PDF_A4PAGESIZE_BOX_NAME. */
-	public static final String PDF_A4PAGESIZE_BOX_NAME = "A4Box";
-
-	/** The Constant EMBEDD_ORIGBYTESTREAM. */
-	public static final int EMBEDD_ORIGBYTESTREAM = 0;
-
-	/** The Constant EMBEDD_RENDEREDIMAGE. */
-	public static final int EMBEDD_RENDEREDIMAGE = 1;
-
-	/** The Constant EMBEDD_JPEG. */
-	public static final int EMBEDD_JPEG = 2;
-
-	/** The Constant EMBEDD_LOSSYJPEG2000. */
-	public static final int EMBEDD_LOSSYJPEG2000 = 3;
-
-	/** The Constant EMBEDD_LOSSLESSJPEG2000. */
-	public static final int EMBEDD_LOSSLESSJPEG2000 = 4;
-
-	/** The Constant EMBEDD_TIFFG4. */
-	public static final int EMBEDD_TIFFG4 = 5;
-
+	/** Image, that used for pages with error. */
 	private static final String ERROR_PAGE = Loader.getResource("errorfile.jpg").toExternalForm();
+
+	// ----------------------------------------------------------------------------------------
+
+	public enum PdfPageSize {
+		/** every page has the size of the image */
+		ORIGINAL("original"),
+
+		/** every page has A4 size, the page image is horizontally centered */
+		A4("A4"),
+
+		/**
+		 * every page has A4 size, the page image is horizontally centered. A
+		 * small, black bounding box is drawn around the original page.
+		 */
+		A4BOX("A4Box");
+		private String name;
+
+		private PdfPageSize(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
+	}
+
+	public enum PaperSize {
+		A4(210, 290);
+		public int width;
+		public int height;
+
+		private PaperSize(int width, int height) {
+			this.width = width;
+			this.height = height;
+		}
+	}
+
+	// ----------------------------------------------------------------------------------------
+
+	public enum Embedd {
+		ORIGBYTESTREAM, RENDEREDIMAGE, JPEG, LOSSYJPEG2000, LOSSLESSJPEG2000, TIFFG4
+	}
+
+	/** The always use rendered image. */
+	Boolean alwaysUseRenderedImage = false; // uses rendered Image and embedd
+											// this into PDF
+	/** The always compress to jpeg. */
+	Boolean alwaysCompressToJPEG = false;
+
+	/** The embedd bitonal image. */
+	Embedd embeddBitonalImage = Embedd.ORIGBYTESTREAM;
+
+	/** The embedd greyscale image. */
+	Embedd embeddGreyscaleImage = Embedd.ORIGBYTESTREAM;
+
+	/** The embedd color image. */
+	Embedd embeddColorImage = Embedd.ORIGBYTESTREAM;
+	// ----------------------------------------------------------------------------------------
 
 	/** The creator. */
 	private String creator = null;
@@ -159,30 +184,23 @@ public class PDFManager {
 
 	/** The keyword. */
 	private String keyword = null;
-
-	// TODO: Check if this comments are right
-	/** The url watermark. */
-	private String urlWatermark = null; // not used yet
-
-	/** The url metadatafile. */
-	private String urlMetadatafile = null; // not used yet
-
-	/** The xmp header. */
-	private String xmpHeader = null; // not used yet
+	// ----------------------------------------------------------------------------------------
 
 	/** The pdftitlepage. */
 	private PDFTitlePage pdftitlepage = null; // object defining the contents
-	// of the PDF title page
-
+												// of the PDF title page
 	/** The image names. */
 	private Map<Integer, String> imageNames = null; // contains all the page
-	// numbers
-	/** The image ur ls. */
-	private Map<Integer, UrlImage> imageURLs = null; //
+													// numbers
+	/** The image urls. */
+	private Map<Integer, UrlImage> imageURLs = null;
 
-	/** The pdftitlepages. */
-	private HashMap<Integer, PDFTitlePage> pdftitlepages = null; // thsoe
-	// title pages are added before the page with the given pagenumber
+	/**
+	 * A PDF file may consists of several parts. These parts may have their own
+	 * title page. The integer contains the pagenumber before the appropriate
+	 * title page is added to the PDF.
+	 */
+	private HashMap<Integer, PDFTitlePage> pdftitlepages = null;
 
 	/** The structure list. */
 	private List<PDFBookmark> structureList = null;
@@ -194,22 +212,7 @@ public class PDFManager {
 	private ICC_Profile iccprofile = null; // ICC color profile; needed for
 	// PDFA
 
-	/** The always use rendered image. */
-	Boolean alwaysUseRenderedImage = false; // uses rendered Image and embedd
-											// this into PDF
-
-	/** The always compress to jpeg. */
-	Boolean alwaysCompressToJPEG = false;
-
-	/** The embedd bitonal image. */
-	Integer embeddBitonalImage = 0;
-
-	/** The embedd greyscale image. */
-	Integer embeddGreyscaleImage = 0;
-
-	/** The embedd color image. */
-	Integer embeddColorImage = 0;
-
+	// ----------------------------------------------------------------------------------------
 	/** The httpproxyhost. */
 	String httpproxyhost = null;
 
@@ -222,34 +225,30 @@ public class PDFManager {
 	/** The httpproxypassword. */
 	String httpproxypassword = null;
 
-	/**
-	 * *************************************************************************
+	// ----------------------------------------------------------------------------------------
+
+	/****************************************************************************
 	 * The PDFManager class organizes all pdf generation handlings depending on
 	 * its parameters the images get compressed, is written as pdf/a etc.
 	 * 
 	 * The {@link Integer} for the images in HashMap has to start at 1 for
 	 * references of image names
-	 * ************************************************************************
-	 */
-	public PDFManager() {
-	}
+	 * *************************************************************************/
+	// public PDFManager() {
+	// }
 
-	/**
-	 * *************************************************************************
-	 * Constructor for {@link PDFManager}.
+	/***************************************************************************************************************
+	 * Constructor for {@link PDFManager}
 	 * 
 	 * @param inPages
-	 *            a {@link Map} with {@link PdfPage}
-	 *            **************************************************************
-	 *            **********
-	 */
+	 *            {@link Map} with {@link UrlImage}
+	 ***************************************************************************************************************/
 	public PDFManager(Map<Integer, UrlImage> inPages) {
 		imageURLs = inPages;
 		logger.debug("PDFManager intstantiated");
 	}
 
-	/**
-	 * *************************************************************************
+	/***************************************************************************
 	 * Constructor for {@link PDFManager}.
 	 * 
 	 * @param inPages
@@ -257,28 +256,21 @@ public class PDFManager {
 	 * @param inPdfa
 	 *            a boolean set to true, if the pdf should be written in pdf/a
 	 *            mode
-	 *            **********************************************************
-	 *            **************
-	 */
+	 ****************************************************************************/
 	public PDFManager(Map<Integer, UrlImage> inPages, boolean inPdfa) {
 		this.pdfa = inPdfa;
 		imageURLs = inPages;
 		logger.debug("PDFManager intstantiated");
 	}
 
-	/**
-	 * *************************************************************************
-	 * Creates a PDF, which is streams to the OutputStream out. Pagesize mode
-	 * may have the following values:<br/>
-	 * <b>PDF_ORIGPAGESIZE</b> - every page has the size of the image
-	 * <b>PDF_A4PAGESIZE</b> - every page has A4 size, the page image is
-	 * horizontally centered <b>PDF_A4PAGESIZE_BOX</b> - same as PDF_A4PAGESIZE,
-	 * but a small,black bounding box is drawn around the original page.
+	/***************************************************************************
+	 * Creates a PDF, which is streams to the OutputStream out.
 	 * 
 	 * @param out
-	 *            the out
+	 *            {@link OutputStream}
 	 * @param pagesizemode
-	 *            the pagesizemode
+	 *            {@link PdfPageSize}
+	 * 
 	 * 
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
@@ -291,26 +283,25 @@ public class PDFManager {
 	 * @throws ImageInterpreterException
 	 *             the image interpreter exception
 	 * @throws URISyntaxException
-	 *             *************************************************************
-	 *             ***********
-	 */
-	public void createPDF(OutputStream out, int pagesizemode, Watermark myWatermark) throws ImageManagerException, FileNotFoundException,
-			IOException, PDFManagerException, ImageInterpreterException, URISyntaxException {
+	 ****************************************************************************/
+	public void createPDF(OutputStream out, PdfPageSize pagesizemode, Watermark myWatermark) throws ImageManagerException, FileNotFoundException, IOException, PDFManagerException,
+			ImageInterpreterException, URISyntaxException {
+
 		PdfWriter writer = null; // writer for creating the PDF
 		Document pdfdoc; // the pdfdocument
 		Rectangle pagesize = null; // pagesize of the first page
-		PdfPageLabels pagelabels = null; // object to stora all page labels
+		PdfPageLabels pagelabels = null; // object to store all page labels
 
 		if ((imageURLs == null) || (imageURLs.size() == 0)) {
 			throw new PDFManagerException("No URLs for images available, HashMap is null or empty");
 		}
+
 		// set the page sizes
 		pdfdoc = setPDFPageSizeForFirstPage(pagesizemode, pagesize, 80);
-
 		writer = createPDFWriter(out, writer, pdfdoc);
 
 		// set metadata for PDF as author and title
-
+		// ------------------------------------------------------------------------------------
 		if (this.title != null) {
 			pdfdoc.addTitle(this.title);
 		}
@@ -323,7 +314,6 @@ public class PDFManager {
 		if (this.subject != null) {
 			pdfdoc.addSubject(this.subject);
 		}
-
 		// add title page to PDF
 		if (pdftitlepage != null) {
 			// create a title page
@@ -333,6 +323,7 @@ public class PDFManager {
 		// iterate over all files, they must be ordered by the key
 		// the key contains the page number (as integer), the String
 		// contains the Page name
+		// ----------------------------------------------------------------------
 		pagelabels = addAllPages(pagesizemode, writer, pdfdoc, myWatermark);
 
 		// add page labels
@@ -353,17 +344,17 @@ public class PDFManager {
 		logger.debug("PDF document and writer closed");
 	}
 
-	/**
+	/******************************************************************************************************
 	 * Adds the all pages.
 	 * 
 	 * @param pagesizemode
-	 *            the pagesizemode
+	 *            {@link PdfPageSize}
 	 * @param writer
-	 *            the writer
+	 *            {@link PdfWriter}
 	 * @param pdfdoc
-	 *            the pdfdoc
+	 *            {@link Document}
+	 * @return {@link PdfPageLabels}
 	 * 
-	 * @return the pdf page labels
 	 * 
 	 * @throws ImageInterpreterException
 	 *             the image interpreter exception
@@ -373,41 +364,42 @@ public class PDFManager {
 	 *             the malformed url exception
 	 * @throws PDFManagerException
 	 *             the PDF manager exception
-	 */
-	private PdfPageLabels addAllPages(int pagesizemode, PdfWriter writer, Document pdfdoc, Watermark myWatermark) throws ImageInterpreterException,
-			IOException, MalformedURLException, PDFManagerException {
+	 *******************************************************************************************************/
+	private PdfPageLabels addAllPages(PdfPageSize pagesizemode, PdfWriter writer, Document pdfdoc, Watermark myWatermark) throws ImageInterpreterException, IOException,
+			MalformedURLException, PDFManagerException {
 
 		PdfPageLabels pagelabels = new PdfPageLabels();
 		int pageadded = 0;
+
 		// sort the HashMap by the KeySet (pagenumber)
 		Map<Integer, UrlImage> sortedMap = new TreeMap<Integer, UrlImage>(imageURLs);
 
-		logger.debug("iterate over " + imageURLs.size() + " pages.");
 		float scalefactor = 1; // scaling factor of the image
-		int page_w = 210; // default page size for A4
-		int page_h = 290; //
+		int page_w = PaperSize.A4.width;
+		int page_h = PaperSize.A4.height;
 
-		
-		
-		for (Integer key : sortedMap.keySet()) {
+		logger.debug("iterate over " + imageURLs.size() + " pages.");
+		for (Integer imageKey : sortedMap.keySet()) {
 			Watermark watermark = myWatermark;
 			Image pdfImage = null; // PDF-Image
-			logger.debug("Writing page " + key);
-			//true if the image does not exists
-			boolean errorPage = false;
-			//url of the image that does not exists
-			URL errorUrl = null;
+			logger.debug("Writing page " + imageKey);
 
-			//------------------------------------------------------------------------------------------------
+			boolean errorPage = false; // true if the image does not exists
+			URL errorUrl = null; // url of the image that does not exists
+
+			// ------------------------------------------------------------------------------------------------
 			// pagename (physical page
 			// number)
 			// check if we have to create a title page before
 			// this page number
-			//------------------------------------------------------------------------------------------------
+			// ------------------------------------------------------------------------------------------------
 
-			if ((pdftitlepages != null) && (pdftitlepages.get(key) != null)) {
-				// title page available
-				PDFTitlePage pdftitlepage = pdftitlepages.get(key);
+			// ------------------------------------------------------------------------------------------------
+			// Title page available. Render it in pdftitlepage
+			// ------------------------------------------------------------------------------------------------
+			if ((pdftitlepages != null) && (pdftitlepages.get(imageKey) != null)) {
+				// title page
+				PDFTitlePage pdftitlepage = pdftitlepages.get(imageKey);
 				// create new PDF page
 				try {
 					pdfdoc.setPageSize(PageSize.A4);
@@ -422,14 +414,15 @@ public class PDFManager {
 				// render title page
 				pdftitlepage.render(pdfdoc);
 			}
-
-			UrlImage pdfpage = imageURLs.get(key);
+			// ------------------------------------------------------------------------------------------------
+			// Process image with imageKey
+			// ------------------------------------------------------------------------------------------------
+			UrlImage pdfpage = imageURLs.get(imageKey);
 			if (pdfpage.getURL() != null) {
-				boolean emergencyCase = false;
 
 				// it is an image file which must be inserted
 				URL url = pdfpage.getURL();
-				logger.debug("page:" + key + "  url:" + url.toString());
+				logger.debug("page:" + imageKey + "  url:" + url.toString());
 
 				// if the image does not exists, use error_page image
 				if (url.openConnection().getContentLength() == 0) {
@@ -438,14 +431,14 @@ public class PDFManager {
 					errorPage = true;
 				}
 
+				// try to get ImageInterpreter from url
 				ImageInterpreter myInterpreter = ImageFileFormat.getInterpreter(url, httpproxyhost, httpproxyport, httpproxyuser, httpproxypassword);
 
-				// check if image format is directly embeddable
 				try {
 
 					// check preferred compresiion type dependent
 					// on color depth
-					int preferredEmbeddingType = 0;
+					Embedd preferredEmbeddingType = Embedd.ORIGBYTESTREAM;
 
 					if (myInterpreter.getColordepth() == 1) {
 						// bitonal image
@@ -458,140 +451,24 @@ public class PDFManager {
 						preferredEmbeddingType = embeddColorImage;
 					}
 
-					// if the bytestream is directly embeddable
-					if (preferredEmbeddingType == PDFManager.EMBEDD_ORIGBYTESTREAM) {
-						// should be embedded, but is it the bytestream
-						// embeddable?
-						if (myInterpreter.pdfBytestreamEmbeddable()) {
-							pdfImage = Image.getInstance(myInterpreter.getImageByteStream());
-						} else {
-							emergencyCase = true;
-						}
-					} else if (preferredEmbeddingType == PDFManager.EMBEDD_JPEG) {
-						// it is NOT embeddable
-						//
-						RenderedImage ri = null;
-						if (myInterpreter.getColordepth() == 1) {
-							emergencyCase = true;
-							// ImageManager sourcemanager = new
-							// ImageManager(url);
-							// ri = sourcemanager.scaleImageByPixel(1000, 0,
-							// ImageManager.SCALE_BY_WIDTH, 0, null, null,
-							// myWatermark, false, ImageManager.BOTTOM);
-							// myInterpreter = sourcemanager.getMyInterpreter();
-						} else {
-							ri = myInterpreter.getRenderedImage();
-							//if there is an error - write error watermark!
-							if (errorPage) {
-								watermark = getNoImageErrorWatermark(errorUrl.toString());
-								ri = addwatermark(ri, watermark, ImageManager.TOP);
-								myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
-							} else if (watermark != null) {
-								ri = addwatermark(ri, watermark, 2);
-								myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
-							}
+					// -------------------------------------------------------------------------------------
+					// Try to Generate Image
+					// -------------------------------------------------------------------------------------
+					pdfImage = generatePdfImageFromInterpreter(myInterpreter, preferredEmbeddingType, errorPage, watermark, errorUrl);
 
-						}
-						// TODO: scale bitonal images here for correct
-						// watermarks
-						// if ( myInterpreter.getColordepth() == 1) {
-						// ri=ImageManipulator.scaleInterpolationBilinear(ri,
-						// 0.1f, 0.1f);
-						// }
-
-						if (myInterpreter.getColordepth() > 1) {
-							// compress image if greyscale or color
-							JpegInterpreter jpint = new JpegInterpreter(ri);
-							ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
-							jpint.setXResolution(myInterpreter.getXResolution());
-							jpint.setYResolution(myInterpreter.getYResolution());
-							jpint.writeToStream(null, bytesoutputstream);
-
-							byte[] returnbyteArray = bytesoutputstream.toByteArray();
-							pdfImage = Image.getInstance(returnbyteArray);
-						} else {
-							emergencyCase = true;
-						}
-					} else if ((preferredEmbeddingType == PDFManager.EMBEDD_LOSSLESSJPEG2000)
-							|| ((preferredEmbeddingType == PDFManager.EMBEDD_LOSSYJPEG2000))) {
-
-						RenderedImage ri = myInterpreter.getRenderedImage();
-						if (myInterpreter.getColordepth() > 1) {
-							// compress image if greyscale or color
-							JpegTwoThousandInterpreter jpint = new JpegTwoThousandInterpreter(ri);
-							ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
-							jpint.setXResolution(myInterpreter.getXResolution());
-							jpint.setYResolution(myInterpreter.getYResolution());
-
-							try {
-								if (preferredEmbeddingType == PDFManager.EMBEDD_LOSSLESSJPEG2000) {
-									jpint.setWriterCompressionType(JpegTwoThousandInterpreter.LOSSLESS);
-								} else {
-									jpint.setWriterCompressionType(JpegTwoThousandInterpreter.LOSSY);
-									jpint.setWriterCompressionValue(80);
-								}
-							} catch (ParameterNotSupportedException e) {
-								// should never happen, as the JPEG200
-								// Interpreter supports this
-								logger.debug("Can't create JPEG2000 stream for PDF; compression parameter not supported!");
-								e.printStackTrace();
-							}
-
-							jpint.writeToStream(null, bytesoutputstream);
-
-							byte[] returnbyteArray = bytesoutputstream.toByteArray();
-							pdfImage = Image.getInstance(returnbyteArray);
-						} else {
-							emergencyCase = true;
-						}
-
-					} else if (preferredEmbeddingType == PDFManager.EMBEDD_RENDEREDIMAGE) {
-						RenderedImage ri = myInterpreter.getRenderedImage();
-
-						// image is NOT compressed as a JPEG, but
-						// iText decides what to do with it
-						BufferedImage buffImage = ImageManipulator.fromRenderedToBuffered(ri);
-						pdfImage = Image.getInstance(buffImage, null, false);
-					} else if (preferredEmbeddingType == PDFManager.EMBEDD_TIFFG4) {
-						if (myInterpreter.getColordepth() > 1) {
-							// it's not a bitonal image
-							emergencyCase = true;
-						} else {
-							TiffInterpreter tiffint = new TiffInterpreter();
-							ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
-							tiffint.setXResolution(myInterpreter.getXResolution());
-							tiffint.setYResolution(myInterpreter.getYResolution());
-							try {
-								tiffint.setWriterCompressionType(TiffInterpreter.COMPRESSION_CCITTFAX4);
-							} catch (ParameterNotSupportedException e) {
-								// should never happen, as the TiffInterpreter
-								// supports this
-								// kind of compression
-								logger.warn("Can't create TIFF G4 compressed image for embedding into PDF", e);
-							}
-
-							tiffint.writeToStream(null, bytesoutputstream);
-
-							byte[] returnbyteArray = bytesoutputstream.toByteArray();
-							pdfImage = Image.getInstance(returnbyteArray);
-						}
-					}
-
-					//
-					// emergency case - image couldn't be embedded yet
-					//
-
-					if (emergencyCase) {
-
+					// -------------------------------------------------------------------------------------
+					// image couldn't be embedded yet (emergencyCase)
+					// -------------------------------------------------------------------------------------
+					if (pdfImage == null) {
 						logger.warn("Couldn't use preferred method for embedding the image. Instead had to use JPEG or RenderedImage");
 						// image couldn't be embedded yet, try using the JPEG
 						// or RenderedImage if bitonal
+
+						// Get Interpreter
 						RenderedImage ri = null;
 						if (preferredEmbeddingType == embeddBitonalImage) {
-
 							ImageManager sourcemanager = new ImageManager(url);
-							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, false,
-									ImageManager.BOTTOM);
+							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, false, ImageManager.BOTTOM);
 							myInterpreter = sourcemanager.getMyInterpreter();
 						} else {
 							ri = myInterpreter.getRenderedImage();
@@ -600,14 +477,16 @@ public class PDFManager {
 								myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
 							}
 						}
+
+						// Try to write into pdfImage
 						if (myInterpreter.getColordepth() > 1) {
 							// compress image if greyscale or color
-							JpegInterpreter jpint = new JpegInterpreter(ri);
 							ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
-							jpint.setXResolution(myInterpreter.getXResolution());
-							jpint.setYResolution(myInterpreter.getYResolution());
-							jpint.writeToStream(null, bytesoutputstream);
-
+							// JpegInterpreter jpint = new JpegInterpreter(ri);
+							// jpint.setXResolution(myInterpreter.getXResolution());
+							// jpint.setYResolution(myInterpreter.getYResolution());
+							// jpint.writeToStream(null, bytesoutputstream);
+							writeJpegFromRenderedImageToStream(bytesoutputstream, ri, null, myInterpreter);
 							byte[] returnbyteArray = bytesoutputstream.toByteArray();
 							pdfImage = Image.getInstance(returnbyteArray);
 						} else {
@@ -616,6 +495,7 @@ public class PDFManager {
 							BufferedImage buffImage = ImageManipulator.fromRenderedToBuffered(ri);
 							pdfImage = Image.getInstance(buffImage, null, false);
 
+							// create Image for Watermark
 							JpegInterpreter jpint = new JpegInterpreter(myWatermark.getRenderedImage());
 							ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
 							jpint.setXResolution(myInterpreter.getXResolution());
@@ -623,37 +503,42 @@ public class PDFManager {
 							jpint.writeToStream(null, bytesoutputstream);
 							byte[] returnbyteArray = bytesoutputstream.toByteArray();
 							Image blaImage = Image.getInstance(returnbyteArray);
+
+							// set Watermark as Footer at fixed position
+							// (200,200)
 							Chunk c = new Chunk(blaImage, 200, 200);
 							Phrase p = new Phrase(c);
 							HeaderFooter hf = new HeaderFooter(p, false);
 							pdfdoc.setFooter(hf);
 							// pdfdoc.setPageSize(arg0)
+							// FIXME hier wird nicht in pdfImage geschrieben.
 
 						}
-					}
-
+					} // end of : if (pdfImage == null) {
 				} catch (BadElementException e) {
 					throw new PDFManagerException("Can't create a PDFImage from a Buffered Image.", e);
 				} catch (ImageManipulatorException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.warn(e);
 				}
 
+				// ---------------------------------------------------------------------------------------------------------
 				// place the image on the page
-				if (pagesizemode == PDF_ORIGPAGESIZE) {
+				// ---------------------------------------------------------------------------------------------------------
+				if (pagesizemode == PdfPageSize.ORIGINAL) {
 					// calculate the image width and height in points, create
 					// the rectangle in points
 					float image_w_points = (myInterpreter.getWidth() / myInterpreter.getXResolution()) * 72;
 					float image_h_points = ((myInterpreter.getHeight()) / myInterpreter.getYResolution()) * 72;
 					Rectangle rect = new Rectangle(image_w_points, image_h_points);
 
-					logger.debug("creating original page sized PDF page:" + image_w_points + " x " + image_h_points);
-
 					// create the pdf page according to this rectangle
+					logger.debug("creating original page sized PDF page:" + image_w_points + " x " + image_h_points);
 					pdfdoc.setPageSize(rect);
+
+					// create new page to put the content
 					try {
 						pageadded++;
-						pdfdoc.newPage(); // create new page to put the content
+						pdfdoc.newPage();
 					} catch (Exception e1) {
 						throw new PDFManagerException("DocumentException occured while creating new page in PDF", e1);
 					}
@@ -662,22 +547,25 @@ public class PDFManager {
 					// not scale the images bytestream
 					pdfImage.scalePercent((72f / myInterpreter.getXResolution() * 100), (72f / myInterpreter.getYResolution() * 100));
 					pdfImage.setAbsolutePosition(0, 0); // set image to lower
-					// left corner
+														// left corner
+
 					boolean result;
 					try {
 						result = pdfdoc.add(pdfImage); // add it to PDF
 						if (!result) {
-							throw new PDFManagerException("Image \"" + url.toString()
-									+ "\" can's be added to PDF! Error during placing image on page");
+							throw new PDFManagerException("Image \"" + url.toString() + "\" can's be added to PDF! Error during placing image on page");
 						}
 					} catch (DocumentException e) {
 						throw new PDFManagerException("DocumentException occured while adding the image to PDF", e);
 					}
 				} else {
-					// it is not the original page size
-					// PDF will contain only A4 pages
+					/*
+					 * it is not the original page size PDF will contain only A4
+					 * pages
+					 */
 					logger.debug("creating A4 pdf page");
 
+					// create new page to put the content
 					try {
 						pageadded++;
 						pdfdoc.setPageSize(PageSize.A4);
@@ -695,36 +583,33 @@ public class PDFManager {
 					long w = myInterpreter.getWidth(); // get height and width
 					long h = myInterpreter.getHeight();
 
-					// if the page is landscape, we have to rotate the page;
-					// this is only done in PDF, the orig
-					// image bytestream is NOT rotated
+					/*
+					 * if the page is landscape, we have to rotate the page;
+					 * this is only done in PDF, the orig image bytestream is
+					 * NOT rotated
+					 */
 					if (w > h) {
 						logger.debug("rotate image");
-
 						// must be rotated
 						pdfImage.setRotationDegrees(90);
-
 						// change width and height
 						long dummy = w;
 						w = h;
 						h = dummy;
-
 						// change the resolutions x and y
 						float dummy2 = res_x;
 						res_x = res_y;
 						res_y = dummy2;
 					}
 
-					// check, if the image needs to be scaled, because it's
-					// bigger than A4 calculate the new scalefactor
+					/*
+					 * check, if the image needs to be scaled, because it's
+					 * bigger than A4 calculate the new scalefactor
+					 */
 					if ((w > page_w_pixel) || (h > page_h_pixel)) {
 						logger.debug("scale image to fit the page");
-
-						// System.out.println("DEBUG: Scale image for PDF;
-						// doesn't fit on page");
 						float scalefactor_w = page_w_pixel / w;
 						float scalefactor_h = page_h_pixel / h;
-
 						if (scalefactor_h < scalefactor_w) {
 							scalefactor = scalefactor_h;
 						} else {
@@ -736,19 +621,18 @@ public class PDFManager {
 					pdfImage.scalePercent((72f / res_x * 100) * scalefactor, (72f / res_y * 100) * scalefactor);
 
 					// center the image on the page
+					// ---------------------------------------------------------------
 					float y_offset = 0; // y - offset
-					float h_cm = (float) (h / (res_x / 2.54)); // get image
-					// size in cm; height
+					// get image size in cm; height
+					float h_cm = (float) (h / (res_x / 2.54));
 					// float w_cm = (float) (w / (res_y / 2.54)); // and width
 					if ((h_cm + 2) < (page_h / 10)) {
 						y_offset = 2 * 72f / 2.54f;
 					}
 					float freespace_x = ((page_w_pixel - w) / res_x * 72f);
 					float freespace_y = ((page_h_pixel - h) / res_y * 72f) - (y_offset);
-
-					pdfImage.setAbsolutePosition(freespace_x / 2, freespace_y); // set
-					// position
-					// add image
+					// set position add image
+					pdfImage.setAbsolutePosition(freespace_x / 2, freespace_y);
 					boolean result;
 					try {
 						result = pdfdoc.add(pdfImage);
@@ -761,7 +645,9 @@ public class PDFManager {
 						throw new PDFManagerException("Image \"" + url.toString() + "\" can's be added to PDF! Error during placing image on page");
 					}
 
-					if (pagesizemode == PDF_A4PAGESIZE_BOX) {
+					// draw box around the image page
+					// ------------------------------------------------------------------------------------------------
+					if (pagesizemode == PdfPageSize.A4BOX) {
 						logger.debug("draw box around the image page");
 
 						// draw a black frame around the image
@@ -784,26 +670,29 @@ public class PDFManager {
 						pcb.stroke();
 					}
 
-				} // endif of origsize
-			} else if (pdfpage.getClass() == PDFPage.class && ((PDFPage) pdfpage).getPdfreader() != null) {
-				// it is a page from a PDF file which should be inserted
+				} // end of: if (pagesizemode == PdfPageSize.ORIGINAL) {
+
+			} // end of : if (pdfpage.getURL() != null) {
+
+			// ------------------------------------------------------------------------------------------------
+			// it is a page from a PDF file which should be inserted
+			// ------------------------------------------------------------------------------------------------
+			else if (pdfpage.getClass() == PDFPage.class && ((PDFPage) pdfpage).getPdfreader() != null) {
+
 				PdfContentByte pdfcb = writer.getDirectContent();
 
 				PdfReader pdfreader = ((PDFPage) pdfpage).getPdfreader();
 				PdfImportedPage importpage = writer.getImportedPage(pdfreader, pdfpage.getPageNumber());
 
-				if (pagesizemode == PDF_ORIGPAGESIZE) {
+				if (pagesizemode == PdfPageSize.ORIGINAL) {
 					logger.debug("creating orig pdf page");
-
 					Rectangle rect = pdfreader.getPageSize(pdfpage.getPageNumber());
-
 					try {
 						pdfdoc.setPageSize(rect);
 						pdfdoc.newPage(); // create new page
 					} catch (Exception e1) {
 						throw new PDFManagerException("Exception occured while creating new page in PDF", e1);
 					}
-
 					// add content
 					pageadded++;
 					pdfcb.addTemplate(importpage, 0, 0);
@@ -822,15 +711,15 @@ public class PDFManager {
 					pdfcb.addTemplate(importpage, 0, 0);
 
 					// draw box
-					if (pagesizemode == PDF_A4PAGESIZE_BOX) {
-
+					if (pagesizemode == PdfPageSize.A4BOX) {
+						// FIXME: nichts implementiert ?
 					}
 				}
 
 			}
 			// handle pagename
 			if (imageNames != null) {
-				String pagename = imageNames.get(key);
+				String pagename = imageNames.get(imageKey);
 
 				if (pagename != null) {
 					pagelabels.addPageLabel(pageadded, PdfPageLabels.EMPTY, pagename);
@@ -842,7 +731,7 @@ public class PDFManager {
 			logger.debug("handle bookmark(s) for page");
 
 			PdfDestination destinator = new PdfDestination(PdfDestination.FIT);
-			setBookmarksForPage(writer, destinator, key); // the key in the
+			setBookmarksForPage(writer, destinator, imageKey); // the key in the
 			// mashMap is the pagenumber
 
 		} // end of while iterator over all pages
@@ -850,21 +739,158 @@ public class PDFManager {
 	}
 
 	/***************************************************************************************************************
+	 * Writes JPEG to outputstream from {@link RenderedImage}. This method is
+	 * used by
+	 * {@link PDFManager#generatePdfImageFromInterpreter(ImageInterpreter, Embedd, boolean, Watermark, URL)}
+	 * 
+	 * @param bytesoutputstream
+	 *            {@link ByteArrayOutputStream}
+	 * @param ri
+	 *            {@link RenderedImage}
+	 * @param preferredEmbeddingType
+	 *            {@link Embedd}
+	 * @param myInterpreter
+	 *            {@link ImageInterpreter}
+	 ***************************************************************************************************************/
+	private void writeJpegFromRenderedImageToStream(ByteArrayOutputStream bytesoutputstream, RenderedImage ri, Embedd preferredEmbeddingType, ImageInterpreter myInterpreter) {
+		JpegInterpreter jpint = new JpegInterpreter(ri);
+		jpint.setXResolution(myInterpreter.getXResolution());
+		jpint.setYResolution(myInterpreter.getYResolution());
+		try {
+			switch (preferredEmbeddingType) {
+			case LOSSLESSJPEG2000:
+				jpint.setWriterCompressionType(JpegTwoThousandInterpreter.LOSSLESS);
+				break;
+			case LOSSYJPEG2000:
+				jpint.setWriterCompressionType(JpegTwoThousandInterpreter.LOSSY);
+				jpint.setWriterCompressionValue(80);
+				break;
+			}
+		} catch (ParameterNotSupportedException e) {
+			logger.debug("Error: ", e);
+			e.printStackTrace();
+		}
+		jpint.writeToStream(null, bytesoutputstream);
+	}
+
+	/***************************************************************************************************************
+	 * Generates {@link Image} from {@link ImageInterpreter} that we can embedd
+	 * in PDF. Used by
+	 * {@link PDFManager#addAllPages(PdfPageSize, PdfWriter, Document, Watermark)}
+	 * 
+	 * @param myInterpreter
+	 *            {@link ImageInterpreter}
+	 * @param preferredEmbeddingType
+	 *            {@link Embedd}
+	 * 
+	 * @param errorPage
+	 *            {@link Boolean} is this an errorpage ?
+	 * @param watermark
+	 *            {@link Watermark}
+	 * @param errorUrl
+	 *            {@link URL} link to image, that caused the error
+	 * 
+	 * @return {@link Image} or null
+	 * 
+	 * @throws IOException
+	 * @throws MalformedURLException
+	 * @throws BadElementException
+	 * 
+	 * @throws ImageInterpreterException
+	 *             - if we can't generate Watermark
+	 * @throws ImageManipulatorException
+	 *             - if we can't generate Watermark
+	 ***************************************************************************************************************/
+	private Image generatePdfImageFromInterpreter(ImageInterpreter myInterpreter, Embedd preferredEmbeddingType, boolean errorPage, Watermark watermark, URL errorUrl)
+			throws BadElementException, MalformedURLException, IOException, ImageInterpreterException, ImageManipulatorException {
+		ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
+		RenderedImage ri = null;
+		switch (preferredEmbeddingType) {
+
+		case ORIGBYTESTREAM: // if the bytestream is directly embeddable
+			// should be embedded, but is it the bytestream
+			// embeddable?
+			if (myInterpreter.pdfBytestreamEmbeddable()) {
+				return Image.getInstance(myInterpreter.getImageByteStream());
+			} else {
+				return null;
+			}
+			// ----------------------------------------------------------------------------------------------------
+		case JPEG: // it is NOT directly embeddable!
+			if (myInterpreter.getColordepth() <= 1) {
+				return null;
+			}
+			ri = myInterpreter.getRenderedImage();
+			// if there is an error - write error watermark!
+			if (errorPage) {
+				watermark = getNoImageErrorWatermark(errorUrl.toString());
+				ri = addwatermark(ri, watermark, ImageManager.TOP);
+				myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
+			} else if (watermark != null) {
+				ri = addwatermark(ri, watermark, 2);
+				myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
+			}
+
+			writeJpegFromRenderedImageToStream(bytesoutputstream, ri, preferredEmbeddingType, myInterpreter);
+			// ----------------------------------------------------------------------------------------------------
+		case LOSSLESSJPEG2000:
+			if (myInterpreter.getColordepth() > 1) {
+				ri = myInterpreter.getRenderedImage();
+				writeJpegFromRenderedImageToStream(bytesoutputstream, ri, preferredEmbeddingType, myInterpreter);
+			} else {
+				return null;
+			}
+			break;
+		case LOSSYJPEG2000:
+			if (myInterpreter.getColordepth() > 1) {
+				ri = myInterpreter.getRenderedImage();
+				writeJpegFromRenderedImageToStream(bytesoutputstream, ri, preferredEmbeddingType, myInterpreter);
+			} else {
+				return null;
+			}
+			break;
+		// ----------------------------------------------------------------------------------------------------
+		case TIFFG4:
+			if (myInterpreter.getColordepth() > 1) {
+				// it's not a bitonal image
+				return null;
+			} else {
+				TiffInterpreter tiffint = new TiffInterpreter();
+
+				tiffint.setXResolution(myInterpreter.getXResolution());
+				tiffint.setYResolution(myInterpreter.getYResolution());
+				try {
+					tiffint.setWriterCompressionType(TiffInterpreter.COMPRESSION_CCITTFAX4);
+				} catch (ParameterNotSupportedException e) {
+					// should never happen, as the TiffInterpreter
+					// supports this
+					// kind of compression
+					logger.warn("Can't create TIFF G4 compressed image for embedding into PDF", e);
+				}
+
+				tiffint.writeToStream(null, bytesoutputstream);
+
+			}
+			break;
+		}
+		byte[] returnbyteArray = bytesoutputstream.toByteArray();
+		return Image.getInstance(returnbyteArray);
+	}
+
+	/***************************************************************************************************************
 	 * @param errorUrl
 	 *            {@link String} url of the image that does not exists
 	 * @return {@link Watermark} with error message about image that does not
 	 *         exists..
-	 * @throws FileNotFoundException 
-	 * @throws ImageInterpreterException 
+	 * @throws FileNotFoundException
+	 * @throws ImageInterpreterException
 	 ***************************************************************************************************************/
 	private Watermark getNoImageErrorWatermark(String errorUrl) throws FileNotFoundException, ImageInterpreterException {
-		String errorString = "Error: Image: "+errorUrl+" does not exists!";
-		String jpgfile = new File(Util.getBaseFolderAsFile(),
-				"errorfile.jpg").getAbsolutePath();
+		String errorString = "Error: Image: " + errorUrl + " does not exists!";
+		String jpgfile = new File(Util.getBaseFolderAsFile(), "errorfile.jpg").getAbsolutePath();
 		FileInputStream inputFileStream = new FileInputStream(jpgfile);
-		return ServletWatermark.generateErrorWatermark(inputFileStream,
-				errorString);
-		
+		return ServletWatermark.generateErrorWatermark(inputFileStream, errorString);
+
 	}
 
 	private RenderedImage addwatermark(RenderedImage outImage, Watermark inWatermark, Integer watermarkposition) throws ImageManipulatorException {
@@ -999,13 +1025,13 @@ public class PDFManager {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	private Document setPDFPageSizeForFirstPage(int pagesizemode, Rectangle pagesize, int footer) throws ImageInterpreterException, IOException {
+	private Document setPDFPageSizeForFirstPage(PdfPageSize pagesizemode, Rectangle pagesize, int footer) throws ImageInterpreterException, IOException {
 
 		Document pdfdoc;
 		boolean isTitlePage = false;
 
 		// set page size of the PDF
-		if ((pagesizemode == PDF_ORIGPAGESIZE) && (pdftitlepage == null)) {
+		if ((pagesizemode == PdfPageSize.ORIGINAL) && (pdftitlepage == null)) {
 			logger.debug("Page size of the first page is size of first image");
 
 			// GDZ: Check if this changes the order of the Pages
@@ -1032,8 +1058,7 @@ public class PDFManager {
 					// it's an image file
 					URL url = pdfpage.getURL();
 					logger.debug("Using image" + pdfpage.getURL().toString());
-					ImageInterpreter myInterpreter = ImageFileFormat.getInterpreter(url, httpproxyhost, httpproxyport, httpproxyuser,
-							httpproxypassword);
+					ImageInterpreter myInterpreter = ImageFileFormat.getInterpreter(url, httpproxyhost, httpproxyport, httpproxyuser, httpproxypassword);
 
 					float xres = myInterpreter.getXResolution();
 					float yres = myInterpreter.getYResolution();
@@ -1457,18 +1482,6 @@ public class PDFManager {
 	}
 
 	/**
-	 * *************************************************************************
-	 * Getter for urlWatermark.
-	 * 
-	 * @return the urlWatermark
-	 *         *************************************************
-	 *         ***********************
-	 */
-	public String getUrlWatermark() {
-		return urlWatermark;
-	}
-
-	/**
 	 * Sets the iccprofile.
 	 * 
 	 * @param iccprofile
@@ -1476,67 +1489,6 @@ public class PDFManager {
 	 */
 	public void setIccprofile(ICC_Profile iccprofile) {
 		this.iccprofile = iccprofile;
-	}
-
-	/**
-	 * *************************************************************************
-	 * Setter for urlWatermark.
-	 * 
-	 * @param urlWatermark
-	 *            the urlWatermark to set
-	 *            ***************************************
-	 *            *********************************
-	 */
-	public void setUrlWatermark(String urlWatermark) {
-		this.urlWatermark = urlWatermark;
-	}
-
-	/**
-	 * *************************************************************************
-	 * Getter for url_metadatafile.
-	 * 
-	 * @return the url_metadatafile
-	 *         *********************************************
-	 *         ***************************
-	 */
-	public String getUrlMetadatafile() {
-		return urlMetadatafile;
-	}
-
-	/**
-	 * *************************************************************************
-	 * Setter for urlMetadatafile.
-	 * 
-	 * @param urlMetadatafile
-	 *            the urlMetadatafile to set
-	 *            ************************************
-	 *            ************************************
-	 */
-	public void setUrlMetadatafile(String urlMetadatafile) {
-		this.urlMetadatafile = urlMetadatafile;
-	}
-
-	/**
-	 * *************************************************************************
-	 * Getter for xmpHeader.
-	 * 
-	 * @return the xmpHeader
-	 *         ****************************************************
-	 *         ********************
-	 */
-	public String getXmpHeader() {
-		return xmpHeader;
-	}
-
-	/**
-	 * *************************************************************************
-	 * Setter for xmpHeader.
-	 * 
-	 * @param xmpHeader
-	 *            the xmp header
-	 */
-	public void setXmpHeader(String xmpHeader) {
-		this.xmpHeader = xmpHeader;
 	}
 
 	/**
@@ -1648,11 +1600,8 @@ public class PDFManager {
 	// method is called before setAlwaysCompressToJPEG
 	public void setAlwaysUseRenderedImage(boolean alwaysUseRenderedImage) {
 		this.alwaysUseRenderedImage = alwaysUseRenderedImage;
-
 		// set everything to rendered image
-		this.embeddBitonalImage = PDFManager.EMBEDD_RENDEREDIMAGE;
-		this.embeddGreyscaleImage = PDFManager.EMBEDD_RENDEREDIMAGE;
-		this.embeddColorImage = PDFManager.EMBEDD_RENDEREDIMAGE;
+		this.embeddBitonalImage = this.embeddGreyscaleImage = this.embeddColorImage = Embedd.RENDEREDIMAGE;
 	}
 
 	/**
@@ -1663,87 +1612,8 @@ public class PDFManager {
 	 */
 	public void setAlwaysCompressToJPEG(boolean alwaysCompressToJPEG) {
 		this.alwaysCompressToJPEG = alwaysCompressToJPEG;
-
 		// set everything to jpeg
-		this.embeddBitonalImage = PDFManager.EMBEDD_JPEG;
-		this.embeddGreyscaleImage = PDFManager.EMBEDD_JPEG;
-		this.embeddColorImage = PDFManager.EMBEDD_JPEG;
-	}
-
-	/**
-	 * Gets the embedd bitonal image.
-	 * 
-	 * @return the embedd bitonal image
-	 */
-	public int getEmbeddBitonalImage() {
-		return embeddBitonalImage;
-	}
-
-	/**
-	 * Sets the embedd bitonal image.
-	 * 
-	 * @param embeddBitonalImage
-	 *            the new embedd bitonal image
-	 */
-	public void setEmbeddBitonalImage(int embeddBitonalImage) {
-		this.embeddBitonalImage = embeddBitonalImage;
-	}
-
-	/**
-	 * Gets the embedd greyscale image.
-	 * 
-	 * @return the embedd greyscale image
-	 */
-	public int getEmbeddGreyscaleImage() {
-		return embeddGreyscaleImage;
-	}
-
-	/**
-	 * Sets the embedd greyscale image.
-	 * 
-	 * @param embeddGreyscaleImage
-	 *            the new embedd greyscale image
-	 */
-	public void setEmbeddGreyscaleImage(int embeddGreyscaleImage) {
-		this.embeddGreyscaleImage = embeddGreyscaleImage;
-	}
-
-	/**
-	 * Gets the embedd color image.
-	 * 
-	 * @return the embedd color image
-	 */
-	public int getEmbeddColorImage() {
-		return embeddColorImage;
-	}
-
-	/**
-	 * Sets the embedd color image.
-	 * 
-	 * @param embeddColorImage
-	 *            the new embedd color image
-	 */
-	public void setEmbeddColorImage(int embeddColorImage) {
-		this.embeddColorImage = embeddColorImage;
-	}
-
-	/**
-	 * Checks if is pdfa.
-	 * 
-	 * @return the pdfa value
-	 */
-	public boolean isPdfa() {
-		return pdfa;
-	}
-
-	/**
-	 * Sets the pdfa.
-	 * 
-	 * @param pdfa
-	 *            the pdfa to set
-	 */
-	public void setPdfa(boolean pdfa) {
-		this.pdfa = pdfa;
+		this.embeddBitonalImage = this.embeddGreyscaleImage = this.embeddColorImage = Embedd.JPEG;
 	}
 
 	//
@@ -1832,18 +1702,19 @@ public class PDFManager {
 	 * @param strPageSize
 	 *            the str page size
 	 * 
-	 * @return the page sizefrom string
+	 * @return {@link PdfPageSize}
 	 */
-	public static Integer getPageSizefromString(String strPageSize) {
-		if (strPageSize.equalsIgnoreCase(PDF_A4PAGESIZE_NAME)) {
-			return PDF_A4PAGESIZE;
-		}
-		if (strPageSize.equalsIgnoreCase(PDF_ORIGPAGESIZE_NAME)) {
-			return PDF_ORIGPAGESIZE;
-		}
-		if (strPageSize.equalsIgnoreCase(PDF_A4PAGESIZE_BOX_NAME)) {
-			return PDF_A4PAGESIZE_BOX;
+	public static PdfPageSize getPageSizefromString(String strPageSize) {
+		for (PdfPageSize pageSize : PdfPageSize.values()) {
+			if (pageSize.getName().equalsIgnoreCase(strPageSize)) {
+				return pageSize;
+			}
 		}
 		return null;
+	}
+
+	public void setPdfa(boolean writeAsPdfA) {
+		this.pdfa = writeAsPdfA;
+
 	}
 }

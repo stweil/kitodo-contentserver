@@ -45,6 +45,7 @@ import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFBookmark;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFManager;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFPage;
+import de.unigoettingen.sub.commons.contentlib.pdflib.PDFManager.PdfPageSize;
 import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 import de.unigoettingen.sub.commons.util.datasource.UrlImage;
 
@@ -220,7 +221,7 @@ public class GetPdfAction extends GetAction {
 		 * --------------------------------
 		 */
 		try {
-			pdfmanager.createPDF(response.getOutputStream(), PDFManager.PDF_ORIGPAGESIZE, myWatermark);
+			pdfmanager.createPDF(response.getOutputStream(), PdfPageSize.ORIGINAL, myWatermark);
 		} catch (URISyntaxException e) {
 			throw new ContentLibPdfException("error while creating pdf file", e);
 		}

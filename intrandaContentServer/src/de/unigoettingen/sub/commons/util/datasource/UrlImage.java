@@ -24,28 +24,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+/**
+ * Rendered Images with Urls
+ * 
+ */
 public interface UrlImage extends Image {
 	/**
 	 * Gets the URL.
 	 * 
 	 * @return the URL
 	 */
-	abstract URL getURL ();
-	
+	abstract URL getURL();
 
 	/**************************************************************************************
 	 * Setter for url
-	 *
-	 * @param url the imageurl to set
+	 * 
+	 * @param url
+	 *            the imageurl to set
 	 **************************************************************************************/
 	public void setURL(URL url);
-	
+
 	/**
 	 * Open stream.
 	 * 
 	 * @return the input stream
 	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	abstract InputStream openStream() throws IOException;
 }

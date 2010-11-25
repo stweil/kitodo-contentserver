@@ -21,6 +21,8 @@
  */
 package de.unigoettingen.sub.commons.contentlib.pdflib;
 
+import de.unigoettingen.sub.commons.contentlib.pdflib.PDFManager.PdfPageSize;
+
 
 //TODO: GDZ: Merge with configuration for other PDF classes
 public class PDFConfiguration {
@@ -29,7 +31,7 @@ public class PDFConfiguration {
 	private boolean PdfDefaultAlwaysUseRenderedImage = true;
 	private boolean writeAsPdfA = true;
 	private String iccinputfilename = null;
-	private int pagesize = 1;
+	private PdfPageSize pagesize = PdfPageSize.ORIGINAL;
 	private PDFTitlePage pdftitlepage = null;
 
 	/**************************************************************************************
@@ -111,23 +113,7 @@ public class PDFConfiguration {
 		this.iccinputfilename = iccinputfilename;
 	}
 
-	/*************************************************************************************
-	 * Getter for pagesize
-	 *
-	 * @return the pagesize
-	 *************************************************************************************/
-	public int getPagesize() {
-		return pagesize;
-	}
 
-	/**************************************************************************************
-	 * Setter for pagesize
-	 *
-	 * @param pagesize the pagesize to set
-	 **************************************************************************************/
-	public void setPagesize(int pagesize) {
-		this.pagesize = pagesize;
-	}
 
 	/*************************************************************************************
 	 * Getter for pdftitlepage
@@ -145,6 +131,14 @@ public class PDFConfiguration {
 	 **************************************************************************************/
 	public void setPdftitlepage(PDFTitlePage pdftitlepage) {
 		this.pdftitlepage = pdftitlepage;
+	}
+
+	public void setPagesize(PdfPageSize pagesize) {
+		this.pagesize = pagesize;
+	}
+
+	public PdfPageSize getPagesize() {
+		return pagesize;
 	}
 
 }

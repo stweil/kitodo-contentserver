@@ -72,7 +72,7 @@ public class PDFCreator {
 			throws ImageManagerException, FileNotFoundException, IOException, PDFManagerException,
 			ImageInterpreterException, URISyntaxException, MetsException {
 
-		PDFManager pdfmanager = new PDFManager();
+		PDFManager pdfmanager = null;
 
 		String creator = "";
 		String title = "";
@@ -275,6 +275,7 @@ public class PDFCreator {
 		} // end of while over all document parts
 
 		// setting for PDFManager
+		pdfmanager = new PDFManager(allPages);
 		pdfmanager.setAlwaysCompressToJPEG(pdfconfig.isPdfDefaultAlwaysCompressToJPEG());
 		pdfmanager.setAlwaysUseRenderedImage(pdfconfig.isPdfDefaultAlwaysUseRenderedImage());
 		pdfmanager.setPdfa(pdfconfig.isWriteAsPdfA());

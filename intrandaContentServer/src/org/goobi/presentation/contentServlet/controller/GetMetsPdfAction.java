@@ -60,6 +60,7 @@ import de.unigoettingen.sub.commons.contentlib.imagelib.ContentLibUtil;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageManipulator;
 import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFManager;
+import de.unigoettingen.sub.commons.contentlib.pdflib.PDFManager.PdfPageSize;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFTitlePage;
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFTitlePageLine;
 import de.unigoettingen.sub.commons.contentlib.servlet.ServletWatermark;
@@ -452,7 +453,7 @@ public class GetMetsPdfAction implements Action {
 	 * @param request
 	 *            {@link HttpServletRequest} of ServletRequest
 	 ************************************************************************************/
-	protected int getPageSize(HttpServletRequest request) {
+	protected PdfPageSize getPageSize(HttpServletRequest request) {
 		/* --------------------------------
 		 * check if page size is defined in request 
 		 * else take it from config file
