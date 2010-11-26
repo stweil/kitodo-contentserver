@@ -78,14 +78,12 @@ public class GetPdfAction extends GetAction {
 		super.run(servletContext, request, response);
 		Watermark myWatermark = null;
 		/*
-		 * -------------------------------- get central configuration and
-		 * retrieve source image from url --------------------------------
+		 * get central configuration and retrieve source image from url
 		 */
 		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
 
 		/*
-		 * -------------------------------- parse images and get all image paths
-		 * into HashMap --------------------------------
+		 * parse images and get all image paths into HashMap
 		 */
 		HashMap<Integer, UrlImage> urlMap = new HashMap<Integer, UrlImage>();
 		String images = request.getParameter("images");
@@ -99,8 +97,7 @@ public class GetPdfAction extends GetAction {
 		}
 
 		/*
-		 * -------------------------------- parse image names and get all into
-		 * HashMap --------------------------------
+		 * parse image names and get all into HashMap
 		 */
 		HashMap<Integer, String> nameMap = new HashMap<Integer, String>();
 		if (request.getParameter("imageNames") != null) {
@@ -139,8 +136,7 @@ public class GetPdfAction extends GetAction {
 		}
 
 		/*
-		 * -------------------------------- create new PDFManager to create the
-		 * PDF files --------------------------------
+		 * create new PDFManager to create the PDF files
 		 */
 		PDFManager pdfmanager = new PDFManager(urlMap);
 		/* add bookmarks */
@@ -154,10 +150,10 @@ public class GetPdfAction extends GetAction {
 			File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
 			myWatermark = Watermark.generateWatermark(request, watermarkfile);
 		}
-		
+
 		/*
-		 * -------------------------------- define conversion parameters from
-		 * request or from configuration --------------------------------
+		 * define conversion parameters from request or from configuration
+		 * --------------------------------
 		 */
 		/* alwaysUseRenderedImage */
 		if (request.getParameter("alwaysUseRenderedImage") != null) {
@@ -217,8 +213,7 @@ public class GetPdfAction extends GetAction {
 		response.setContentType("application/pdf");
 
 		/*
-		 * -------------------------------- write pdf to response streeam
-		 * --------------------------------
+		 * write pdf to response stream
 		 */
 		try {
 			pdfmanager.createPDF(response.getOutputStream(), PdfPageSize.ORIGINAL, myWatermark);

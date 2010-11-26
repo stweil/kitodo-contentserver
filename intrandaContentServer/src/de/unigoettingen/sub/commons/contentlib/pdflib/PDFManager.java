@@ -435,11 +435,8 @@ public class PDFManager {
 				ImageInterpreter myInterpreter = ImageFileFormat.getInterpreter(url, httpproxyhost, httpproxyport, httpproxyuser, httpproxypassword);
 
 				try {
-
-					// check preferred compresiion type dependent
-					// on color depth
+					// check preferred compression type depending on color depth
 					Embedd preferredEmbeddingType = Embedd.ORIGBYTESTREAM;
-
 					if (myInterpreter.getColordepth() == 1) {
 						// bitonal image
 						preferredEmbeddingType = embeddBitonalImage;
@@ -452,7 +449,7 @@ public class PDFManager {
 					}
 
 					// -------------------------------------------------------------------------------------
-					// Try to Generate Image
+					// Try to generate image
 					// -------------------------------------------------------------------------------------
 					pdfImage = generatePdfImageFromInterpreter(myInterpreter, preferredEmbeddingType, errorPage, watermark, errorUrl);
 
@@ -468,7 +465,8 @@ public class PDFManager {
 						RenderedImage ri = null;
 						if (preferredEmbeddingType == embeddBitonalImage) {
 							ImageManager sourcemanager = new ImageManager(url);
-							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, false, ImageManager.BOTTOM);
+							boolean watermarkscale = true; //should we scale the watermark ? 
+							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, watermarkscale, ImageManager.BOTTOM);
 							myInterpreter = sourcemanager.getMyInterpreter();
 						} else {
 							ri = myInterpreter.getRenderedImage();

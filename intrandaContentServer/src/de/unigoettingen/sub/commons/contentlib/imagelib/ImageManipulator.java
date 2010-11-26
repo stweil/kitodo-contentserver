@@ -128,6 +128,16 @@ public class ImageManipulator {
 		// set all parameters for scaling
 		ParameterBlock params = new ParameterBlock();
 
+		//some kind of hack...
+		//-------------------------------
+		if (scalex>1) {
+			scalex = (float)1/scalex;
+		}
+		if (scaley>1) {
+			scaley = (float)1/scaley;
+		}
+		//-------------------------------
+		
 		params.addSource(inImage);
 		params.add(scalex);
 		params.add(scaley);
