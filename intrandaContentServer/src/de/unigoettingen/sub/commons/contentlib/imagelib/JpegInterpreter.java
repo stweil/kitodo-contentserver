@@ -102,6 +102,10 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 		try {
 			inputStream = new ByteArraySeekableStream(imagebytes);
 		} catch (IOException e1) {
+			try {
+				inputStream.close();
+			} catch (Exception e) {
+			}
 			logger.error("Can't transform the image's byte array to stream");
 			ImageInterpreterException iie = new ImageInterpreterException("Can't transform the image's byte array to stream");
 			throw iie;
@@ -119,7 +123,6 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 			// the
 			// rendered
 			// image
-
 		} catch (IOException ioe) {
 			logger.error("Can't read jpeg image", ioe);
 			throw new ImageInterpreterException("Can't read the input stream", ioe);
@@ -185,29 +188,10 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 		if (samplesperpixel_str != null) {
 			this.samplesPerPixel = Integer.parseInt(samplesperpixel_str);
 		}
-
-		// TODO: INTRANDA: Remove this, if it's not needed
-		// somehow I don't get any result with those xpath expressions. No
-		// matter
-		// what XPATH I define or if I take te domNode directly or create a new
-		// XML document from
-		// the xml string provided by the printXmlNode method !!!
-		//
-		// // get new metadata
-		// try
-		// {
-		//
-		// XPath xpath = XPathFactory.newInstance().newXPath();
-		// String n = (String) xpath.evaluate("/javax_imageio_jpeg_image_1.0",
-		// domNode);
-		// System.out.println("XPath result:"+n+"<");
-		//
-		// }catch (XPathExpressionException e){
-		// logger.error(e);
-		// }
-
-		// JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(inStream);
-
+		try {
+			iis.close();
+		} catch (Exception e) {
+		}
 	}
 
 	/************************************************************************************

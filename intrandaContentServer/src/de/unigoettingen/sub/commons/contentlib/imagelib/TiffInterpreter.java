@@ -218,6 +218,12 @@ public class TiffInterpreter extends AbstractImageInterpreter implements
 			logger.error("Can't read compression type of TIFF", e);
 			throw new ImageInterpreterException(
 					"Can't read compression type of TIFF", e);
+		} finally {
+			try {
+				iis.close();
+				inStream.close();
+			} catch (IOException e) {
+			}
 		}
 	}
 
@@ -244,6 +250,11 @@ public class TiffInterpreter extends AbstractImageInterpreter implements
 		if ((this.renderedimage == null) && (this.inputStream != null)) {
 			// create the renderedimage from stream, if not already done
 			this.renderedimage = JAI.create("Stream", this.inputStream);
+			try {
+				inputStream.close();
+			} catch (Exception e) {
+				logger.error("safaf");
+			}
 		}
 		return this.renderedimage;
 	}
