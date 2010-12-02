@@ -116,6 +116,8 @@ public class GetImageAction extends GetAction {
 			if (!ignoreCache && cc.cacheContains(myUniqueID, targetExtension)) {
 				logger.debug("get file from cache: " + myUniqueID);
 				cc.writeToStream(output, myUniqueID, targetExtension);
+				output.flush();
+				output.close();
 				return;
 			} else if (ignoreCache == false) {
 				logger.debug("file not found in cache: " + myUniqueID);

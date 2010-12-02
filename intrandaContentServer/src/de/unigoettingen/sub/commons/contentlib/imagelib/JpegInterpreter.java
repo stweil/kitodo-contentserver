@@ -277,6 +277,8 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 				writer.endWriteSequence();
 				imageToFile.flush();
 				imageToFile.close();
+				fos.flush();
+				fos.close();
 			}
 
 			writer.dispose();

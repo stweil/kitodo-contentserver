@@ -291,6 +291,8 @@ public class JpegTwoThousandInterpreter extends AbstractImageInterpreter
 				writer.write(null, iioImage, writerParam);
 				imageToFile.flush();
 				imageToFile.close();
+				fos.flush();
+				fos.close();
 			}
 			
 			writer.dispose();

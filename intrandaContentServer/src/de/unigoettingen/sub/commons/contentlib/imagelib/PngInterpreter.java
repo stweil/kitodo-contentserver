@@ -253,6 +253,8 @@ public class PngInterpreter extends AbstractImageInterpreter implements
 				writer.write(null, iioImage, writerParam);
 				imageToFile.flush();
 				imageToFile.close();
+				fos.flush();
+				fos.close();
 			}
 			writer.dispose();
 			imageOutStream.close();

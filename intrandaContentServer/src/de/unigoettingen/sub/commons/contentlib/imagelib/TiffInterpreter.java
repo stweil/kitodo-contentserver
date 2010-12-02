@@ -339,6 +339,8 @@ public class TiffInterpreter extends AbstractImageInterpreter implements
 				iwriter.write(null, new IIOImage(bi, null, null), wparam);
 				imageToFile.flush();
 				imageToFile.close();
+				fos.flush();
+				fos.close();
 			}
 		} catch (IOException e) {
 			logger.error("IOException occured", e);
