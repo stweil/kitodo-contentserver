@@ -70,6 +70,15 @@ public class ContentServerConfiguration {
 		return instance;
 	}
 
+	/***************************************************************************************************************
+	 * get maximal file length for input images
+	 * 
+	 * @return int
+	 ***************************************************************************************************************/
+	public int getMaxFileLength() {
+		return config.getInt("maxFileLength[@value]");
+	}
+
 	/************************************************************************************
 	 * get path of repository from configuration as URL-String
 	 * 

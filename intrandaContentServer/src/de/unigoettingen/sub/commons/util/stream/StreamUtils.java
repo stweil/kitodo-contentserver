@@ -32,6 +32,8 @@ import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
 
+import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
+
 
 public class StreamUtils {
 
@@ -140,6 +142,12 @@ public class StreamUtils {
 			}
 			inStream = con.getInputStream();
 		} else if (url.getProtocol().equalsIgnoreCase("file")) {
+			int size = url.openConnection().getContentLength();
+			
+			int maxFileLength = ContentServerConfiguration.getInstance().getMaxFileLength();
+			if (size > maxFileLength) {
+				throw new IOException("File "+url.getFile()+" is too large ("+size+")");
+			}
 			String filepath = url.getFile();
 	
 			filepath = URLDecoder.decode(filepath, System

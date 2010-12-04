@@ -72,6 +72,7 @@ import com.lowagie.text.xml.xmp.DublinCoreSchema;
 import com.lowagie.text.xml.xmp.PdfSchema;
 import com.lowagie.text.xml.xmp.XmpSchema;
 import com.lowagie.text.xml.xmp.XmpWriter;
+import com.sun.tools.example.debug.gui.SourceManager;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageInterpreterException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManagerException;
@@ -287,8 +288,6 @@ public class PDFManager {
 	public void createPDF(OutputStream out, PdfPageSize pagesizemode, Watermark myWatermark) throws ImageManagerException, FileNotFoundException, IOException, PDFManagerException,
 			ImageInterpreterException, URISyntaxException {
 
-		PdfWriter writer = null; // writer for creating the PDF
-		Document pdfdoc; // the pdfdocument
 		Rectangle pagesize = null; // pagesize of the first page
 		PdfPageLabels pagelabels = null; // object to store all page labels
 
@@ -296,9 +295,11 @@ public class PDFManager {
 			throw new PDFManagerException("No URLs for images available, HashMap is null or empty");
 		}
 
-		// set the page sizes
-		pdfdoc = setPDFPageSizeForFirstPage(pagesizemode, pagesize, 80);
-		writer = createPDFWriter(out, writer, pdfdoc);
+		// set the page sizes & pdf document
+		Document pdfdoc = setPDFPageSizeForFirstPage(pagesizemode, pagesize, 80);
+
+		// writer for creating the PDF
+		PdfWriter writer = createPDFWriter(out, pdfdoc);
 
 		// set metadata for PDF as author and title
 		// ------------------------------------------------------------------------------------
@@ -388,13 +389,6 @@ public class PDFManager {
 			URL errorUrl = null; // url of the image that does not exists
 
 			// ------------------------------------------------------------------------------------------------
-			// pagename (physical page
-			// number)
-			// check if we have to create a title page before
-			// this page number
-			// ------------------------------------------------------------------------------------------------
-
-			// ------------------------------------------------------------------------------------------------
 			// Title page available. Render it in pdftitlepage
 			// ------------------------------------------------------------------------------------------------
 			if ((pdftitlepages != null) && (pdftitlepages.get(imageKey) != null)) {
@@ -414,13 +408,16 @@ public class PDFManager {
 				// render title page
 				pdftitlepage.render(pdfdoc);
 			}
+
 			// ------------------------------------------------------------------------------------------------
 			// Process image with imageKey
 			// ------------------------------------------------------------------------------------------------
 			UrlImage pdfpage = imageURLs.get(imageKey);
 			if (pdfpage.getURL() != null) {
 
-				// it is an image file which must be inserted
+				boolean scaled = false;
+
+				// image file
 				URL url = pdfpage.getURL();
 				logger.debug("page:" + imageKey + "  url:" + url.toString());
 
@@ -458,16 +455,18 @@ public class PDFManager {
 					// -------------------------------------------------------------------------------------
 					if (pdfImage == null) {
 						logger.warn("Couldn't use preferred method for embedding the image. Instead had to use JPEG or RenderedImage");
-						// image couldn't be embedded yet, try using the JPEG
-						// or RenderedImage if bitonal
 
-						// Get Interpreter
+						// Get Interpreter and rendered Image
+						// ---------------------------------------------------------------------------------------------------------------------------------
 						RenderedImage ri = null;
 						if (preferredEmbeddingType == embeddBitonalImage) {
 							ImageManager sourcemanager = new ImageManager(url);
-							boolean watermarkscale = true; // should we scale
-															// the watermark ?
-							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, watermarkscale, ImageManager.BOTTOM);
+							 boolean watermarkscale = true; // should we scale
+							 // the watermark ?
+							 ri = sourcemanager.scaleImageByPixel(3000, 0,
+							 ImageManager.SCALE_BY_WIDTH, 0, null, null,
+							 watermark, watermarkscale, ImageManager.BOTTOM);
+							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, false, ImageManager.BOTTOM);
 							myInterpreter = sourcemanager.getMyInterpreter();
 						} else {
 							ri = myInterpreter.getRenderedImage();
@@ -477,7 +476,73 @@ public class PDFManager {
 							}
 						}
 
+						// scale rendered image
+						// ---------------------------------------------------------------------------------------------------------------------------------
+						// float scalefactorX = 1;
+						// float scalefactorY = 1;
+						// switch (pagesizemode) {
+						// case ORIGINAL:
+						// scalefactorX = 72f / myInterpreter.getXResolution();
+						// scalefactorY = 72f / myInterpreter.getYResolution();
+						// break;
+						// default:
+						// /*
+						// * check, if the image needs to be scaled, because
+						// * it's bigger than A4 calculate the new scalefactor
+						// */
+						// float page_w_pixel = (float) (page_w *
+						// myInterpreter.getXResolution() / 25.4);
+						// float page_h_pixel = (float) (page_h *
+						// myInterpreter.getYResolution() / 25.4);
+						//
+						// float res_x = myInterpreter.getXResolution();
+						// float res_y = myInterpreter.getYResolution();
+						//
+						// long w = myInterpreter.getWidth(); // get height and
+						// // width
+						// long h = myInterpreter.getHeight();
+						//
+						// if ((w > page_w_pixel) || (h > page_h_pixel)) {
+						// logger.debug("scale image to fit the page");
+						// float scalefactor_w = page_w_pixel / w;
+						// float scalefactor_h = page_h_pixel / h;
+						// if (scalefactor_h < scalefactor_w) {
+						// scalefactor = scalefactor_h;
+						// } else {
+						// scalefactor = scalefactor_w;
+						// }
+						// w = (long) (w * scalefactor);
+						// h = (long) (h * scalefactor);
+						// }
+						// scalefactorX = (72f / res_x) * scalefactor;
+						// scalefactorY = (72f / res_y) * scalefactor;
+						// break;
+						// }
+						// //scalefactorX = 0.2f;
+						// //scalefactorY = 0.2f;
+						// if (preferredEmbeddingType == embeddBitonalImage) {
+						// ImageManager sourcemanager = new ImageManager(url);
+						// ri = sourcemanager.scaleImageByPixel((int)
+						// (scalefactorX*100), (int) (scalefactorY*100),
+						// ImageManager.SCALE_BY_PERCENT, 0, null, null,
+						// watermark, true, ImageManager.BOTTOM);
+						// }else{
+						// ri = ImageManipulator.scaleInterpolationBilinear(ri,
+						// scalefactorX, scalefactorY);
+						// }
+						// myInterpreter.setHeight(ri.getHeight());
+						// myInterpreter.setWidth(ri.getWidth());
+						// scaled = true;
+
+						// add Watermark
+						// ---------------------------------------------------------------------------------------------------------------------------------
+						// ri = addwatermark(ri, watermark,
+						// ImageManager.BOTTOM);
+						// myInterpreter.setHeight(myInterpreter.getHeight() +
+						// watermark.getRenderedImage().getHeight());
+
 						// Try to write into pdfImage
+						// ---------------------------------------------------------------------------------------------------------------------------------
 						if (myInterpreter.getColordepth() > 1) {
 							// compress image if greyscale or color
 							ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
@@ -510,7 +575,8 @@ public class PDFManager {
 							HeaderFooter hf = new HeaderFooter(p, false);
 							pdfdoc.setFooter(hf);
 							// pdfdoc.setPageSize(arg0)
-							// FIXME hier wird nicht in pdfImage geschrieben.
+							// TODO das scheint nicht zu funktionieren... sollte
+							// dieser Code entfernt werden?
 
 						}
 					} // end of : if (pdfImage == null) {
@@ -526,12 +592,18 @@ public class PDFManager {
 				if (pagesizemode == PdfPageSize.ORIGINAL) {
 					// calculate the image width and height in points, create
 					// the rectangle in points
-					float image_w_points = (myInterpreter.getWidth() / myInterpreter.getXResolution()) * 72;
-					float image_h_points = ((myInterpreter.getHeight()) / myInterpreter.getYResolution()) * 72;
-					Rectangle rect = new Rectangle(image_w_points, image_h_points);
+
+					Rectangle rect = null;
+					if (!scaled) {
+						float image_w_points = (myInterpreter.getWidth() / myInterpreter.getXResolution()) * 72;
+						float image_h_points = ((myInterpreter.getHeight()) / myInterpreter.getYResolution()) * 72;
+						rect = new Rectangle(image_w_points, image_h_points);
+					} else {
+						rect = new Rectangle(myInterpreter.getWidth(), myInterpreter.getHeight());
+					}
 
 					// create the pdf page according to this rectangle
-					logger.debug("creating original page sized PDF page:" + image_w_points + " x " + image_h_points);
+					logger.debug("creating original page sized PDF page:" + rect.getWidth() + " x " + rect.getHeight());
 					pdfdoc.setPageSize(rect);
 
 					// create new page to put the content
@@ -544,7 +616,9 @@ public class PDFManager {
 
 					// scale image and place it on page; scaling the image does
 					// not scale the images bytestream
-					pdfImage.scalePercent((72f / myInterpreter.getXResolution() * 100), (72f / myInterpreter.getYResolution() * 100));
+					if (!scaled) {
+						pdfImage.scalePercent((72f / myInterpreter.getXResolution() * 100), (72f / myInterpreter.getYResolution() * 100));
+					}
 					pdfImage.setAbsolutePosition(0, 0); // set image to lower
 														// left corner
 
@@ -617,7 +691,9 @@ public class PDFManager {
 						w = (long) (w * scalefactor);
 						h = (long) (h * scalefactor);
 					}
-					pdfImage.scalePercent((72f / res_x * 100) * scalefactor, (72f / res_y * 100) * scalefactor);
+					if (!scaled) {
+						pdfImage.scalePercent((72f / res_x * 100) * scalefactor, (72f / res_y * 100) * scalefactor);
+					}
 
 					// center the image on the page
 					// ---------------------------------------------------------------
@@ -877,6 +953,8 @@ public class PDFManager {
 	}
 
 	/***************************************************************************************************************
+	 * Generate error watermark with the text and url of missing image
+	 * 
 	 * @param errorUrl
 	 *            {@link String} url of the image that does not exists
 	 * @return {@link Watermark} with error message about image that does not
@@ -939,10 +1017,10 @@ public class PDFManager {
 	 * @throws PDFManagerException
 	 *             the PDF manager exception
 	 */
-	private PdfWriter createPDFWriter(OutputStream out, PdfWriter writer, Document pdfdoc) throws PDFManagerException {
-		// open the pdfwriter using the outstream
-		//
+	private PdfWriter createPDFWriter(OutputStream out, Document pdfdoc) throws PDFManagerException {
+		PdfWriter writer = null;
 		try {
+			// open the pdfwriter using the outstream
 			writer = PdfWriter.getInstance(pdfdoc, out);
 			logger.debug("PDFWriter intstantiated");
 
