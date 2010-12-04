@@ -110,8 +110,8 @@ public class GetPdfAction extends GetAction {
 		}
 
 		/*
-		 * -------------------------------- parse bookmarks and get all into
-		 * HashMap --------------------------------
+		 * parse bookmarks and get all into
+		 * HashMap 
 		 */
 		HashMap<String, PDFBookmark> allBookmarks = new HashMap<String, PDFBookmark>();
 		LinkedList<PDFBookmark> topBookmarks = new LinkedList<PDFBookmark>();
@@ -169,7 +169,7 @@ public class GetPdfAction extends GetAction {
 		}
 
 		/*
-		 * -------------------------------- set pdf metadata
+		 *  set pdf metadata
 		 * --------------------------------
 		 */
 		/* author */
@@ -194,8 +194,9 @@ public class GetPdfAction extends GetAction {
 		}
 
 		/*
-		 * -------------------------------- set file name and attachment header
-		 * from parameter or from configuration --------------------------------
+		 * set file name and attachment header
+		 * from parameter or from configuration 
+		 * 
 		 */
 		StringBuilder targetFileName = new StringBuilder();
 		if (config.getSendPdfAsAttachment()) {
