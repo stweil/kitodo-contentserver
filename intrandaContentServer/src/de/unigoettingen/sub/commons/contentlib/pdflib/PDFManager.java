@@ -465,7 +465,8 @@ public class PDFManager {
 						RenderedImage ri = null;
 						if (preferredEmbeddingType == embeddBitonalImage) {
 							ImageManager sourcemanager = new ImageManager(url);
-							boolean watermarkscale = true; //should we scale the watermark ? 
+							boolean watermarkscale = true; // should we scale
+															// the watermark ?
 							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, watermarkscale, ImageManager.BOTTOM);
 							myInterpreter = sourcemanager.getMyInterpreter();
 						} else {
@@ -1039,7 +1040,11 @@ public class PDFManager {
 			// (first image of imageURLs)
 			Map<Integer, UrlImage> sortedMap = new TreeMap<Integer, UrlImage>(imageURLs);
 			for (Integer key : sortedMap.keySet()) {
-				// the
+
+				// do the image exists ?
+				while (key < sortedMap.size() && sortedMap.get(key).getURL().openConnection().getContentLength() == 0) {
+					key++;
+				}
 
 				if ((pdftitlepages != null) && (pdftitlepages.get(key) != null)) {
 					// title page for Document Part available; set pagesize to
