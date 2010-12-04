@@ -57,7 +57,7 @@
 	*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 	<!-- for digiverso-->
  <defaultRepositoryPathImages
-		value="file:/C:/digiverso/tiff/" />  
+		value="file:/Users/itoker/Desktop/ECLIPSE/WORKSPACE/intrandaContentServer/example/gemischt/" />  
   <!-- for ucc 
 	<defaultRepositoryPathImages
 		value="file:/" />-->
@@ -71,7 +71,7 @@
     * configuration if watermark should be used and url for watermark content configuration file
     * sample: <watermark use="true" configFile="file:/home/goobi/config/watermarkconfig.xml" />
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-<watermark use="true" configFile="file:/C:/Eclipse/workspace/intrandaContentServer/src/watermark_example_config.xml" />
+<watermark use="true" configFile="file:/Users/itoker/Desktop/ECLIPSE/WORKSPACE/intrandaContentServer/src/watermark_example_config.xml" />
   
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * configuration for the error watermark if message should not be shown on jsp echo page 
@@ -96,7 +96,7 @@
 	* sample: <defaultRepositoryPath value="file:/home/goobi/metsRepository/" /> 
 	*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 	<defaultRepositoryPathMets
-		value="file:/C:/digiverso/indexed_mets/" />
+		value="file:/Users/itoker/Desktop/ECLIPSE/WORKSPACE/intrandaContentServer/example/" />
   
   	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * configuration if titlepage for pdf file should be generated and 
@@ -105,7 +105,7 @@
     * sample: <defaultRepositoryPath value="file:/home/goobi/config/pdftitlepage.xml" /> 
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <pdfTitlePage use="false"
-        configFile="file:/D:/Eclipse%20Run/WorkspaceGoobi/GoobiContentServerServlet/WebContent/WEB-INF/classes/pdftitlepage.xml" />	
+        configFile="file:/Users/itoker/Desktop/ECLIPSE/WORKSPACE/intrandaContentServer/src/pdftitlepage.xml" />	
 
      <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * path to contentCache and maximum size in MB
@@ -117,6 +117,12 @@
     *
     * sample: <contentCache useCache="false" path="/home/goobi/gcsCache" size="300"/>
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <contentCache useCache="false" path="C:/digiverso/cache/" size="30" useShortFileNames="false"/>
+    <contentCache useCache="false" path="/Users/itoker/Desktop/cache" size="30" useShortFileNames="false"/>
+    
+   
+     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * maximal file length for images
+     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <maxFileLength value="150000000"/>
     		
 </config>
