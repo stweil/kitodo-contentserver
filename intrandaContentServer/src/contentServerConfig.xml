@@ -40,7 +40,7 @@
 	*	- pagesize						   default page size for pdf generation; possible values are 'A4', 'original' and 'A4Box' 
     * sample: <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="true" metsFileGroup="DEFAULT" writeAsPdfA="true" pagesize="A4"/> 
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="false" metsFileGroup="LOCAL" writeAsPdfA="true" pagesize="A4"/>
+    <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="true" metsFileGroup="PRESENTATION" writeAsPdfA="false" pagesize="A4"/>
     
     <!--########################################################## 
     *#############################################################
@@ -55,9 +55,9 @@
 	* if repository path is empty, in the servlet request has to be a complete url 
 	* sample: <defaultRepositoryPath value="file:/home/goobi/imageRepository/" /> 
 	*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-	<!-- for digiverso-->
+	<!-- for digiverso -->
  <defaultRepositoryPathImages
-		value="file:/Users/itoker/Desktop/ECLIPSE/WORKSPACE/intrandaContentServer/example/gemischt/" />  
+		value="file:/C:/digiverso/tiff/" /> 
   <!-- for ucc 
 	<defaultRepositoryPathImages
 		value="file:/" />-->
@@ -71,7 +71,7 @@
     * configuration if watermark should be used and url for watermark content configuration file
     * sample: <watermark use="true" configFile="file:/home/goobi/config/watermarkconfig.xml" />
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-<watermark use="true" configFile="file:/Users/itoker/Desktop/ECLIPSE/WORKSPACE/intrandaContentServer/src/watermark_example_config.xml" />
+	<watermark use="false" configFile="file:/C:/Eclipse/workspace/DigiversoPresentation/src/watermark_example_config.xml" />
   
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * configuration for the error watermark if message should not be shown on jsp echo page 
@@ -96,7 +96,7 @@
 	* sample: <defaultRepositoryPath value="file:/home/goobi/metsRepository/" /> 
 	*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 	<defaultRepositoryPathMets
-		value="file:/Users/itoker/Desktop/ECLIPSE/WORKSPACE/intrandaContentServer/example/" />
+		value="file:/C:/digiverso/indexed_mets/" />
   
   	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * configuration if titlepage for pdf file should be generated and 
@@ -105,7 +105,7 @@
     * sample: <defaultRepositoryPath value="file:/home/goobi/config/pdftitlepage.xml" /> 
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <pdfTitlePage use="false"
-        configFile="file:/Users/itoker/Desktop/ECLIPSE/WORKSPACE/intrandaContentServer/src/pdftitlepage.xml" />	
+        configFile="file:/D:/Eclipse%20Run/WorkspaceGoobi/GoobiContentServerServlet/WebContent/WEB-INF/classes/pdftitlepage.xml" />	
 
      <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * path to contentCache and maximum size in MB
@@ -117,12 +117,6 @@
     *
     * sample: <contentCache useCache="false" path="/home/goobi/gcsCache" size="300"/>
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <contentCache useCache="false" path="/Users/itoker/Desktop/cache" size="30" useShortFileNames="false"/>
-    
-   
-     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * maximal file length for images
-     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <maxFileLength value="150000000"/>
-    		
+    <contentCache useCache="false" path="C:/digiverso/cache/" size="30" useShortFileNames="false"/>
+    <thumbnailCache useCache="false" path="C:/digiverso/cache/" size="30" useShortFileNames="false"/>		
 </config>

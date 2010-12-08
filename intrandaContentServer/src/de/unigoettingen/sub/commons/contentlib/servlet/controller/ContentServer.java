@@ -46,6 +46,7 @@ public class ContentServer extends HttpServlet {
 	private static final Logger logger = Logger.getLogger(ContentServer.class);
 	protected Map<String, Class<? extends Action>> actions = null;
 	private static ContentCache cc;
+	private static ContentCache thumbnailcache;
 	
 	private static final long serialVersionUID = 1L;
 
@@ -59,7 +60,10 @@ public class ContentServer extends HttpServlet {
 		try {
 			/* initialize ContentCache only, if set in configuration */
 			if (config.getContentCacheUse()) {
-				cc = new ContentCache(config.getContentCachePath(), config.getContentCacheSize());
+				cc = new ContentCache(config.getContentCachePath(), config.getContentCacheSize());		
+			}
+			if (config.getThumbnailCacheUse()) {
+				thumbnailcache = new ContentCache(config.getThumbnailCachePath(), config.getThumbnailCacheSize());
 			}
 		} catch (CacheException e) {
 			throw new ServletException("ContentCache for GoobiContentServer can not be initialized", e);
@@ -159,6 +163,13 @@ public class ContentServer extends HttpServlet {
 	 *************************************************************************************/
 	public static ContentCache getContentCache() {
 		return cc;
+	}
+
+	/**
+	 * @return the thumbnailcache
+	 */
+	public static ContentCache getThumbnailCache() {
+		return thumbnailcache;
 	}
 
 }

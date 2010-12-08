@@ -41,8 +41,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.Loader;
 
-import sun.awt.image.URLImageSource;
-
 import com.lowagie.text.BadElementException;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
@@ -72,7 +70,6 @@ import com.lowagie.text.xml.xmp.DublinCoreSchema;
 import com.lowagie.text.xml.xmp.PdfSchema;
 import com.lowagie.text.xml.xmp.XmpSchema;
 import com.lowagie.text.xml.xmp.XmpWriter;
-import com.sun.tools.example.debug.gui.SourceManager;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageInterpreterException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManagerException;
@@ -90,7 +87,6 @@ import de.unigoettingen.sub.commons.contentlib.imagelib.TiffInterpreter;
 import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
 import de.unigoettingen.sub.commons.contentlib.servlet.ServletWatermark;
 import de.unigoettingen.sub.commons.contentlib.servlet.Util;
-import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 import de.unigoettingen.sub.commons.util.datasource.Structure;
 import de.unigoettingen.sub.commons.util.datasource.UrlImage;
 

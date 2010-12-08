@@ -56,8 +56,7 @@ import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
 import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 
 /************************************************************************************
- * Image action for all kinds of image handlings first of all validate all
- * request parameters, and than interprete all request parameters for correct
+ * Image action for all kinds of image handlings first of all validate all request parameters, and than interprete all request parameters for correct
  * image handling
  * 
  * @version 20.11.2010
@@ -68,14 +67,12 @@ public class GetImageAction extends GetAction {
 	private static final Logger logger = Logger.getLogger(GetImageAction.class);
 
 	/************************************************************************************
-	 * exectute all image actions (rotation, scaling etc.) and send image back
-	 * to output stream of the servlet, after setting correct mime type
+	 * exectute all image actions (rotation, scaling etc.) and send image back to output stream of the servlet, after setting correct mime type
 	 * 
 	 * @param request
 	 *            {@link HttpServletRequest} of ServletRequest
 	 * @param response
-	 *            {@link HttpServletResponse} for writing to response output
-	 *            stream
+	 *            {@link HttpServletResponse} for writing to response output stream
 	 * @throws IOException
 	 * @throws ServletException
 	 * @throws ContentLibException
@@ -86,19 +83,22 @@ public class GetImageAction extends GetAction {
 		super.run(servletContext, request, response);
 
 		/*
-		 * -------------------------------- get central configuration
-		 * --------------------------------
+		 * -------------------------------- get central configuration --------------------------------
 		 */
 		URI sourceImageUrl = null;
 		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
-		if (!request.getParameter("sourcepath").startsWith("file:")&& !request.getParameter("sourcepath").startsWith("http:")) {
+		if (!request.getParameter("sourcepath").startsWith("file:") && !request.getParameter("sourcepath").startsWith("http:")) {
 			sourceImageUrl = new URI(config.getRepositoryPathImages() + request.getParameter("sourcepath"));
 		} else {
 			sourceImageUrl = new URI(request.getParameter("sourcepath"));
 		}
-	
+		ContentCache cc = null;
 		ServletOutputStream output = response.getOutputStream();
-		ContentCache cc = GoobiContentServer.getContentCache();
+		if (request.getParameter("thumbnail") != null) {
+			cc = GoobiContentServer.getThumbnailCache();
+		} else {
+			cc = GoobiContentServer.getContentCache();
+		}
 		String myUniqueID = getContentCacheIdForRequest(request, config);
 		String targetExtension = request.getParameter("format");
 		try {
@@ -108,7 +108,13 @@ public class GetImageAction extends GetAction {
 				String ignore = request.getParameter("ignoreCache").trim();
 				ignoreCache = Boolean.parseBoolean(ignore);
 			}
-			if (cc == null || !config.getContentCacheUse()) {
+			boolean useCache = false;
+			if (request.getParameter("thumbnail") != null) {
+				useCache = config.getThumbnailCacheUse();
+			} else {
+				useCache = config.getContentCacheUse();
+			}
+			if (cc == null || !useCache) {
 				ignoreCache = true;
 				cc = null;
 				logger.debug("cache deactivated via configuration");
@@ -124,10 +130,8 @@ public class GetImageAction extends GetAction {
 			}
 
 			/*
-			 * -------------------------------- if there is an internal request
-			 * from goobiContentServer, you have to overwrite the sourcepath
-			 * with given attribute for image url
-			 * --------------------------------
+			 * -------------------------------- if there is an internal request from goobiContentServer, you have to overwrite the sourcepath with
+			 * given attribute for image url --------------------------------
 			 */
 			if (request.getAttribute("sourcepath") != null) {
 				sourceImageUrl = new URI((String) request.getAttribute("sourcepath"));
@@ -135,15 +139,13 @@ public class GetImageAction extends GetAction {
 			logger.debug("source image:" + sourceImageUrl);
 
 			/*
-			 * -------------------------------- retrieve source image from url
-			 * --------------------------------
+			 * -------------------------------- retrieve source image from url --------------------------------
 			 */
 			ImageManager sourcemanager = new ImageManager(sourceImageUrl.toURL());
 			logger.debug("imageManager initialized");
 
 			/*
-			 * -------------------------------- set the defaults
-			 * --------------------------------
+			 * -------------------------------- set the defaults --------------------------------
 			 */
 			int angle = 0;
 			int scaleX = 100;
@@ -155,8 +157,7 @@ public class GetImageAction extends GetAction {
 			logger.debug("Variables set");
 
 			/*
-			 * -------------------------------- rotate
-			 * --------------------------------
+			 * -------------------------------- rotate --------------------------------
 			 */
 			if (request.getParameterMap().containsKey("rotate")) {
 				angle = Integer.parseInt(request.getParameter("rotate"));
@@ -164,8 +165,7 @@ public class GetImageAction extends GetAction {
 			}
 
 			/*
-			 * -------------------------------- scale: scale the image to some
-			 * percent value --------------------------------
+			 * -------------------------------- scale: scale the image to some percent value --------------------------------
 			 */
 			if (request.getParameterMap().containsKey("scale")) {
 				scaleX = Integer.parseInt(request.getParameter("scale"));
@@ -181,8 +181,7 @@ public class GetImageAction extends GetAction {
 			}
 
 			/*
-			 * -------------------------------- width: scale image to fixed
-			 * width --------------------------------
+			 * -------------------------------- width: scale image to fixed width --------------------------------
 			 */
 			else if (request.getParameterMap().containsKey("width")) {
 				scaleX = Integer.parseInt(request.getParameter("width"));
@@ -192,8 +191,7 @@ public class GetImageAction extends GetAction {
 			}
 
 			/*
-			 * -------------------------------- height: scale image to fixed
-			 * height --------------------------------
+			 * -------------------------------- height: scale image to fixed height --------------------------------
 			 */
 			else if (request.getParameterMap().containsKey("height")) {
 				scaleY = Integer.parseInt(request.getParameter("height"));
@@ -203,8 +201,7 @@ public class GetImageAction extends GetAction {
 			}
 
 			/*
-			 * -------------------------------- highlight
-			 * --------------------------------
+			 * -------------------------------- highlight --------------------------------
 			 */
 			if (request.getParameterMap().containsKey("highlight")) {
 				highlightCoordinateList = new LinkedList<String>();
@@ -218,8 +215,7 @@ public class GetImageAction extends GetAction {
 			}
 
 			/*
-			 * -------------------------------- insert watermark, if it should
-			 * be used --------------------------------
+			 * -------------------------------- insert watermark, if it should be used --------------------------------
 			 */
 			if (!request.getParameterMap().containsKey("ignoreWatermark")) {
 				if (config.getWatermarkUse()) {
@@ -230,8 +226,7 @@ public class GetImageAction extends GetAction {
 			}
 
 			/*
-			 * -------------------------------- prepare target
-			 * --------------------------------
+			 * -------------------------------- prepare target --------------------------------
 			 */
 			// change to true if watermark should scale
 
@@ -243,8 +238,7 @@ public class GetImageAction extends GetAction {
 																			// file
 
 			/*
-			 * -------------------------------- set file name and attachment
-			 * header from parameter or from configuration
+			 * -------------------------------- set file name and attachment header from parameter or from configuration
 			 * --------------------------------
 			 */
 			StringBuilder targetFileName = new StringBuilder();
@@ -263,8 +257,7 @@ public class GetImageAction extends GetAction {
 			response.setContentType(targetFormat.getMimeType());
 
 			/*
-			 * -------------------------------- resolution
-			 * --------------------------------
+			 * -------------------------------- resolution --------------------------------
 			 */
 			if (request.getParameter("resolution") != null) {
 				wi.setXResolution(Float.parseFloat(request.getParameter("resolution")));
@@ -275,8 +268,7 @@ public class GetImageAction extends GetAction {
 			}
 
 			/*
-			 * -------------------------------- write target image to stream
-			 * --------------------------------
+			 * -------------------------------- write target image to stream --------------------------------
 			 */
 			if (cc != null && !cc.isCacheSizeExceeded()) {
 				logger.info("write file to cache and servlet response: " + cc.getFileForId(myUniqueID, targetExtension));
@@ -446,8 +438,7 @@ public class GetImageAction extends GetAction {
 	// }
 
 	/************************************************************************************
-	 * validate all parameters of request for image handling, throws
-	 * IllegalArgumentException if one request parameter is not valid
+	 * validate all parameters of request for image handling, throws IllegalArgumentException if one request parameter is not valid
 	 * 
 	 * @param request
 	 *            {@link HttpServletRequest} of ServletRequest
@@ -567,5 +558,4 @@ public class GetImageAction extends GetAction {
 
 	}
 
-	
 }

@@ -133,6 +133,38 @@ public class ContentServerConfiguration {
 		return config.getBoolean("contentCache[@useShortFileNames]");
 	}
 
+	
+	public String getThumbnailCachePath() {
+		return config.getString("contentCache[@path]");
+	}
+
+	/************************************************************************************
+	 * get maximum size of content cache from configuration
+	 * 
+	 * @return maximum size to content cache as {@link Long}
+	 ************************************************************************************/
+	public Long getThumbnailCacheSize() {
+		return config.getLong("thumbnailCache[@size]", 100);
+	}
+
+	/************************************************************************************
+	 * get boolean if content cache should be used or not
+	 * 
+	 * @return value if cache should be used as Boolean
+	 ************************************************************************************/
+	public Boolean getThumbnailCacheUse() {
+		return config.getBoolean("thumbnailCache[@useCache]");
+	}
+
+	/************************************************************************************
+	 * get boolean if content cache should use short file names
+	 * 
+	 * @return value if cache should use short file names as Boolean
+	 ************************************************************************************/
+	public Boolean getThumbnailCacheUseShortFileNames() {
+		return config.getBoolean("thumbnailCache[@useShortFileNames]");
+	}
+	
 	/************************************************************************************
 	 * get default resolution from configuration
 	 * 
