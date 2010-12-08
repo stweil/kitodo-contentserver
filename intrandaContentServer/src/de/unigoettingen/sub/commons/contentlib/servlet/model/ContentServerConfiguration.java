@@ -135,7 +135,7 @@ public class ContentServerConfiguration {
 
 	
 	public String getThumbnailCachePath() {
-		return config.getString("contentCache[@path]");
+		return config.getString("thumbnailCache[@path]");
 	}
 
 	/************************************************************************************
