@@ -129,13 +129,13 @@ public class GetImageAction extends GetAction {
 				logger.debug("file not found in cache: " + myUniqueID);
 			}
 
-			/*
-			 * -------------------------------- if there is an internal request from goobiContentServer, you have to overwrite the sourcepath with
-			 * given attribute for image url --------------------------------
-			 */
-			if (request.getAttribute("sourcepath") != null) {
-				sourceImageUrl = new URI((String) request.getAttribute("sourcepath"));
-			}
+//			/*
+//			 * -------------------------------- if there is an internal request from goobiContentServer, you have to overwrite the sourcepath with
+//			 * given attribute for image url --------------------------------
+//			 */
+//			if (request.getAttribute("sourcepath") != null) {
+//				sourceImageUrl = new URI((String) request.getAttribute("sourcepath"));
+//			}
 			logger.debug("source image:" + sourceImageUrl);
 
 			/*

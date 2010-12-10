@@ -34,7 +34,6 @@ import org.apache.commons.codec.binary.Base64;
 
 import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 
-
 public class StreamUtils {
 
 	/************************************************************************************
@@ -46,7 +45,7 @@ public class StreamUtils {
 	 * @throws IOException
 	 ************************************************************************************/
 	public static String getMimeTypeFromUrl(URL url) throws IOException {
-	
+
 		URLConnection con = url.openConnection();
 		return con.getContentType();
 	}
@@ -67,10 +66,9 @@ public class StreamUtils {
 	 * @return MimeType as {@link String}
 	 * @throws IOException
 	 ************************************************************************************/
-	
-	public static String getMimeTypeFromUrl(URL url, String httpproxyhost,
-			String httpproxyport, String httpproxyusername,
-			String httpproxypassword) throws IOException {
+
+	public static String getMimeTypeFromUrl(URL url, String httpproxyhost, String httpproxyport, String httpproxyusername, String httpproxypassword)
+			throws IOException {
 		if (httpproxyhost != null) {
 			Properties properties = System.getProperties();
 			properties.put("http.proxyHost", httpproxyhost);
@@ -83,10 +81,8 @@ public class StreamUtils {
 		URLConnection con = url.openConnection();
 		if (httpproxyusername != null) {
 			String login = httpproxyusername + ":" + httpproxypassword;
-			String encodedLogin = new String(Base64.encodeBase64(login
-					.getBytes()));
-			con.setRequestProperty("Proxy-Authorization", "Basic "
-					+ encodedLogin);
+			String encodedLogin = new String(Base64.encodeBase64(login.getBytes()));
+			con.setRequestProperty("Proxy-Authorization", "Basic " + encodedLogin);
 		}
 		return con.getContentType();
 	}
@@ -108,20 +104,23 @@ public class StreamUtils {
 	 * 
 	 * @param url
 	 *            the url from where to get the {@link InputStream}
-	 * @param basepath the basispath
-	 * @param httpproxyhost the host for proxy
-	 * @param httpproxyport the port for proxy
-	 * @param httpproxyusername the username for the proxy
-	 * @param httpproxypassword the password for the proxy
+	 * @param basepath
+	 *            the basispath
+	 * @param httpproxyhost
+	 *            the host for proxy
+	 * @param httpproxyport
+	 *            the port for proxy
+	 * @param httpproxyusername
+	 *            the username for the proxy
+	 * @param httpproxypassword
+	 *            the password for the proxy
 	 * @return {@link InputStream} for url
 	 * @throws IOException
 	 ************************************************************************************/
-	public static InputStream getInputStreamFromUrl(URL url, String basepath,
-			String httpproxyhost, String httpproxyport,
-			String httpproxyusername, String httpproxypassword)
-			throws IOException {
+	public static InputStream getInputStreamFromUrl(URL url, String basepath, String httpproxyhost, String httpproxyport, String httpproxyusername,
+			String httpproxypassword) throws IOException {
 		InputStream inStream = null;
-	
+
 		if (url.getProtocol().equalsIgnoreCase("http")) {
 			if (httpproxyhost != null) {
 				Properties properties = System.getProperties();
@@ -135,36 +134,34 @@ public class StreamUtils {
 			URLConnection con = url.openConnection();
 			if (httpproxyusername != null) {
 				String login = httpproxyusername + ":" + httpproxypassword;
-				String encodedLogin = new String(Base64.encodeBase64(login
-						.getBytes()));
-				con.setRequestProperty("Proxy-Authorization", "Basic "
-						+ encodedLogin);
+				String encodedLogin = new String(Base64.encodeBase64(login.getBytes()));
+				con.setRequestProperty("Proxy-Authorization", "Basic " + encodedLogin);
 			}
 			inStream = con.getInputStream();
 		} else if (url.getProtocol().equalsIgnoreCase("file")) {
 			int size = url.openConnection().getContentLength();
-			
-			int maxFileLength = ContentServerConfiguration.getInstance().getMaxFileLength();
-			if (size > maxFileLength) {
-				throw new IOException("File "+url.getFile()+" is too large ("+size+")");
+			Integer maxFileLength = ContentServerConfiguration.getInstance().getMaxFileLength();
+
+			if (maxFileLength != 0 && size > maxFileLength) {
+				throw new IOException("File " + url.getFile() + " is too large (" + size + ")");
 			}
 			String filepath = url.getFile();
-	
-			filepath = URLDecoder.decode(filepath, System
-					.getProperty("file.encoding"));
-	
+
+			filepath = URLDecoder.decode(filepath, System.getProperty("file.encoding"));
+
 			File f = new File(filepath);
 			inStream = new FileInputStream(f);
+
 		} else if (url.getProtocol().equalsIgnoreCase("")) {
 			String filepath = url.getFile();
 			// we just have the relative path, need to find the absolute path
 			String path = basepath + filepath;
-	
+
 			// call this method again
 			URL completeurl = new URL(path);
 			inStream = getInputStreamFromUrl(completeurl);
 		}
-	
+
 		return inStream;
 	}
 
@@ -173,12 +170,12 @@ public class StreamUtils {
 	 * 
 	 * @param url
 	 *            the url from where to get the {@link InputStream}
-	 * @param basepath the basispath
+	 * @param basepath
+	 *            the basispath
 	 * @return {@link InputStream} for url
 	 * @throws IOException
 	 ************************************************************************************/
-	public static InputStream getInputStreamFromUrl(URL url, String basepath)
-			throws IOException {
+	public static InputStream getInputStreamFromUrl(URL url, String basepath) throws IOException {
 		return getInputStreamFromUrl(url, basepath, null, null, null, null);
 	}
 

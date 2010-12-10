@@ -75,8 +75,8 @@ public class ContentServerConfiguration {
 	 * 
 	 * @return int
 	 ***************************************************************************************************************/
-	public int getMaxFileLength() {
-		return config.getInt("maxFileLength[@value]");
+	public Integer getMaxFileLength() {
+		return config.getInt("maxFileLength[@value]",0);
 	}
 
 	/************************************************************************************
