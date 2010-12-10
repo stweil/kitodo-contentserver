@@ -474,7 +474,9 @@ public class ImageManipulator {
 
 		if (keys != null) {
 			for (int i = 0; i < keys.length; i++) {
+				try{
 				props.put(keys[i], img.getProperty(keys[i]));
+				}catch (ClassCastException e) {}
 			}
 		}
 		BufferedImage ret = new BufferedImage(cm, raster, isAlphaPremultiplied,
