@@ -333,9 +333,9 @@ public class ImageManager {
 			throw new ImageManipulatorException("Invalid value for angle - must be between 0 and 360 degrees");
 		}
 
-		if ((angle > 0) && (coordinates != null) && (coordinates.size() > 0)) {
-			throw new ImageManipulatorException("Can't rotate angle, when box cordinates are used!");
-		}
+//		if ((angle > 0) && (coordinates != null) && (coordinates.size() > 0)) {
+//			throw new ImageManipulatorException("Can't rotate angle, when box cordinates are used!");
+//		}
 
 		// get image
 		inImage = myInterpreter.getRenderedImage();
@@ -433,21 +433,23 @@ public class ImageManager {
 			throw new ImageManipulatorException("wrong scalemethod");
 		}
 
+	
+
+		// ----------------------------------------------------------------------------------------------------
+		// draw boxes, but only if we don't rotate the image
+		// ----------------------------------------------------------------------------------------------------
+		if ((coordinates != null)) {
+			if (inColor == null) {
+				inColor = Color.GREEN;
+			}
+			outImage = ImageManipulator.drawBoxes(outImage, draw_coordinates, inColor);
+		}
+		
 		// ----------------------------------------------------------------------------------------------------
 		// rotate image
 		// ----------------------------------------------------------------------------------------------------
 		if (angle > 0) {
 			outImage = ImageManipulator.rotate(outImage, angle, "bicubic");
-		}
-
-		// ----------------------------------------------------------------------------------------------------
-		// draw boxes, but only if we don't rotate the image
-		// ----------------------------------------------------------------------------------------------------
-		if ((coordinates != null) && (angle == 0)) {
-			if (inColor == null) {
-				inColor = Color.GREEN;
-			}
-			outImage = ImageManipulator.drawBoxes(outImage, draw_coordinates, inColor);
 		}
 
 		// ----------------------------------------------------------------------------------------------------
