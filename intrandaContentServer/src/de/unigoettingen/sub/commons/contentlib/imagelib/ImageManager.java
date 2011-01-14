@@ -392,8 +392,10 @@ public class ImageManager {
 			float intpercenty = ((float) pixely / 100);
 
 			internalScaling_x = (myInterpreter.getXResolution() / xres);
+//			internalScaling_x = (DPI_DEFAULT / xres);
 			internalScaling_x = internalScaling_x * intpercentx;
 			internalScaling_y = (myInterpreter.getXResolution() / yres);
+//			internalScaling_y = (DPI_DEFAULT / yres);
 			internalScaling_y = internalScaling_y * intpercenty;
 
 		} else {

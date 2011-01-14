@@ -78,6 +78,10 @@ public class ContentServerConfiguration {
 	public Integer getMaxFileLength() {
 		return config.getInt("maxFileLength[@value]",0);
 	}
+	
+	public String getErrorFile() {
+		return config.getString("maxFileLength[@file]");
+	}
 
 	/************************************************************************************
 	 * get path of repository from configuration as URL-String

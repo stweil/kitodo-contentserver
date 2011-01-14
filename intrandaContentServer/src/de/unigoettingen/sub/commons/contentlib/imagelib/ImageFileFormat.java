@@ -141,7 +141,7 @@ public enum ImageFileFormat {
 		case JP2:
 			return new JpegTwoThousandInterpreter(inputFileStream);
 		default:
-			return null;
+			return new JpegInterpreter(inputFileStream);
 		}
 	}
 
@@ -164,7 +164,7 @@ public enum ImageFileFormat {
 		case JP2:
 			return new JpegTwoThousandInterpreter(image);
 		default:
-			return null;
+			return new JpegInterpreter(image);
 		}
 	}
 
@@ -195,11 +195,11 @@ public enum ImageFileFormat {
 		} else if (ext.equals("png")) {
 			return PNG;
 		} else if (ext.equals("jpeg") || ext.equals("jpg")) {
-			return ImageFileFormat.JPG;
+			return JPG;
 		} else if (ext.equals("jp2")) {
 			return JP2;
 		} else {
-			return null;
+			return JPG;
 		}
 	}
 
@@ -226,7 +226,7 @@ public enum ImageFileFormat {
 		} else if (mt.equals("image/jp2")) {
 			return JP2;
 		} else {
-			return null;
+			return JPG;
 		}
 	}
 

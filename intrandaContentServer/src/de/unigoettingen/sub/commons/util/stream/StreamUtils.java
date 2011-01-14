@@ -143,7 +143,8 @@ public class StreamUtils {
 			Integer maxFileLength = ContentServerConfiguration.getInstance().getMaxFileLength();
 
 			if (maxFileLength != 0 && size > maxFileLength) {
-				throw new IOException("File " + url.getFile() + " is too large (" + size + ")");
+//				System.out.println("File " + url.getFile() + " is too large (" + size + "/" + maxFileLength + ")");
+				return getInputStreamFromUrl(new URL(ContentServerConfiguration.getInstance().getErrorFile()));
 			}
 			String filepath = url.getFile();
 

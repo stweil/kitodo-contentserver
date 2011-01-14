@@ -387,9 +387,9 @@ public class Watermark {
 
 			}
 		} catch (ParserConfigurationException pce) {
-
+			logger.error("Error occured while reading Watermark configuration");
 		} catch (WatermarkException we) {
-			logger.warn("Error occured while reading Watermark configuration");
+			logger.error("Error occured while reading Watermark configuration");
 		} catch (SAXException sae) {
 			logger.error("XML configuration for Watermark is invalid; non wellformed XML?\n" + sae);
 			throw new WatermarkException("XML configuration for Watermark is invalid; non wellformed XML?", sae);
