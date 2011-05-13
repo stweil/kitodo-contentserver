@@ -49,10 +49,10 @@
     *
     *#############################################################
     *###########################################################-->
-<!--  
+ 
 	 <defaultRepositoryPathPdf
 		value="file:/C:/digiverso/viewer/pdf/" usage="true" /> 
-    -->
+
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	* default path to repository for all image processing requests
 	* if repository path is empty, in the servlet request has to be a complete url 

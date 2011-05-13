@@ -414,8 +414,9 @@ public class PDFManager {
 					try {
 						String pdfpath = ContentServerConfiguration.getInstance().getRepositoryPathPdf();
 						UrlImage copy = new PDFPage(pdfpage);
+						
 						URL pdfurl = new URL(url.toString().replace(ContentServerConfiguration.getInstance().getRepositoryPathImages(), pdfpath)
-								.replace(".tif", ".pdf"));
+								.replace(url.toString().substring(url.toString().lastIndexOf(".")), ".pdf"));
 						if (new File(pdfurl.toURI()).exists()) {
 							copy.setURL(pdfurl);
 							PdfContentByte pdfcb = writer.getDirectContent();
