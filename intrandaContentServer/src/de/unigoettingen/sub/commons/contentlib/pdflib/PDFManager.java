@@ -87,6 +87,7 @@ import de.unigoettingen.sub.commons.contentlib.imagelib.TiffInterpreter;
 import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
 import de.unigoettingen.sub.commons.contentlib.servlet.ServletWatermark;
 import de.unigoettingen.sub.commons.contentlib.servlet.Util;
+import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 import de.unigoettingen.sub.commons.util.datasource.Structure;
 import de.unigoettingen.sub.commons.util.datasource.UrlImage;
 
@@ -369,7 +370,6 @@ public class PDFManager {
 		float scalefactor = 1; // scaling factor of the image
 		int page_w = PaperSize.A4.width;
 		int page_h = PaperSize.A4.height;
-
 		logger.debug("iterate over " + imageURLs.size() + " pages.");
 		for (Integer imageKey : sortedMap.keySet()) {
 			Watermark watermark = myWatermark;
@@ -388,7 +388,8 @@ public class PDFManager {
 				// create new PDF page
 				try {
 					pdfdoc.setPageSize(PageSize.A4);
-					pdfdoc.setMargins(36, 72, 108, 180);
+					pdfdoc.setMargins(pdftitlepage.getLeftMargin(), pdftitlepage.getRightMargin(), pdftitlepage.getTopMargin(),
+							pdftitlepage.getBottomMargin());
 					pageadded++;
 					pdfdoc.newPage(); // create new page
 					// set page name
@@ -405,400 +406,427 @@ public class PDFManager {
 			// ------------------------------------------------------------------------------------------------
 			UrlImage pdfpage = imageURLs.get(imageKey);
 			if (pdfpage.getURL() != null) {
-
+				boolean added = false;
 				boolean scaled = false;
-
-				// image file
 				URL url = pdfpage.getURL();
-				logger.debug("page:" + imageKey + "  url:" + url.toString());
+				// pdf hack
+				if (ContentServerConfiguration.getInstance().getUsePdf()) {
+					try {
+						String pdfpath = ContentServerConfiguration.getInstance().getRepositoryPathPdf();
+						UrlImage copy = new PDFPage(pdfpage);
+						URL pdfurl = new URL(url.toString().replace(ContentServerConfiguration.getInstance().getRepositoryPathImages(), pdfpath)
+								.replace(".tif", ".pdf"));
+						if (new File(pdfurl.toURI()).exists()) {
+							copy.setURL(pdfurl);
+							PdfContentByte pdfcb = writer.getDirectContent();
+							PdfReader pdfreader = new PdfReader(copy.getURL());
+							PdfImportedPage importpage = writer.getImportedPage(pdfreader, copy.getPageNumber());
 
-				// if the image does not exists, use error_page image
-				if (url.openConnection().getContentLength() == 0) {
-					errorUrl = url;
-					url = new URL(ERROR_PAGE);
-					errorPage = true;
-				}
-
-				// try to get ImageInterpreter from url
-				ImageInterpreter myInterpreter = ImageFileFormat.getInterpreter(url, httpproxyhost, httpproxyport, httpproxyuser, httpproxypassword);
-
-				try {
-					// check preferred compression type depending on color depth
-					Embedd preferredEmbeddingType = Embedd.ORIGBYTESTREAM;
-					if (myInterpreter.getColordepth() == 1) {
-						// bitonal image
-						preferredEmbeddingType = embeddBitonalImage;
-					} else if ((myInterpreter.getColordepth() > 1) && (myInterpreter.getSamplesperpixel() == 1)) {
-						// greyscale image
-						preferredEmbeddingType = embeddGreyscaleImage;
-					} else {
-						// color image
-						preferredEmbeddingType = embeddColorImage;
-					}
-
-					// -------------------------------------------------------------------------------------
-					// Try to generate image
-					// -------------------------------------------------------------------------------------
-					pdfImage = generatePdfImageFromInterpreter(myInterpreter, preferredEmbeddingType, errorPage, watermark, errorUrl);
-
-					// -------------------------------------------------------------------------------------
-					// image couldn't be embedded yet (emergencyCase)
-					// -------------------------------------------------------------------------------------
-					if (pdfImage == null) {
-						logger.warn("Couldn't use preferred method for embedding the image. Instead had to use JPEG or RenderedImage");
-
-						// Get Interpreter and rendered Image
-						// ---------------------------------------------------------------------------------------------------------------------------------
-						RenderedImage ri = null;
-						if (preferredEmbeddingType == embeddBitonalImage) {
-							ImageManager sourcemanager = new ImageManager(url);
-							boolean watermarkscale = true; // should we scale
-							// the watermark ?
-							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, watermarkscale,
-									ImageManager.BOTTOM);
-							ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, false,
-									ImageManager.BOTTOM);
-							myInterpreter = sourcemanager.getMyInterpreter();
-						} else {
-							ri = myInterpreter.getRenderedImage();
-							if (watermark != null) {
-								ri = addwatermark(ri, watermark, 2);
-								myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
+							logger.debug("creating orig pdf page");
+							Rectangle rect = pdfreader.getPageSize(copy.getPageNumber());
+							try {
+								pdfdoc.setPageSize(rect);
+								pdfdoc.newPage(); // create new page
+							} catch (Exception e1) {
+								throw new PDFManagerException("Exception occured while creating new page in PDF", e1);
 							}
+							pageadded++;
+							pdfcb.addTemplate(importpage, 0, 0);
+							added = true;
+							logger.debug("page:" + imageKey + "  url: " + pdfurl.toString());
+
+						}
+					} catch (URISyntaxException e) {
+						added = false;
+					}
+				}
+				if (!added) {
+					// image file
+
+					// try to get ImageInterpreter from url
+					ImageInterpreter myInterpreter = ImageFileFormat.getInterpreter(url, httpproxyhost, httpproxyport, httpproxyuser,
+							httpproxypassword);
+
+					try {
+						// check preferred compression type depending on color depth
+						Embedd preferredEmbeddingType = Embedd.ORIGBYTESTREAM;
+						if (myInterpreter.getColordepth() == 1) {
+							// bitonal image
+							preferredEmbeddingType = embeddBitonalImage;
+						} else if ((myInterpreter.getColordepth() > 1) && (myInterpreter.getSamplesperpixel() == 1)) {
+							// greyscale image
+							preferredEmbeddingType = embeddGreyscaleImage;
+						} else {
+							// color image
+							preferredEmbeddingType = embeddColorImage;
 						}
 
-						// scale rendered image
-						// ---------------------------------------------------------------------------------------------------------------------------------
-						// float scalefactorX = 1;
-						// float scalefactorY = 1;
-						// switch (pagesizemode) {
-						// case ORIGINAL:
-						// scalefactorX = 72f / myInterpreter.getXResolution();
-						// scalefactorY = 72f / myInterpreter.getYResolution();
-						// break;
-						// default:
-						// /*
-						// * check, if the image needs to be scaled, because
-						// * it's bigger than A4 calculate the new scalefactor
-						// */
-						// float page_w_pixel = (float) (page_w *
-						// myInterpreter.getXResolution() / 25.4);
-						// float page_h_pixel = (float) (page_h *
-						// myInterpreter.getYResolution() / 25.4);
-						//
-						// float res_x = myInterpreter.getXResolution();
-						// float res_y = myInterpreter.getYResolution();
-						//
-						// long w = myInterpreter.getWidth(); // get height and
-						// // width
-						// long h = myInterpreter.getHeight();
-						//
-						// if ((w > page_w_pixel) || (h > page_h_pixel)) {
-						// logger.debug("scale image to fit the page");
-						// float scalefactor_w = page_w_pixel / w;
-						// float scalefactor_h = page_h_pixel / h;
-						// if (scalefactor_h < scalefactor_w) {
-						// scalefactor = scalefactor_h;
-						// } else {
-						// scalefactor = scalefactor_w;
-						// }
-						// w = (long) (w * scalefactor);
-						// h = (long) (h * scalefactor);
-						// }
-						// scalefactorX = (72f / res_x) * scalefactor;
-						// scalefactorY = (72f / res_y) * scalefactor;
-						// break;
-						// }
-						// //scalefactorX = 0.2f;
-						// //scalefactorY = 0.2f;
-						// if (preferredEmbeddingType == embeddBitonalImage) {
-						// ImageManager sourcemanager = new ImageManager(url);
-						// ri = sourcemanager.scaleImageByPixel((int)
-						// (scalefactorX*100), (int) (scalefactorY*100),
-						// ImageManager.SCALE_BY_PERCENT, 0, null, null,
-						// watermark, true, ImageManager.BOTTOM);
-						// }else{
-						// ri = ImageManipulator.scaleInterpolationBilinear(ri,
-						// scalefactorX, scalefactorY);
-						// }
-						// myInterpreter.setHeight(ri.getHeight());
-						// myInterpreter.setWidth(ri.getWidth());
-						// scaled = true;
+						// -------------------------------------------------------------------------------------
+						// Try to generate image
+						// -------------------------------------------------------------------------------------
+						pdfImage = generatePdfImageFromInterpreter(myInterpreter, preferredEmbeddingType, errorPage, watermark, errorUrl);
 
-						// add Watermark
-						// ---------------------------------------------------------------------------------------------------------------------------------
-						// ri = addwatermark(ri, watermark,
-						// ImageManager.BOTTOM);
-						// myInterpreter.setHeight(myInterpreter.getHeight() +
-						// watermark.getRenderedImage().getHeight());
+						// -------------------------------------------------------------------------------------
+						// image couldn't be embedded yet (emergencyCase)
+						// -------------------------------------------------------------------------------------
+						if (pdfImage == null) {
+							logger.warn("Couldn't use preferred method for embedding the image. Instead had to use JPEG or RenderedImage");
 
-						// Try to write into pdfImage
-						// ---------------------------------------------------------------------------------------------------------------------------------
-						if (myInterpreter.getColordepth() > 1) {
-							// compress image if greyscale or color
-							ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
-							// JpegInterpreter jpint = new JpegInterpreter(ri);
-							// jpint.setXResolution(myInterpreter.getXResolution());
-							// jpint.setYResolution(myInterpreter.getYResolution());
-							// jpint.writeToStream(null, bytesoutputstream);
-							writeJpegFromRenderedImageToStream(bytesoutputstream, ri, null, myInterpreter);
-							byte[] returnbyteArray = bytesoutputstream.toByteArray();
-							pdfImage = Image.getInstance(returnbyteArray);
-						} else {
-							// its bitonal, but can't be embedded directly,
-							// need to go via RenderedImage
-							BufferedImage buffImage = ImageManipulator.fromRenderedToBuffered(ri);
-							pdfImage = Image.getInstance(buffImage, null, false);
-							if (myWatermark != null) {
-								// create Image for Watermark
-								JpegInterpreter jpint = new JpegInterpreter(myWatermark.getRenderedImage());
+							// Get Interpreter and rendered Image
+							// ---------------------------------------------------------------------------------------------------------------------------------
+							RenderedImage ri = null;
+							if (preferredEmbeddingType == embeddBitonalImage) {
+								ImageManager sourcemanager = new ImageManager(url);
+								boolean watermarkscale = true; // should we scale
+								// the watermark ?
+								ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, watermarkscale,
+										ImageManager.BOTTOM);
+								ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, false,
+										ImageManager.BOTTOM);
+								myInterpreter = sourcemanager.getMyInterpreter();
+							} else {
+								ri = myInterpreter.getRenderedImage();
+								if (watermark != null) {
+									ri = addwatermark(ri, watermark, 2);
+									myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
+								}
+							}
+
+							// scale rendered image
+							// ---------------------------------------------------------------------------------------------------------------------------------
+							// float scalefactorX = 1;
+							// float scalefactorY = 1;
+							// switch (pagesizemode) {
+							// case ORIGINAL:
+							// scalefactorX = 72f / myInterpreter.getXResolution();
+							// scalefactorY = 72f / myInterpreter.getYResolution();
+							// break;
+							// default:
+							// /*
+							// * check, if the image needs to be scaled, because
+							// * it's bigger than A4 calculate the new scalefactor
+							// */
+							// float page_w_pixel = (float) (page_w *
+							// myInterpreter.getXResolution() / 25.4);
+							// float page_h_pixel = (float) (page_h *
+							// myInterpreter.getYResolution() / 25.4);
+							//
+							// float res_x = myInterpreter.getXResolution();
+							// float res_y = myInterpreter.getYResolution();
+							//
+							// long w = myInterpreter.getWidth(); // get height and
+							// // width
+							// long h = myInterpreter.getHeight();
+							//
+							// if ((w > page_w_pixel) || (h > page_h_pixel)) {
+							// logger.debug("scale image to fit the page");
+							// float scalefactor_w = page_w_pixel / w;
+							// float scalefactor_h = page_h_pixel / h;
+							// if (scalefactor_h < scalefactor_w) {
+							// scalefactor = scalefactor_h;
+							// } else {
+							// scalefactor = scalefactor_w;
+							// }
+							// w = (long) (w * scalefactor);
+							// h = (long) (h * scalefactor);
+							// }
+							// scalefactorX = (72f / res_x) * scalefactor;
+							// scalefactorY = (72f / res_y) * scalefactor;
+							// break;
+							// }
+							// //scalefactorX = 0.2f;
+							// //scalefactorY = 0.2f;
+							// if (preferredEmbeddingType == embeddBitonalImage) {
+							// ImageManager sourcemanager = new ImageManager(url);
+							// ri = sourcemanager.scaleImageByPixel((int)
+							// (scalefactorX*100), (int) (scalefactorY*100),
+							// ImageManager.SCALE_BY_PERCENT, 0, null, null,
+							// watermark, true, ImageManager.BOTTOM);
+							// }else{
+							// ri = ImageManipulator.scaleInterpolationBilinear(ri,
+							// scalefactorX, scalefactorY);
+							// }
+							// myInterpreter.setHeight(ri.getHeight());
+							// myInterpreter.setWidth(ri.getWidth());
+							// scaled = true;
+
+							// add Watermark
+							// ---------------------------------------------------------------------------------------------------------------------------------
+							// ri = addwatermark(ri, watermark,
+							// ImageManager.BOTTOM);
+							// myInterpreter.setHeight(myInterpreter.getHeight() +
+							// watermark.getRenderedImage().getHeight());
+
+							// Try to write into pdfImage
+							// ---------------------------------------------------------------------------------------------------------------------------------
+							if (myInterpreter.getColordepth() > 1) {
+								// compress image if greyscale or color
 								ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
-								jpint.setXResolution(myInterpreter.getXResolution());
-								jpint.setYResolution(myInterpreter.getYResolution());
-								jpint.writeToStream(null, bytesoutputstream);
+								// JpegInterpreter jpint = new JpegInterpreter(ri);
+								// jpint.setXResolution(myInterpreter.getXResolution());
+								// jpint.setYResolution(myInterpreter.getYResolution());
+								// jpint.writeToStream(null, bytesoutputstream);
+								writeJpegFromRenderedImageToStream(bytesoutputstream, ri, null, myInterpreter);
 								byte[] returnbyteArray = bytesoutputstream.toByteArray();
-								Image blaImage = Image.getInstance(returnbyteArray);
+								pdfImage = Image.getInstance(returnbyteArray);
+							} else {
+								// its bitonal, but can't be embedded directly,
+								// need to go via RenderedImage
+								BufferedImage buffImage = ImageManipulator.fromRenderedToBuffered(ri);
+								pdfImage = Image.getInstance(buffImage, null, false);
+								if (myWatermark != null) {
+									// create Image for Watermark
+									JpegInterpreter jpint = new JpegInterpreter(myWatermark.getRenderedImage());
+									ByteArrayOutputStream bytesoutputstream = new ByteArrayOutputStream();
+									jpint.setXResolution(myInterpreter.getXResolution());
+									jpint.setYResolution(myInterpreter.getYResolution());
+									jpint.writeToStream(null, bytesoutputstream);
+									byte[] returnbyteArray = bytesoutputstream.toByteArray();
+									Image blaImage = Image.getInstance(returnbyteArray);
 
-								// set Watermark as Footer at fixed position
-								// (200,200)
-								Chunk c = new Chunk(blaImage, 200, 200);
-								Phrase p = new Phrase(c);
-								HeaderFooter hf = new HeaderFooter(p, false);
-								pdfdoc.setFooter(hf);
+									// set Watermark as Footer at fixed position
+									// (200,200)
+									Chunk c = new Chunk(blaImage, 200, 200);
+									Phrase p = new Phrase(c);
+									HeaderFooter hf = new HeaderFooter(p, false);
+									pdfdoc.setFooter(hf);
+								}
+								// pdfdoc.setPageSize(arg0)
+								// TODO das scheint nicht zu funktionieren... sollte
+								// dieser Code entfernt werden?
+
 							}
-							// pdfdoc.setPageSize(arg0)
-							// TODO das scheint nicht zu funktionieren... sollte
-							// dieser Code entfernt werden?
+						} // end of : if (pdfImage == null) {
+					} catch (BadElementException e) {
+						throw new PDFManagerException("Can't create a PDFImage from a Buffered Image.", e);
+					} catch (ImageManipulatorException e) {
+						logger.warn(e);
+					}
 
+					// ---------------------------------------------------------------------------------------------------------
+					// place the image on the page
+					// ---------------------------------------------------------------------------------------------------------
+					if (pagesizemode == PdfPageSize.ORIGINAL) {
+						// calculate the image width and height in points, create
+						// the rectangle in points
+
+						Rectangle rect = null;
+						if (!scaled) {
+							float image_w_points = (myInterpreter.getWidth() / myInterpreter.getXResolution()) * 72;
+							float image_h_points = ((myInterpreter.getHeight()) / myInterpreter.getYResolution()) * 72;
+							rect = new Rectangle(image_w_points, image_h_points);
+						} else {
+							rect = new Rectangle(myInterpreter.getWidth(), myInterpreter.getHeight());
 						}
-					} // end of : if (pdfImage == null) {
-				} catch (BadElementException e) {
-					throw new PDFManagerException("Can't create a PDFImage from a Buffered Image.", e);
-				} catch (ImageManipulatorException e) {
-					logger.warn(e);
-				}
 
-				// ---------------------------------------------------------------------------------------------------------
-				// place the image on the page
-				// ---------------------------------------------------------------------------------------------------------
-				if (pagesizemode == PdfPageSize.ORIGINAL) {
-					// calculate the image width and height in points, create
-					// the rectangle in points
+						// create the pdf page according to this rectangle
+						logger.debug("creating original page sized PDF page:" + rect.getWidth() + " x " + rect.getHeight());
+						pdfdoc.setPageSize(rect);
 
-					Rectangle rect = null;
-					if (!scaled) {
-						float image_w_points = (myInterpreter.getWidth() / myInterpreter.getXResolution()) * 72;
-						float image_h_points = ((myInterpreter.getHeight()) / myInterpreter.getYResolution()) * 72;
-						rect = new Rectangle(image_w_points, image_h_points);
+						// create new page to put the content
+						try {
+							pageadded++;
+							pdfdoc.newPage();
+						} catch (Exception e1) {
+							throw new PDFManagerException("DocumentException occured while creating new page in PDF", e1);
+						}
+
+						// scale image and place it on page; scaling the image does
+						// not scale the images bytestream
+						if (!scaled) {
+							pdfImage.scalePercent((72f / myInterpreter.getXResolution() * 100), (72f / myInterpreter.getYResolution() * 100));
+						}
+						pdfImage.setAbsolutePosition(0, 0); // set image to lower
+															// left corner
+
+						boolean result;
+						try {
+							result = pdfdoc.add(pdfImage); // add it to PDF
+							if (!result) {
+								throw new PDFManagerException("Image \"" + url.toString()
+										+ "\" can's be added to PDF! Error during placing image on page");
+							}
+						} catch (DocumentException e) {
+							throw new PDFManagerException("DocumentException occured while adding the image to PDF", e);
+						}
 					} else {
-						rect = new Rectangle(myInterpreter.getWidth(), myInterpreter.getHeight());
-					}
+						/*
+						 * it is not the original page size PDF will contain only A4 pages
+						 */
+						logger.debug("creating A4 pdf page");
 
-					// create the pdf page according to this rectangle
-					logger.debug("creating original page sized PDF page:" + rect.getWidth() + " x " + rect.getHeight());
-					pdfdoc.setPageSize(rect);
+						// create new page to put the content
+						try {
+							pageadded++;
+							pdfdoc.setPageSize(PageSize.A4);
+							pdfdoc.newPage(); // create new page
+						} catch (Exception e1) {
+							throw new PDFManagerException("Exception occured while creating new page in PDF", e1);
+						}
 
-					// create new page to put the content
-					try {
-						pageadded++;
-						pdfdoc.newPage();
-					} catch (Exception e1) {
-						throw new PDFManagerException("DocumentException occured while creating new page in PDF", e1);
-					}
+						float page_w_pixel = (float) (page_w * myInterpreter.getXResolution() / 25.4);
+						float page_h_pixel = (float) (page_h * myInterpreter.getYResolution() / 25.4);
 
-					// scale image and place it on page; scaling the image does
-					// not scale the images bytestream
-					if (!scaled) {
-						pdfImage.scalePercent((72f / myInterpreter.getXResolution() * 100), (72f / myInterpreter.getYResolution() * 100));
-					}
-					pdfImage.setAbsolutePosition(0, 0); // set image to lower
-														// left corner
+						float res_x = myInterpreter.getXResolution();
+						float res_y = myInterpreter.getYResolution();
 
-					boolean result;
-					try {
-						result = pdfdoc.add(pdfImage); // add it to PDF
+						long w = myInterpreter.getWidth(); // get height and width
+						long h = myInterpreter.getHeight();
+
+						/*
+						 * if the page is landscape, we have to rotate the page; this is only done in PDF, the orig image bytestream is NOT rotated
+						 */
+						if (w > h) {
+							logger.debug("rotate image");
+							// must be rotated
+							pdfImage.setRotationDegrees(90);
+							// change width and height
+							long dummy = w;
+							w = h;
+							h = dummy;
+							// change the resolutions x and y
+							float dummy2 = res_x;
+							res_x = res_y;
+							res_y = dummy2;
+						}
+
+						/*
+						 * check, if the image needs to be scaled, because it's bigger than A4 calculate the new scalefactor
+						 */
+						if ((w > page_w_pixel) || (h > page_h_pixel)) {
+							logger.debug("scale image to fit the page");
+							float scalefactor_w = page_w_pixel / w;
+							float scalefactor_h = page_h_pixel / h;
+							if (scalefactor_h < scalefactor_w) {
+								scalefactor = scalefactor_h;
+							} else {
+								scalefactor = scalefactor_w;
+							}
+							w = (long) (w * scalefactor);
+							h = (long) (h * scalefactor);
+						}
+						if (!scaled) {
+							pdfImage.scalePercent((72f / res_x * 100) * scalefactor, (72f / res_y * 100) * scalefactor);
+						}
+
+						// center the image on the page
+						// ---------------------------------------------------------------
+						float y_offset = 0; // y - offset
+						// get image size in cm; height
+						float h_cm = (float) (h / (res_x / 2.54));
+						// float w_cm = (float) (w / (res_y / 2.54)); // and width
+						if ((h_cm + 2) < (page_h / 10)) {
+							y_offset = 2 * 72f / 2.54f;
+						}
+						float freespace_x = ((page_w_pixel - w) / res_x * 72f);
+						float freespace_y = ((page_h_pixel - h) / res_y * 72f) - (y_offset);
+						// set position add image
+						pdfImage.setAbsolutePosition(freespace_x / 2, freespace_y);
+						boolean result;
+						try {
+							result = pdfdoc.add(pdfImage);
+						} catch (DocumentException e) {
+							logger.error(e);
+							throw new PDFManagerException("DocumentException occured while adding the image to PDF", e);
+						}
 						if (!result) {
+							// placing the image in the PDF was not successful
 							throw new PDFManagerException("Image \"" + url.toString()
 									+ "\" can's be added to PDF! Error during placing image on page");
 						}
-					} catch (DocumentException e) {
-						throw new PDFManagerException("DocumentException occured while adding the image to PDF", e);
-					}
-				} else {
-					/*
-					 * it is not the original page size PDF will contain only A4 pages
-					 */
-					logger.debug("creating A4 pdf page");
 
-					// create new page to put the content
-					try {
-						pageadded++;
-						pdfdoc.setPageSize(PageSize.A4);
-						pdfdoc.newPage(); // create new page
-					} catch (Exception e1) {
-						throw new PDFManagerException("Exception occured while creating new page in PDF", e1);
-					}
+						// draw box around the image page
+						// ------------------------------------------------------------------------------------------------
+						if (pagesizemode == PdfPageSize.A4BOX) {
+							logger.debug("draw box around the image page");
 
-					float page_w_pixel = (float) (page_w * myInterpreter.getXResolution() / 25.4);
-					float page_h_pixel = (float) (page_h * myInterpreter.getYResolution() / 25.4);
+							// draw a black frame around the image
+							PdfContentByte pcb = writer.getDirectContent();
 
-					float res_x = myInterpreter.getXResolution();
-					float res_y = myInterpreter.getYResolution();
+							// calculate upper left corner of the box (measurment is
+							// in points)
+							float left_x = (freespace_x / 2);
+							float left_y = freespace_y;
 
-					long w = myInterpreter.getWidth(); // get height and width
-					long h = myInterpreter.getHeight();
+							// calculate the lower right corner of the box
+							// (measurement is in points)
+							float image_w_points = (w / res_x) * 72;
+							float image_h_points = (h / res_y) * 72;
 
-					/*
-					 * if the page is landscape, we have to rotate the page; this is only done in PDF, the orig image bytestream is NOT rotated
-					 */
-					if (w > h) {
-						logger.debug("rotate image");
-						// must be rotated
-						pdfImage.setRotationDegrees(90);
-						// change width and height
-						long dummy = w;
-						w = h;
-						h = dummy;
-						// change the resolutions x and y
-						float dummy2 = res_x;
-						res_x = res_y;
-						res_y = dummy2;
-					}
+							pcb.setLineWidth(1f);
+							pcb.stroke();
+							pcb.rectangle(left_x, left_y, image_w_points, image_h_points);
 
-					/*
-					 * check, if the image needs to be scaled, because it's bigger than A4 calculate the new scalefactor
-					 */
-					if ((w > page_w_pixel) || (h > page_h_pixel)) {
-						logger.debug("scale image to fit the page");
-						float scalefactor_w = page_w_pixel / w;
-						float scalefactor_h = page_h_pixel / h;
-						if (scalefactor_h < scalefactor_w) {
-							scalefactor = scalefactor_h;
-						} else {
-							scalefactor = scalefactor_w;
+							pcb.stroke();
 						}
-						w = (long) (w * scalefactor);
-						h = (long) (h * scalefactor);
-					}
-					if (!scaled) {
-						pdfImage.scalePercent((72f / res_x * 100) * scalefactor, (72f / res_y * 100) * scalefactor);
-					}
 
-					// center the image on the page
-					// ---------------------------------------------------------------
-					float y_offset = 0; // y - offset
-					// get image size in cm; height
-					float h_cm = (float) (h / (res_x / 2.54));
-					// float w_cm = (float) (w / (res_y / 2.54)); // and width
-					if ((h_cm + 2) < (page_h / 10)) {
-						y_offset = 2 * 72f / 2.54f;
-					}
-					float freespace_x = ((page_w_pixel - w) / res_x * 72f);
-					float freespace_y = ((page_h_pixel - h) / res_y * 72f) - (y_offset);
-					// set position add image
-					pdfImage.setAbsolutePosition(freespace_x / 2, freespace_y);
-					boolean result;
-					try {
-						result = pdfdoc.add(pdfImage);
-					} catch (DocumentException e) {
-						logger.error(e);
-						throw new PDFManagerException("DocumentException occured while adding the image to PDF", e);
-					}
-					if (!result) {
-						// placing the image in the PDF was not successful
-						throw new PDFManagerException("Image \"" + url.toString() + "\" can's be added to PDF! Error during placing image on page");
-					}
+					} // end of: if (pagesizemode == PdfPageSize.ORIGINAL) {
 
-					// draw box around the image page
-					// ------------------------------------------------------------------------------------------------
-					if (pagesizemode == PdfPageSize.A4BOX) {
-						logger.debug("draw box around the image page");
+				} // end of : if (pdfpage.getURL() != null) {
 
-						// draw a black frame around the image
-						PdfContentByte pcb = writer.getDirectContent();
+				// ------------------------------------------------------------------------------------------------
+				// it is a page from a PDF file which should be inserted
+				// ------------------------------------------------------------------------------------------------
+				else if (pdfpage.getClass() == PDFPage.class && ((PDFPage) pdfpage).getPdfreader() != null) {
 
-						// calculate upper left corner of the box (measurment is
-						// in points)
-						float left_x = (freespace_x / 2);
-						float left_y = freespace_y;
+					PdfContentByte pdfcb = writer.getDirectContent();
 
-						// calculate the lower right corner of the box
-						// (measurement is in points)
-						float image_w_points = (w / res_x) * 72;
-						float image_h_points = (h / res_y) * 72;
+					PdfReader pdfreader = ((PDFPage) pdfpage).getPdfreader();
+					PdfImportedPage importpage = writer.getImportedPage(pdfreader, pdfpage.getPageNumber());
 
-						pcb.setLineWidth(1f);
-						pcb.stroke();
-						pcb.rectangle(left_x, left_y, image_w_points, image_h_points);
+					if (pagesizemode == PdfPageSize.ORIGINAL) {
+						logger.debug("creating orig pdf page");
+						Rectangle rect = pdfreader.getPageSize(pdfpage.getPageNumber());
+						try {
+							pdfdoc.setPageSize(rect);
+							pdfdoc.newPage(); // create new page
+						} catch (Exception e1) {
+							throw new PDFManagerException("Exception occured while creating new page in PDF", e1);
+						}
+						// add content
+						pageadded++;
+						pdfcb.addTemplate(importpage, 0, 0);
 
-						pcb.stroke();
+					} else {
+						logger.debug("creating A4 pdf page");
+						try {
+							pdfdoc.setPageSize(PageSize.A4);
+							pdfdoc.newPage(); // create new page
+						} catch (Exception e1) {
+							throw new PDFManagerException("Exception occured while creating new page in PDF", e1);
+						}
+
+						// add content
+						pageadded++;
+						pdfcb.addTemplate(importpage, 0, 0);
+
+						// draw box
+						if (pagesizemode == PdfPageSize.A4BOX) {
+							// FIXME: nichts implementiert ?
+						}
 					}
 
-				} // end of: if (pagesizemode == PdfPageSize.ORIGINAL) {
+				}
+				// handle pagename
+				if (imageNames != null) {
+					String pagename = imageNames.get(imageKey);
 
-			} // end of : if (pdfpage.getURL() != null) {
-
-			// ------------------------------------------------------------------------------------------------
-			// it is a page from a PDF file which should be inserted
-			// ------------------------------------------------------------------------------------------------
-			else if (pdfpage.getClass() == PDFPage.class && ((PDFPage) pdfpage).getPdfreader() != null) {
-
-				PdfContentByte pdfcb = writer.getDirectContent();
-
-				PdfReader pdfreader = ((PDFPage) pdfpage).getPdfreader();
-				PdfImportedPage importpage = writer.getImportedPage(pdfreader, pdfpage.getPageNumber());
-
-				if (pagesizemode == PdfPageSize.ORIGINAL) {
-					logger.debug("creating orig pdf page");
-					Rectangle rect = pdfreader.getPageSize(pdfpage.getPageNumber());
-					try {
-						pdfdoc.setPageSize(rect);
-						pdfdoc.newPage(); // create new page
-					} catch (Exception e1) {
-						throw new PDFManagerException("Exception occured while creating new page in PDF", e1);
-					}
-					// add content
-					pageadded++;
-					pdfcb.addTemplate(importpage, 0, 0);
-
-				} else {
-					logger.debug("creating A4 pdf page");
-					try {
-						pdfdoc.setPageSize(PageSize.A4);
-						pdfdoc.newPage(); // create new page
-					} catch (Exception e1) {
-						throw new PDFManagerException("Exception occured while creating new page in PDF", e1);
-					}
-
-					// add content
-					pageadded++;
-					pdfcb.addTemplate(importpage, 0, 0);
-
-					// draw box
-					if (pagesizemode == PdfPageSize.A4BOX) {
-						// FIXME: nichts implementiert ?
+					if (pagename != null) {
+						pagelabels.addPageLabel(pageadded, PdfPageLabels.EMPTY, pagename);
+					} else {
+						pagelabels.addPageLabel(pageadded, PdfPageLabels.EMPTY, "unnumbered");
 					}
 				}
+				// handle bookmarks and set destinator for bookmarks
+				logger.debug("handle bookmark(s) for page");
 
-			}
-			// handle pagename
-			if (imageNames != null) {
-				String pagename = imageNames.get(imageKey);
+				PdfDestination destinator = new PdfDestination(PdfDestination.FIT);
+				setBookmarksForPage(writer, destinator, imageKey); // the key in the
+				// mashMap is the pagenumber
 
-				if (pagename != null) {
-					pagelabels.addPageLabel(pageadded, PdfPageLabels.EMPTY, pagename);
-				} else {
-					pagelabels.addPageLabel(pageadded, PdfPageLabels.EMPTY, "unnumbered");
-				}
-			}
-			// handle bookmarks and set destinator for bookmarks
-			logger.debug("handle bookmark(s) for page");
+			} // end of while iterator over all pages
+		}
 
-			PdfDestination destinator = new PdfDestination(PdfDestination.FIT);
-			setBookmarksForPage(writer, destinator, imageKey); // the key in the
-			// mashMap is the pagenumber
-
-		} // end of while iterator over all pages
 		return pagelabels;
 	}
 
@@ -1167,7 +1195,8 @@ public class PDFManager {
 			// page for the first page
 			pdfdoc = new Document(pagesize, 2.5f * 72f / 2.54f, 2.5f * 72f / 2.54f, 2.5f * 72f / 2.54f, 3f * 72f / 2.54f);
 			if (isTitlePage) {
-				pdfdoc.setMargins(36, 72, 108, 180);
+				pdfdoc.setMargins(pdftitlepage.getLeftMargin(), pdftitlepage.getRightMargin(), pdftitlepage.getTopMargin(),
+						pdftitlepage.getBottomMargin());
 			}
 		} else {
 			logger.warn("No pagesize available.... strange!");

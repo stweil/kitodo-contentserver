@@ -12,6 +12,8 @@
 <!-- examples for the use of the fo leader -->
 <pdftitlepage>
 
+    <pagemargins marginLeft="0" marginRight="0" marginTop="0" marginBottom="0" />
+
     <!-- get all parents -->
     <!--  <parenttype>Monograph</parenttype> -->
     <!-- usually line1 contains the title of the selected document - this is the title of the chapter, the article or if the whole monograph was selected, the title of the monograph -->
@@ -23,15 +25,27 @@
     <!-- line4 contains the pages; from and until -->
     <!--   <line4>pp. 15 - 27</line4> -->
     <termsconditions title="Terms and Conditions">
-        <p>The Goettingen State and University Library provides access to digitized documents strictly for noncommercial educational, research and private purposes and makes no warranty with regard to their use for other purposes. Some of our collections are protected by copyright. Publication and/or broadcast in any form (including electronic) requires prior written permission from the Goettingen State- and University Library.</p>
-        <p>Each copy of any part of this document must contain there Terms and Conditions. With the usage of the library's online system to access or download a digitized document you accept there Terms and Conditions.</p>
-        <p>Reproductions of material on the web site may not be made for or donated to other repositories, nor may be further reproduced without written permission from the Goettingen State- and University Library</p>
-        <p>For reproduction requests and permissions, please contact us. If citing materials, please give proper attribution of the source.</p>
-        <p>Contact:</p>
-        <p>Niedersaechsische Staats- und Universitaetsbibliothek</p>
-        <p>Digitalisierungszentrum</p>
-        <p>37070 Goettingen</p>
-        <p>Germany</p>
-        <p>Email: gdz@www.sub.uni-goettingen.de</p>
+      <p size="9">Publikationserlaubnis</p>
+      <p>  </p>
+      <p size="9">Die Erlaubnis zur Einsicht in die handschriftlichen Materialien schließt nicht die Erlaubnis zu deren Veröffentlichung ein. Diese bedarf der Zustimmung der Bibliothek. Bei jeder beabsichtigten Veröffentlichung oder bildliche Wiedergabe in gedruckten wie auch elektronischen Medien wird der Benutzer nachdrücklich gebeten, das Vorhaben jeweils vorher schriftlich mitzuteilen. Dies gilt auch für jede kommerzielle Verwendung. Für die Wahrung aller an einzelnen Objekten etwa bestehenden Urheber- und Persönlichkeitsrechte trägt der Benutzer selbst die Verantwortung. Die Handschriften, Autographen und Nachlässe sind mit ihren vollständigen Signaturen und der Besitzangabe „Universitätsbibliothek Kiel“ zu  zitieren.</p>
+      <p size="9">Bei Nutzung unserer alten Drucke für eine gedruckte oder elektronische Publikation ist die „Universitätsbibliothek Kiel“ als Besitzerin der im Internet abgebildeten Objekte zu benennen.</p>
+      <p size="9">Wir bitten Sie, bei Nutzung unserer digitalisierten Bestände für Publikationszwecke ein Exemplar der Veröffentlichung als Beleg an die Bibliothek abzugeben.</p> 
+      <p>      </p>
+      <p size="9">Terms of use for the Digital Collections</p>
+      <p>    </p>
+      <p size="9">Kiel University Library offers its Digital Collections free of charge for non-commercial research and teaching purposes.</p>
+      <p>  </p>
+      <p size="9">Publication regulations </p>
+      <p size="9">Please note that the permission to consult materials of our manuscript collection does not include the permission to publish them. Any publication requires Kiel University Library’s consent. In case you would like to publish any of our materials we strongly ask you to notify us in advance (written form required). This holds true for both textual and visual reproductions in printed as well as electronic documents. The policy applies to all kinds of purposes, especially any commercial purposes you might pursue. It is the recipient’s obligation to maintain any copyrights and personal rights that might exist. All reproductions of our manuscripts, autographs and literary estates have to be cited with their entire call number and the credit line “Kiel University Library”. </p>
+      <p>  </p>
+      <p size="9">When using parts of our digitized old and rare books for a publication (whether in printed or electronic form) it is compulsory that „Kiel University Library“ is cited as the copyright holder of the objects displayed on our website. </p>
+      <p size="9">In this case we kindly ask you to submit us a voucher copy of your publication.  </p>
+
+        <p size="9">Contact:</p>
+        <p size="9">Universitaetsbibliothek Kiel</p>
+        <p size="9">Leibnizstr. 9</p>
+        <p size="9">24118 Kiel</p>
+        <p size="9">Germany</p>
+        <p size="9">Email: auskunft@ub.uni-kiel.de</p> 
     </termsconditions>
 </pdftitlepage>

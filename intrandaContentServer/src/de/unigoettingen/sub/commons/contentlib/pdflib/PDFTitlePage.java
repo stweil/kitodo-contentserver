@@ -73,6 +73,10 @@ public class PDFTitlePage {
 	String ttffontpath = null; // filepath to truetype font(s)
 	String termsandconditionstitle = null;
 	String structuretype = null;
+	private int left = 36;
+	private int right = 72;
+	private int top = 108;
+	private int bottom = 180;
 
 	/************************************************************************************
 	 * public empty constructor
@@ -88,8 +92,7 @@ public class PDFTitlePage {
 	 * @throws IOException
 	 *             , PDFManagerException
 	 ************************************************************************************/
-	private String readXMLviaHTTP(URI url) throws IOException,
-			PDFManagerException {
+	private String readXMLviaHTTP(URI url) throws IOException, PDFManagerException {
 
 		String response = "";
 		URL myURL = url.toURL();
@@ -102,30 +105,24 @@ public class PDFTitlePage {
 			int code = httpConnection.getResponseCode();
 
 			if (code != 200) {
-				PDFManagerException pdfe = new PDFManagerException(
-						"Can't read configuration file for PDF Title Page; http return code != 200");
+				PDFManagerException pdfe = new PDFManagerException("Can't read configuration file for PDF Title Page; http return code != 200");
 				throw pdfe;
 			}
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					httpConnection.getInputStream(), "UTF8"));
+			BufferedReader in = new BufferedReader(new InputStreamReader(httpConnection.getInputStream(), "UTF8"));
 
 			String input;
 			StringBuffer response_buf = new StringBuffer();
 			while ((input = in.readLine()) != null) {
 				for (int i = 0; i < input.length(); i++) {
-					if ((input.length() > (i + 4))
-							&& (input.substring(i, i + 4)).equals("&lt;")) {
+					if ((input.length() > (i + 4)) && (input.substring(i, i + 4)).equals("&lt;")) {
 						// nothing should happen
-					} else if ((input.length() > (i + 5))
-							&& (input.substring(i, i + 5)).equals("&amp;")) {
+					} else if ((input.length() > (i + 5)) && (input.substring(i, i + 5)).equals("&amp;")) {
 						// nothing should happen
-					} else if ((input.length() > (i + 4))
-							&& (input.substring(i, i + 5)).equals("&gt;")) {
+					} else if ((input.length() > (i + 4)) && (input.substring(i, i + 5)).equals("&gt;")) {
 						// nothing should happen
 					}
-					if ((input.length() > (i + 1))
-							&& (input.substring(i, i + 1)).equals("&")) {
+					if ((input.length() > (i + 1)) && (input.substring(i, i + 1)).equals("&")) {
 						// convert the ampersand to "&amp;
 						String b = input.substring(0, i - 1);
 						String c = input.substring(i + 1, input.length());
@@ -156,15 +153,12 @@ public class PDFTitlePage {
 		Document xmldoc = null;
 		try {
 
-			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 			docBuilderFactory.setValidating(false);
 			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 
-			// TODO: GDZ: Move this to "Helper" (Util)
 			docBuilder.setEntityResolver(new EntityResolver() {
-				public InputSource resolveEntity(String publicId,
-						String systemId) throws SAXException, IOException {
+				public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
 					if (systemId.contains("pdftitlepage.dtd")) {
 						return new InputSource(new StringReader(""));
 					} else {
@@ -176,21 +170,17 @@ public class PDFTitlePage {
 			if (inUrl.getScheme().equals("http")) {
 				// read via HTTP
 				String response = readXMLviaHTTP(inUrl);
-				xmldoc = docBuilder.parse(new InputSource(new StringReader(
-						response)));
+				xmldoc = docBuilder.parse(new InputSource(new StringReader(response)));
 			} else if (inUrl.getScheme().equals("file")) {
 				// read from file system
 				File file = new File(inUrl);
 				if (!file.exists() || !file.canRead()) {
-					throw new PDFManagerException(
-							"File for pdf title page configuration can not be read: "
-									+ inUrl.toString());
+					throw new PDFManagerException("File for pdf title page configuration can not be read: " + inUrl.toString());
 				}
 				xmldoc = docBuilder.parse(file);
 			} else {
 				// unknown, throw exception
-				throw new PDFManagerException(
-						"Invalid URI for reading PDF's title page configuration");
+				throw new PDFManagerException("Invalid URI for reading PDF's title page configuration");
 			}
 
 			// iterate through thee DOM tree
@@ -209,16 +199,52 @@ public class PDFTitlePage {
 			for (int i = 0; i < children.getLength(); i++) {
 				Node singlenode = children.item(i);
 
+				if ((singlenode.getNodeType() == Node.ELEMENT_NODE) && (singlenode.getNodeName().startsWith("pagemargins"))) {
+					NamedNodeMap map = singlenode.getAttributes();
+					if (map != null) {
+						Node marginLeft = map.getNamedItem("marginLeft");
+						if (marginLeft != null) {
+							String s = marginLeft.getNodeValue();
+							if (s.matches("\\d*")) {
+								left = new Integer(s);
+							}
+						}
+						
+						Node marginRight = map.getNamedItem("marginRight");
+						if (marginRight != null) {
+							String s = marginRight.getNodeValue();
+							if (s.matches("\\d*")) {
+								right = new Integer(s);
+							}
+						}
+						
+						Node marginTop = map.getNamedItem("marginTop");
+						if (marginTop != null) {
+							String s = marginTop.getNodeValue();
+							if (s.matches("\\d*")) {
+								top = new Integer(s);
+							}
+						}
+						
+						Node marginBottom = map.getNamedItem("marginBottom");
+						if (marginBottom != null) {
+							String s = marginBottom.getNodeValue();
+							if (s.matches("\\d*")) {
+								bottom = new Integer(s);
+							}
+						}
+					}
+
+				}
+
 				// read <parenttype> element
-				if ((singlenode.getNodeType() == Node.ELEMENT_NODE)
-						&& (singlenode.getNodeName().startsWith("parenttype"))) {
+				if ((singlenode.getNodeType() == Node.ELEMENT_NODE) && (singlenode.getNodeName().startsWith("parenttype"))) {
 					structuretype = getValueOfElement(singlenode);
 				}
 
 				// read all the title lines; there is an unlimited number
 				// the just need to begin with <line....>
-				if ((singlenode.getNodeType() == Node.ELEMENT_NODE)
-						&& (singlenode.getNodeName().startsWith("line"))) {
+				if ((singlenode.getNodeType() == Node.ELEMENT_NODE) && (singlenode.getNodeName().startsWith("line"))) {
 					// new line detected
 					PDFTitlePageLine pdftpl = new PDFTitlePageLine();
 
@@ -228,33 +254,26 @@ public class PDFTitlePage {
 
 					NamedNodeMap nnm = singlenode.getAttributes();
 					if (nnm != null) {
-						Node maxlinelengthnode = nnm
-								.getNamedItem("maxlinelength");
+						Node maxlinelengthnode = nnm.getNamedItem("maxlinelength");
 						if (maxlinelengthnode != null) {
-							String linewrap_str = maxlinelengthnode
-									.getNodeValue();
+							String linewrap_str = maxlinelengthnode.getNodeValue();
 							// string needs to be converted to integer
 							try {
 								int linewrap = Integer.parseInt(linewrap_str);
 								pdftpl.setLinewrap(linewrap);
 							} catch (Exception e) {
-								logger
-										.warn("maxlinelength attribute in PDF's title page configuration file has not an integer value");
+								logger.warn("maxlinelength attribute in PDF's title page configuration file has not an integer value");
 								pdftpl.setLinewrap(50);
 							}
 						}
-						Node maxlinetotalhnode = nnm
-								.getNamedItem("maxtotallength");
+						Node maxlinetotalhnode = nnm.getNamedItem("maxtotallength");
 						if (maxlinetotalhnode != null) {
-							String linetotallength_str = maxlinetotalhnode
-									.getNodeValue();
+							String linetotallength_str = maxlinetotalhnode.getNodeValue();
 							try {
-								int linetotallength = Integer
-										.parseInt(linetotallength_str);
+								int linetotallength = Integer.parseInt(linetotallength_str);
 								pdftpl.setShortentextlength(linetotallength);
 							} catch (Exception e) {
-								logger
-										.warn("maxtotallength attribute in PDF's title page configuration file has not an integer value");
+								logger.warn("maxtotallength attribute in PDF's title page configuration file has not an integer value");
 								pdftpl.setShortentextlength(100);
 							}
 						}
@@ -265,8 +284,7 @@ public class PDFTitlePage {
 								int fontsize = Integer.parseInt(fontsize_str);
 								pdftpl.setFontsize(fontsize);
 							} catch (Exception e) {
-								logger
-										.warn("size attribute in PDF's title page configuration file has not an integer value");
+								logger.warn("size attribute in PDF's title page configuration file has not an integer value");
 								pdftpl.setFontsize(12);
 							}
 						}
@@ -281,14 +299,12 @@ public class PDFTitlePage {
 					if (pdftpl.getContent() != null) {
 						allTitleLines.addLast(pdftpl);
 					} else {
-						logger
-								.warn("Line configuration in PDF's title configuration has NO content");
+						logger.warn("Line configuration in PDF's title configuration has NO content");
 					}
 
 				} // end of iteration over DOM elements
 
-				if ((singlenode.getNodeType() == Node.ELEMENT_NODE)
-						&& (singlenode.getNodeName().equals("termsconditions"))) {
+				if ((singlenode.getNodeType() == Node.ELEMENT_NODE) && (singlenode.getNodeName().equals("termsconditions"))) {
 					// get terms and conditions title
 					NamedNodeMap nnm = singlenode.getAttributes();
 					if (nnm != null) {
@@ -309,42 +325,29 @@ public class PDFTitlePage {
 
 				// get all images
 				//
-				if ((singlenode.getNodeType() == Node.ELEMENT_NODE)
-						&& (singlenode.getNodeName().equals("image"))) {
+				if ((singlenode.getNodeType() == Node.ELEMENT_NODE) && (singlenode.getNodeName().equals("image"))) {
 					this.readPDFTitlePageImageConfig(singlenode);
 				}
 			}
 			// catch all the exception which may occur during XML parsing
 		} catch (MalformedURLException mue) {
-			logger.error("This seems to be a funny URL - it is invalid:"
-					+ mue.toString());
-			throw new PDFManagerException(
-					"Invalid URL for PDF's title page configuration", mue);
+			logger.error("This seems to be a funny URL - it is invalid:" + mue.toString());
+			throw new PDFManagerException("Invalid URL for PDF's title page configuration", mue);
 		} catch (IOException ioe) {
-			logger
-					.error(
-							"ERROR: IOException occured while accessing PDF's title page configuration file",
-							ioe);
-			throw new PDFManagerException(
-					"IOException occured while accessing PDF's title page configuration file",
-					ioe);
+			logger.error("ERROR: IOException occured while accessing PDF's title page configuration file", ioe);
+			throw new PDFManagerException("IOException occured while accessing PDF's title page configuration file", ioe);
 		} catch (javax.xml.parsers.ParserConfigurationException pce) {
 			logger.error("ERROR: couldn't parse XML file ", pce);
-			throw new PDFManagerException(
-					"couldn't parse PDF's title page configuration XML file ",
-					pce);
+			throw new PDFManagerException("couldn't parse PDF's title page configuration XML file ", pce);
 		} catch (org.xml.sax.SAXException saxe) {
 			logger.error("ERROR: SAX exception ", saxe);
-			throw new PDFManagerException(
-					" SAX exception while parsing PDF's title page configuration file ",
-					saxe);
+			throw new PDFManagerException(" SAX exception while parsing PDF's title page configuration file ", saxe);
 		}
 
 	}
 
 	/************************************************************************************
-	 * Retrieves the value of the textnode which must be child of an Element
-	 * node in the DOM tree
+	 * Retrieves the value of the textnode which must be child of an Element node in the DOM tree
 	 * 
 	 * @return Value of given Element as String
 	 ************************************************************************************/
@@ -362,9 +365,8 @@ public class PDFTitlePage {
 	}
 
 	/************************************************************************************
-	 * Retrieves the configuration for all paragraphs. For each paragraph a
-	 * PDFTitlePageParagraph object is intantiated and added to the
-	 * allParagraphs LinkedList.
+	 * Retrieves the configuration for all paragraphs. For each paragraph a PDFTitlePageParagraph object is intantiated and added to the allParagraphs
+	 * LinkedList.
 	 * 
 	 * @param inNode
 	 ************************************************************************************/
@@ -373,8 +375,7 @@ public class PDFTitlePage {
 		NodeList childnodes = inNode.getChildNodes();
 		for (int i = 0; i < childnodes.getLength(); i++) {
 			Node singlenode = childnodes.item(i);
-			if ((singlenode.getNodeType() == Node.ELEMENT_NODE)
-					&& (singlenode.getNodeName().equals("p"))) {
+			if ((singlenode.getNodeType() == Node.ELEMENT_NODE) && (singlenode.getNodeName().equals("p"))) {
 				String value = getValueOfElement(singlenode);
 				// paragraph found, create new PDFTitlePageParagraph instance
 
@@ -395,8 +396,7 @@ public class PDFTitlePage {
 							int size = Integer.parseInt(size_str);
 							p.setFontsize(size);
 						} catch (Exception e) {
-							logger
-									.warn("DocumentConverter: paragraph doesn't contain integer for font-size");
+							logger.warn("DocumentConverter: paragraph doesn't contain integer for font-size");
 							p.setFontsize(12);
 						}
 					}
@@ -442,8 +442,7 @@ public class PDFTitlePage {
 					scaling = Integer.parseInt(scaling_str);
 				}
 			} catch (Exception e) {
-				logger
-						.error("DocumentConverter.getImageItem: value for coordinates are not in float format");
+				logger.error("DocumentConverter.getImageItem: value for coordinates are not in float format");
 				return;
 			}
 		}
@@ -473,11 +472,10 @@ public class PDFTitlePage {
 	 *            the given pdf document to render
 	 * @throws PDFManagerException
 	 ************************************************************************************/
-	public void render(com.lowagie.text.Document pdfDoc)
-			throws PDFManagerException {
+	public void render(com.lowagie.text.Document pdfDoc) throws PDFManagerException {
 
 		// set margins
-		pdfDoc.setMargins(36, 72, 108, 180);
+		pdfDoc.setMargins(left, right, top, bottom);
 
 		try {
 			// set fonts
@@ -496,8 +494,7 @@ public class PDFTitlePage {
 			while (it.hasNext()) {
 				PDFTitlePageLine pdftpl = (PDFTitlePageLine) it.next();
 
-				Font tplFont = getPDFFont(pdftpl.getFonttype(), pdftpl
-						.getFontsize());
+				Font tplFont = getPDFFont(pdftpl.getFonttype(), pdftpl.getFontsize());
 				renderTextLine(pdftpl, tplFont, pdfDoc);
 			}
 
@@ -511,11 +508,9 @@ public class PDFTitlePage {
 			}
 
 			// iterate over all paragraphs
-			Iterator<PDFTitlePageParagraph> it_paragraph = allParagraphs
-					.iterator();
+			Iterator<PDFTitlePageParagraph> it_paragraph = allParagraphs.iterator();
 			while (it_paragraph.hasNext()) {
-				PDFTitlePageParagraph pdftpp = (PDFTitlePageParagraph) it_paragraph
-						.next();
+				PDFTitlePageParagraph pdftpp = (PDFTitlePageParagraph) it_paragraph.next();
 				renderParagraph(pdftpp, pdfDoc);
 			}
 
@@ -530,13 +525,8 @@ public class PDFTitlePage {
 			pdfDoc.setMargins(0, 0, 0, 0); // delete all margins
 		} catch (DocumentException de) {
 			// something went wrong while adding data to the PDF
-			logger
-					.error(
-							"ERROR: Something serious went wrong while adding data to the PDF title page",
-							de);
-			throw new PDFManagerException(
-					"ERROR: Something serious went wrong while adding data to the PDF title page",
-					de);
+			logger.error("ERROR: Something serious went wrong while adding data to the PDF title page", de);
+			throw new PDFManagerException("ERROR: Something serious went wrong while adding data to the PDF title page", de);
 		}
 	}
 
@@ -550,8 +540,7 @@ public class PDFTitlePage {
 	 * 
 	 * @throws PDFManagerException
 	 ************************************************************************************/
-	private Font getPDFFont(String fontname, int fontsize)
-			throws PDFManagerException {
+	private Font getPDFFont(String fontname, int fontsize) throws PDFManagerException {
 		Font resultfont = null;
 
 		// set the base font
@@ -559,10 +548,8 @@ public class PDFTitlePage {
 			if (this.ttffontpath == null) {
 				// don't use TTF
 
-				logger
-						.debug("Do not use TrueType Font... instead standard Arial is used");
-				resultfont = FontFactory.getFont("Arial", BaseFont.CP1252,
-						BaseFont.EMBEDDED, fontsize);
+				logger.debug("Do not use TrueType Font... instead standard Arial is used");
+				resultfont = FontFactory.getFont("Arial", BaseFont.CP1252, BaseFont.EMBEDDED, fontsize);
 
 				// String[] codePages = basefont.getCodePagesSupported();
 				// System.out.println("All available encodings for font:\n\n");
@@ -573,33 +560,27 @@ public class PDFTitlePage {
 				// load font, embedd it - use unicode
 				logger.debug("Use TrueType Font... at:" + this.ttffontpath);
 
-				BaseFont bf = BaseFont.createFont(this.ttffontpath,
-						BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+				BaseFont bf = BaseFont.createFont(this.ttffontpath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 				resultfont = new Font(bf, fontsize);
 			}
 
 		} catch (Exception e) {
-			logger.error("DocumentException while creating title page for PDF",
-					e);
-			throw new PDFManagerException(
-					"Exception while creating Titlepage for PDF", e);
+			logger.error("DocumentException while creating title page for PDF", e);
+			throw new PDFManagerException("Exception while creating Titlepage for PDF", e);
 		}
 
 		return resultfont;
 	}
 
-	private void renderTextLine(PDFTitlePageLine inTextLine, Font pdffont,
-			com.lowagie.text.Document pdfdoc) throws DocumentException {
+	private void renderTextLine(PDFTitlePageLine inTextLine, Font pdffont, com.lowagie.text.Document pdfdoc) throws DocumentException {
 		String content = inTextLine.getContent();
 
 		if (content == null) {
 			return;
 		}
 
-		if ((content != null)
-				&& (content.length() > inTextLine.getShortentextlength())) {
-			content = content.substring(0, inTextLine.getShortentextlength())
-					+ "...";
+		if ((content != null) && (content.length() > inTextLine.getShortentextlength())) {
+			content = content.substring(0, inTextLine.getShortentextlength()) + "...";
 		}
 
 		// show first line
@@ -614,8 +595,7 @@ public class PDFTitlePage {
 			// line
 
 			for (int i = 0; i < numberofwords; i++) {
-				if ((charsinline + (allwords[i].length()) + 1) < inTextLine
-						.getLinewrap()) {
+				if ((charsinline + (allwords[i].length()) + 1) < inTextLine.getLinewrap()) {
 					// word does fit in line, so add it to paragraph
 					ch1 = ch1 + allwords[i] + " ";
 					charsinline = charsinline + (allwords[i].length()) + 1;
@@ -649,8 +629,7 @@ public class PDFTitlePage {
 	 *            given {@link com.lowagie.text.Document} where to render
 	 * @throws DocumentException
 	 ************************************************************************************/
-	private void renderParagraph(PDFTitlePageParagraph pdftpp,
-			com.lowagie.text.Document pdfdoc) throws DocumentException {
+	private void renderParagraph(PDFTitlePageParagraph pdftpp, com.lowagie.text.Document pdfdoc) throws DocumentException {
 		String text = pdftpp.getContent();
 		if (text == null) {
 			text = "";
@@ -673,17 +652,13 @@ public class PDFTitlePage {
 		}
 		// create BaseFont for embedding
 		try {
-			Font font = FontFactory.getFont("Arial", BaseFont.CP1252,
-					BaseFont.EMBEDDED, pdftpp.getFontsize(), fontstyle);
+			Font font = FontFactory.getFont("Arial", BaseFont.CP1252, BaseFont.EMBEDDED, pdftpp.getFontsize(), fontstyle);
 			Paragraph p2 = new Paragraph(new Chunk(text, font));
 			// Paragraph p2=new Paragraph(text,
 			// FontFactory.getFont(FontFactory.TIMES_ROMAN, 12));
 			pdfdoc.add(p2);
 		} catch (Exception e) {
-			logger
-					.error(
-							"error occured while generating paragraph for titlepage",
-							e);
+			logger.error("error occured while generating paragraph for titlepage", e);
 		}
 	}
 
@@ -693,11 +668,9 @@ public class PDFTitlePage {
 	 * @param pdftpi
 	 *            the {@link PDFTitlePageImage} which shoud be renderd
 	 * @param pdfdoc
-	 *            the {@link com.lowagie.text.Document} where the titlepage
-	 *            shoud be rendered
+	 *            the {@link com.lowagie.text.Document} where the titlepage shoud be rendered
 	 ************************************************************************************/
-	private void renderImage(PDFTitlePageImage pdftpi,
-			com.lowagie.text.Document pdfdoc) throws DocumentException {
+	private void renderImage(PDFTitlePageImage pdftpi, com.lowagie.text.Document pdfdoc) throws DocumentException {
 		try {
 			Image img = Image.getInstance(pdftpi.getFilename());
 			// calculate the absolute position
@@ -710,11 +683,9 @@ public class PDFTitlePage {
 			}
 			pdfdoc.add(img);
 		} catch (MalformedURLException mue) {
-			logger.error("WARNING: Can't read image " + pdftpi.getFilename()
-					+ " for PDF title page, invalid URL");
+			logger.error("WARNING: Can't read image " + pdftpi.getFilename() + " for PDF title page, invalid URL");
 		} catch (IOException ioe) {
-			logger.error("WARNING: Can't read image:" + pdftpi.getFilename()
-					+ " for PDF title page - IO Exception");
+			logger.error("WARNING: Can't read image:" + pdftpi.getFilename() + " for PDF title page - IO Exception");
 		}
 	}
 
@@ -798,5 +769,18 @@ public class PDFTitlePage {
 
 	public void deleteTitleLines() {
 		allTitleLines = new LinkedList<PDFTitlePageLine>();
+	}
+	
+	public int getLeftMargin() {
+		return left;
+	}
+	public int getRightMargin() {
+		return right;
+	}
+	public int getTopMargin() {
+		return top;
+	}
+	public int getBottomMargin() {
+		return bottom;
 	}
 }

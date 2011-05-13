@@ -76,7 +76,7 @@ public class ContentServerConfiguration {
 	 * @return int
 	 ***************************************************************************************************************/
 	public Integer getMaxFileLength() {
-		return config.getInt("maxFileLength[@value]",0);
+		return config.getInt("maxFileLength[@value]",0) *1024 *1024;
 	}
 	
 	public String getErrorFile() {
@@ -92,6 +92,14 @@ public class ContentServerConfiguration {
 		return config.getString("defaultRepositoryPathImages[@value]");
 	}
 
+	public String getRepositoryPathPdf() {
+		return config.getString("defaultRepositoryPathPdf[@value]", "");
+	}
+	
+	public Boolean getUsePdf() {
+		return config.getBoolean("defaultRepositoryPathPdf[@usage]", false);
+	}
+	
 	/************************************************************************************
 	 * get path of repository from configuration
 	 * 

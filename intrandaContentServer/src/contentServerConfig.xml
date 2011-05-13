@@ -14,7 +14,7 @@
     * sample: <defaultResolution value="600" />
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <defaultResolution value="600" />
-	<maxFileLength value="10000000" file="file:/C:/digiverso/tiff/filetolarge.tif"/>
+	<maxFileLength value="999" file="file:/C:/digiverso/viewer/tiff/filetolarge.tif"/>
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * default file names for pdf or image (file extension will be automatically added); 
     * define if sending of images or pdf should be with header "attachment" or not;
@@ -40,7 +40,7 @@
 	*	- pagesize						   default page size for pdf generation; possible values are 'A4', 'original' and 'A4Box' 
     * sample: <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="true" metsFileGroup="DEFAULT" writeAsPdfA="true" pagesize="A4"/> 
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="false" metsFileGroup="PRESENTATION" writeAsPdfA="false" pagesize="A4"/>
+    <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="false" metsFileGroup="PRESENTATION" writeAsPdfA="false" pagesize="original"/>
     
     <!--########################################################## 
     *#############################################################
@@ -49,15 +49,22 @@
     *
     *#############################################################
     *###########################################################-->
-    
+<!--  
+	 <defaultRepositoryPathPdf
+		value="file:/C:/digiverso/viewer/pdf/" usage="true" /> 
+    -->
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	* default path to repository for all image processing requests
 	* if repository path is empty, in the servlet request has to be a complete url 
 	* sample: <defaultRepositoryPath value="file:/home/goobi/imageRepository/" /> 
 	*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 	<!-- for digiverso -->
+	
+	
  <defaultRepositoryPathImages
-		value="file:/C:/digiverso/tiff/" /> 
+		value="file:/C:/digiverso/viewer/tiff/" /> 
+		
+		
   <!-- for ucc 
 	<defaultRepositoryPathImages
 		value="file:/" />-->
@@ -96,7 +103,7 @@
 	* sample: <defaultRepositoryPath value="file:/home/goobi/metsRepository/" /> 
 	*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 	<defaultRepositoryPathMets
-		value="file:/C:/digiverso/indexed_mets/" />
+		value="file:/C:/digiverso/viewer/indexed_mets/" />
   
   	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * configuration if titlepage for pdf file should be generated and 
@@ -104,8 +111,8 @@
     *
     * sample: <defaultRepositoryPath value="file:/home/goobi/config/pdftitlepage.xml" /> 
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <pdfTitlePage use="false"
-        configFile="file:/D:/Eclipse%20Run/WorkspaceGoobi/GoobiContentServerServlet/WebContent/WEB-INF/classes/pdftitlepage.xml" />	
+    <pdfTitlePage use="true"
+        configFile="file:/C:/Eclipse/workspace/intrandaContentServer/src/pdftitlepage.xml" />	
 
      <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * path to contentCache and maximum size in MB

@@ -36,6 +36,9 @@ public abstract class AbstractUrlImage implements UrlImage {
 	 * @return the pagenumber
 	 *************************************************************************************/
 	public Integer getPageNumber() {
+		if (pagenumber == null) {
+			return 1;
+		}
 		return pagenumber;
 	}
 
