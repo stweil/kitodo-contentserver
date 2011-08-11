@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
@@ -48,6 +49,7 @@ import org.goobi.presentation.contentServlet.controller.GoobiContentServer;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
+import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManipulatorException;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ContentLibUtil;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageFileFormat;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageInterpreter;
@@ -69,10 +71,8 @@ public class GetImageAction extends GetAction {
 	/************************************************************************************
 	 * exectute all image actions (rotation, scaling etc.) and send image back to output stream of the servlet, after setting correct mime type
 	 * 
-	 * @param request
-	 *            {@link HttpServletRequest} of ServletRequest
-	 * @param response
-	 *            {@link HttpServletResponse} for writing to response output stream
+	 * @param request {@link HttpServletRequest} of ServletRequest
+	 * @param response {@link HttpServletResponse} for writing to response output stream
 	 * @throws IOException
 	 * @throws ServletException
 	 * @throws ContentLibException
@@ -129,13 +129,13 @@ public class GetImageAction extends GetAction {
 				logger.debug("file not found in cache: " + myUniqueID);
 			}
 
-//			/*
-//			 * -------------------------------- if there is an internal request from goobiContentServer, you have to overwrite the sourcepath with
-//			 * given attribute for image url --------------------------------
-//			 */
-//			if (request.getAttribute("sourcepath") != null) {
-//				sourceImageUrl = new URI((String) request.getAttribute("sourcepath"));
-//			}
+			// /*
+			// * -------------------------------- if there is an internal request from goobiContentServer, you have to overwrite the sourcepath with
+			// * given attribute for image url --------------------------------
+			// */
+			// if (request.getAttribute("sourcepath") != null) {
+			// sourceImageUrl = new URI((String) request.getAttribute("sourcepath"));
+			// }
 			logger.debug("source image:" + sourceImageUrl);
 
 			/*
@@ -440,8 +440,7 @@ public class GetImageAction extends GetAction {
 	/************************************************************************************
 	 * validate all parameters of request for image handling, throws IllegalArgumentException if one request parameter is not valid
 	 * 
-	 * @param request
-	 *            {@link HttpServletRequest} of ServletRequest
+	 * @param request {@link HttpServletRequest} of ServletRequest
 	 * @throws IllegalArgumentException
 	 ************************************************************************************/
 	public void validateParameters(HttpServletRequest request) throws IllegalArgumentException {
@@ -515,10 +514,8 @@ public class GetImageAction extends GetAction {
 	/*************************************************************************************
 	 * generate an ID for a pdf file, to cache it under an unique name
 	 * 
-	 * @param request
-	 *            the current {@link HttpServletRequest}
-	 * @param inConfig
-	 *            current internal {@link ContentServerConfiguration} objekt
+	 * @param request the current {@link HttpServletRequest}
+	 * @param inConfig current internal {@link ContentServerConfiguration} objekt
 	 ************************************************************************************/
 	private String getContentCacheIdForRequest(HttpServletRequest request, ContentServerConfiguration inConfig) {
 		String myId = "";
@@ -558,4 +555,218 @@ public class GetImageAction extends GetAction {
 
 	}
 
+	public byte[] getImage(Map<String, String> params) {
+		/*
+		 * -------------------------------- get central configuration --------------------------------
+		 */
+		URI sourceImageUrl = null;
+		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
+		if (!params.get("sourcepath").startsWith("file:") && !params.get("sourcepath").startsWith("http:")) {
+			try {
+				sourceImageUrl = new URI(config.getRepositoryPathImages() + params.get("sourcepath"));
+				sourceImageUrl = new URI(params.get("sourcepath"));
+			} catch (URISyntaxException e) {
+				logger.error(e.getMessage(), e);
+			}
+		} else {
+		}
+
+		String targetExtension = params.get("format");
+
+		ContentCache cc = null;
+		// ServletOutputStream output = response.getOutputStream();
+		if (params.get("thumbnail") != null) {
+			cc = GoobiContentServer.getThumbnailCache();
+		} else {
+			cc = GoobiContentServer.getContentCache();
+		}
+		// TODO generate non-url IDs
+		// String myUniqueID = getContentCacheIdForRequest(request, config);
+		String myUniqueID = "";
+
+		try {
+			boolean ignoreCache = false;
+			/* check if cache should be ignored */
+			if (params.get("ignoreCache") != null) {
+				String ignore = params.get("ignoreCache").trim();
+				ignoreCache = Boolean.parseBoolean(ignore);
+			}
+			boolean useCache = false;
+			if (params.get("thumbnail") != null) {
+				useCache = config.getThumbnailCacheUse();
+			} else {
+				useCache = config.getContentCacheUse();
+			}
+			if (cc == null || !useCache) {
+				ignoreCache = true;
+				cc = null;
+				logger.debug("cache deactivated via configuration");
+			}
+			// Image found in cache
+			// TODO get image object from cache w/o
+			if (!ignoreCache && cc.cacheContains(myUniqueID, targetExtension)) {
+				logger.debug("get file from cache: " + myUniqueID);
+				// cc.writeToStream(output, myUniqueID, targetExtension);
+				return null;
+			} else if (ignoreCache == false) {
+				logger.debug("file not found in cache: " + myUniqueID);
+			}
+
+			/*
+			 * -------------------------------- retrieve source image from url --------------------------------
+			 */
+			ImageManager sourcemanager = new ImageManager(sourceImageUrl.toURL());
+			logger.debug("imageManager initialized");
+
+			/*
+			 * -------------------------------- set the defaults --------------------------------
+			 */
+			int angle = 0;
+			int scaleX = 100;
+			int scaleY = 100;
+			int scaleType = ImageManager.SCALE_BY_PERCENT;
+			LinkedList<String> highlightCoordinateList = null;
+			Color highlightColor = null;
+			Watermark myWatermark = null;
+			logger.debug("Variables set");
+
+			/*
+			 * -------------------------------- rotate --------------------------------
+			 */
+			if (params.get("rotate") != null) {
+				angle = Integer.parseInt(params.get("rotate"));
+				logger.debug("rotate image:" + angle);
+			}
+
+			/*
+			 * -------------------------------- scale: scale the image to some percent value --------------------------------
+			 */
+			if (params.get("scale") != null) {
+				scaleX = Integer.parseInt(params.get("scale"));
+				scaleY = scaleX;
+				scaleType = ImageManager.SCALE_BY_PERCENT;
+				logger.debug("scale image to percent:" + scaleX);
+			}
+
+			if (params.get("width") != null && params.get("height") != null) {
+				scaleX = Integer.parseInt(params.get("width"));
+				scaleY = Integer.parseInt(params.get("height"));
+				scaleType = ImageManager.SCALE_TO_BOX;
+			}
+
+			/*
+			 * -------------------------------- width: scale image to fixed width --------------------------------
+			 */
+			else if (params.get("width") != null) {
+				scaleX = Integer.parseInt(params.get("width"));
+				scaleY = 0;
+				scaleType = ImageManager.SCALE_BY_WIDTH;
+				logger.debug("scale image to width:" + scaleX);
+			}
+
+			/*
+			 * -------------------------------- height: scale image to fixed height --------------------------------
+			 */
+			else if (params.get("height") != null) {
+				scaleY = Integer.parseInt(params.get("height"));
+				scaleX = 0;
+				scaleType = ImageManager.SCALE_BY_HEIGHT;
+				logger.debug("scale image to height:" + scaleY);
+			}
+
+			/*
+			 * -------------------------------- highlight --------------------------------
+			 */
+			if (params.get("highlight") != null) {
+				highlightCoordinateList = new LinkedList<String>();
+				String highlight = params.get("highlight");
+				StrTokenizer areas = new StrTokenizer(highlight, "$");
+				for (String area : areas.getTokenArray()) {
+					StrTokenizer coordinates = new StrTokenizer(area, ",");
+					highlightCoordinateList.add(coordinates.getContent());
+				}
+				highlightColor = config.getDefaultHighlightColor();
+			}
+
+			/*
+			 * -------------------------------- insert watermark, if it should be used --------------------------------
+			 */
+			if (params.get("ignoreWatermark") == null) {
+				if (config.getWatermarkUse()) {
+					File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
+					// myWatermark = Watermark.generateWatermark(request, watermarkfile);
+					// TODO generateWatermark w/o request
+
+				}
+			}
+
+			/*
+			 * -------------------------------- prepare target --------------------------------
+			 */
+			// change to true if watermark should scale
+
+			RenderedImage targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor,
+					myWatermark, false, ImageManager.BOTTOM);
+
+			ImageFileFormat targetFormat = ImageFileFormat.getImageFileFormatFromFileExtension(targetExtension);
+			ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read
+																			// file
+
+			/*
+			 * -------------------------------- set file name and attachment header from parameter or from configuration
+			 * --------------------------------
+			 */
+			StringBuilder targetFileName = new StringBuilder();
+			if (config.getSendImageAsAttachment()) {
+				targetFileName.append("attachment; ");
+			}
+			targetFileName.append("filename=");
+
+			if (params.get("targetFileName") != null) {
+				targetFileName.append(params.get("targetFileName"));
+			} else {
+				String filename = ContentLibUtil.getCustomizedFileName(config.getDefaultFileNameImages(), "." + targetFormat.getFileExtension());
+				targetFileName.append(filename);
+			}
+
+			/*
+			 * -------------------------------- resolution --------------------------------
+			 */
+			if (params.get("resolution") != null) {
+				wi.setXResolution(Float.parseFloat(params.get("resolution")));
+				wi.setYResolution(Float.parseFloat(params.get("resolution")));
+			} else {
+				wi.setXResolution(config.getDefaultResolution());
+				wi.setYResolution(config.getDefaultResolution());
+			}
+
+			/*
+			 * -------------------------------- write target image to stream --------------------------------
+			 */
+			// if (cc != null && !cc.isCacheSizeExceeded()) {
+			// logger.info("write file to cache and servlet response: " + cc.getFileForId(myUniqueID, targetExtension));
+			// // new CacheOutputStream(wi, cc.getFileForId( myUniqueID,
+			// // targetExtension), output);
+			// FileOutputStream fos = new FileOutputStream(cc.getFileForId(myUniqueID, targetExtension));
+			// wi.writeToStream(fos, null);
+			// }
+
+			return wi.getImageByteStream();
+		}
+		// catch (CacheException e) {
+		// logger.warn("CacheException", e);
+		// }
+		catch (MalformedURLException e) {
+			logger.error(e.getMessage(), e);
+		} catch (ImageManipulatorException e) {
+			logger.error(e.getMessage(), e);
+		} catch (URISyntaxException e) {
+			logger.error(e.getMessage(), e);
+		}
+		// catch (WatermarkException e) {
+		// logger.error(e.getMessage(), e);
+		// }
+
+		return null;
+	}
 }
