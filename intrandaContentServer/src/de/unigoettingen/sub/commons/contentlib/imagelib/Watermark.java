@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
@@ -60,8 +61,7 @@ public class Watermark {
 	protected static final Logger logger = Logger.getLogger(Watermark.class);
 	private String replacedWatermarkText = null;
 	/**
-	 * Hashmap, that has id of component as a key and value of the text/imageurl
-	 * to replace as value.
+	 * Hashmap, that has id of component as a key and value of the text/imageurl to replace as value.
 	 */
 	private HashMap<Integer, String> replacedWatermarkComponents = new HashMap<Integer, String>();
 	protected BufferedImage watermarkImage; // BUfferedImage to draw components
@@ -80,10 +80,8 @@ public class Watermark {
 	/***************************************************************************
 	 * Constructor for Watermark with given height and width
 	 * 
-	 * @param width
-	 *            The width to use
-	 * @param heigth
-	 *            The height to use
+	 * @param width The width to use
+	 * @param heigth The height to use
 	 **************************************************************************/
 	public Watermark(int width, int heigth) {
 		this.width = width;
@@ -120,10 +118,8 @@ public class Watermark {
 	/***************************************************************************************************************
 	 * TODO JavaDoc
 	 * 
-	 * @param watermarkArgs
-	 *            {@link HashMap} key - id of component, value - text to change
-	 * @param watermarkfile
-	 *            {@link String} configuration file
+	 * @param watermarkArgs {@link HashMap} key - id of component, value - text to change
+	 * @param watermarkfile {@link String} configuration file
 	 * @throws WatermarkException
 	 ***************************************************************************************************************/
 	public Watermark(HashMap<Integer, String> watermarkArgs, File watermarkfile) throws WatermarkException {
@@ -135,8 +131,7 @@ public class Watermark {
 	/***************************************************************************
 	 * add some {@link WatermarkComponent} to the Watermark
 	 * 
-	 * @param inComponent
-	 *            The WatermarkComponent to add
+	 * @param inComponent The WatermarkComponent to add
 	 **************************************************************************/
 	public void addWatermarkComponent(WatermarkComponent inComponent) {
 		allWatermarkComponents.add(inComponent);
@@ -191,16 +186,14 @@ public class Watermark {
 	}
 
 	/**
-	 * @param width
-	 *            the width to set
+	 * @param width the width to set
 	 */
 	protected void setWidth(int width) {
 		this.width = width;
 	}
 
 	/**
-	 * @param width
-	 *            the width to set
+	 * @param width the width to set
 	 */
 	public void overrideWidth(int width) {
 		this.width = width;
@@ -222,8 +215,7 @@ public class Watermark {
 	}
 
 	/**
-	 * @param height
-	 *            the height to set
+	 * @param height the height to set
 	 */
 	protected void setHeight(int height) {
 		this.height = height;
@@ -231,8 +223,7 @@ public class Watermark {
 	}
 
 	/**
-	 * @param height
-	 *            the height to set
+	 * @param height the height to set
 	 */
 	public void overrideHeight(int height) {
 		this.height = height;
@@ -247,8 +238,7 @@ public class Watermark {
 	}
 
 	/***************************************************************************
-	 * returns the rendered result of the {@link Watermark} as a
-	 * {@link RenderedImage}
+	 * returns the rendered result of the {@link Watermark} as a {@link RenderedImage}
 	 * 
 	 * @return the Watermark as RenderedImage
 	 **************************************************************************/
@@ -260,8 +250,7 @@ public class Watermark {
 	/***************************************************************************
 	 * write Watermark to {@link OutputStream}
 	 * 
-	 * @param outputFileStream
-	 *            The {@link OutputStream} to use for writing
+	 * @param outputFileStream The {@link OutputStream} to use for writing
 	 **************************************************************************/
 	public void writeToFile(OutputStream outputFileStream) {
 		RenderedImage ri = this.getRenderedImage();
@@ -279,8 +268,7 @@ public class Watermark {
 	/***************************************************************************
 	 * Setter for all WatermarkCompotents
 	 * 
-	 * @param allWatermarkComponents
-	 *            the allWatermarkComponents to set as List
+	 * @param allWatermarkComponents the allWatermarkComponents to set as List
 	 **************************************************************************/
 	public void setAllWatermarkComponents(List<WatermarkComponent> allWatermarkComponents) {
 		this.allWatermarkComponents = allWatermarkComponents;
@@ -427,33 +415,43 @@ public class Watermark {
 			}
 		}
 	}
-	
+
 	/***************************************************************************************************************
-	 * This method creates watermark.
+	 * This method creates a watermark using an HttpServletRequest.
 	 * 
-	 * @param request
-	 *            {@link HttpServletRequest}
-	 * @param watermarkfile
-	 *            {@link File}
+	 * @param request {@link HttpServletRequest}
+	 * @param watermarkfile {@link File}
 	 * @return {@link Watermark}
 	 * @throws WatermarkException
 	 ***************************************************************************************************************/
 	public static Watermark generateWatermark(HttpServletRequest request, File watermarkfile) throws WatermarkException {
+		return generateWatermark(request.getParameterMap(), watermarkfile);
+	}
+
+	/**
+	 * Creates a watermark.
+	 * 
+	 * @param params
+	 * @param watermarkfile
+	 * @return
+	 * @throws WatermarkException
+	 */
+	public static Watermark generateWatermark(Map<String, String[]> params, File watermarkfile) throws WatermarkException {
 		Watermark myWatermark = null;
 		HashMap<Integer, String> watermarkArgs = new HashMap<Integer, String>();
 		// search for watermarkText as attribute
-		if (request.getParameterMap().containsKey("watermarkText")) {
-			myWatermark = new Watermark(watermarkfile, request.getParameter("watermarkText"));
+		if (params.get("watermarkText") != null) {
+			myWatermark = new Watermark(watermarkfile, params.get("watermarkText")[0]);
 		} else {
 			// search for watermarkid's as attribute
-			for (String key : request.getParameterMap().keySet()) {
+			for (String key : params.keySet()) {
 				if (key.contains("watermarkid")) {
 					try {
 						int id = Integer.valueOf(key.substring(11, key.length()));
-						String value = request.getParameter(key);
+						String value = params.get(key)[0];
 						watermarkArgs.put(id, value);
 					} catch (NumberFormatException e) {
-						//logger.error("Can't get WatermarkId for parameter: " + key);
+						// logger.error("Can't get WatermarkId for parameter: " + key);
 					}
 				}
 			}
@@ -476,8 +474,7 @@ public class Watermark {
 	}
 
 	/**
-	 * @param backgroundColor
-	 *            the backgroundColor to set
+	 * @param backgroundColor the backgroundColor to set
 	 */
 	protected void setBackgroundColor(Color backgroundColor) {
 		this.backgroundColor = backgroundColor;

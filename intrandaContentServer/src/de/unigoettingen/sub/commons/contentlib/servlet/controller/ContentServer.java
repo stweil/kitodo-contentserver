@@ -47,7 +47,7 @@ public class ContentServer extends HttpServlet {
 	protected Map<String, Class<? extends Action>> actions = null;
 	private static ContentCache cc;
 	private static ContentCache thumbnailcache;
-	
+
 	private static final long serialVersionUID = 1L;
 
 	/************************************************************************************
@@ -60,7 +60,7 @@ public class ContentServer extends HttpServlet {
 		try {
 			/* initialize ContentCache only, if set in configuration */
 			if (config.getContentCacheUse()) {
-				cc = new ContentCache(config.getContentCachePath(), config.getContentCacheSize());		
+				cc = new ContentCache(config.getContentCachePath(), config.getContentCacheSize());
 			}
 			if (config.getThumbnailCacheUse()) {
 				thumbnailcache = new ContentCache(config.getThumbnailCachePath(), config.getThumbnailCacheSize());
@@ -81,8 +81,7 @@ public class ContentServer extends HttpServlet {
 		logger.debug("Contentserver start");
 
 		/*
-		 * -------------------------------- check action-Parameter if empty
-		 * execute echo-action --------------------------------
+		 * -------------------------------- check action-Parameter if empty execute echo-action --------------------------------
 		 */
 		String actionString = request.getParameter("action");
 		if (actionString == null || actionString.equals("")) {
@@ -95,7 +94,7 @@ public class ContentServer extends HttpServlet {
 		/*-------------------------------- 
 		 * prepare appropriate action method
 		 * --------------------------------*/
-		
+
 		Action action = null;
 		logger.debug("Implementation class for action " + actionString + " is " + this.actions.get(actionString).getName());
 		try {
@@ -106,14 +105,9 @@ public class ContentServer extends HttpServlet {
 			logger.error("Illegal Access to Action class for " + actionString, e1);
 		}
 		/*
-		if (actionString.equals("image")) {
-			action = new GetImageAction();
-		} else if (actionString.equals("pdf")) {
-			action = new GetPdfAction();
-		} else {
-			action = new JspOnlyAction(actionString);
-		}
-		*/
+		 * if (actionString.equals("image")) { action = new GetImageAction(); } else if (actionString.equals("pdf")) { action = new GetPdfAction(); }
+		 * else { action = new JspOnlyAction(actionString); }
+		 */
 		if (action == null) {
 			action = new JspOnlyAction(actionString);
 		}
@@ -129,8 +123,7 @@ public class ContentServer extends HttpServlet {
 			/* if an error occurs log stacktrace and forward error message */
 			logger.error("An error occured", e);
 			/*
-			 * depending on error reporting parameter show jsp oder image for
-			 * errors
+			 * depending on error reporting parameter show jsp oder image for errors
 			 */
 			Action errorAction = new JspOnlyAction("echo");
 			if (request.getParameterMap().containsKey("errorReport") && request.getParameter("errorReport").equals("image")) {
@@ -148,20 +141,24 @@ public class ContentServer extends HttpServlet {
 	}
 
 	/************************************************************************************
-	 * post-method for contentserver requests, simply forwards request to get
-	 * method
+	 * post-method for contentserver requests, simply forwards request to get method
 	 ************************************************************************************/
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		doGet(req, resp);
 	}
-	
+
 	/*************************************************************************************
 	 * Getter for ContentCache
-	 *
+	 * 
 	 * @return the cc
+	 * @throws CacheException
 	 *************************************************************************************/
-	public static ContentCache getContentCache() {
+	public static ContentCache getContentCache() throws CacheException {
+		if (cc == null) {
+			cc = new ContentCache(ContentServerConfiguration.getInstance().getContentCachePath(), ContentServerConfiguration.getInstance()
+					.getContentCacheSize());
+		}
 		return cc;
 	}
 

@@ -23,6 +23,7 @@ package de.unigoettingen.sub.commons.contentlib.servlet.controller;
 
 import java.awt.Color;
 import java.awt.image.RenderedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -41,6 +42,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.util.URLEncoder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.log4j.Logger;
@@ -50,6 +52,7 @@ import org.goobi.presentation.contentServlet.controller.GoobiContentServer;
 import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManipulatorException;
+import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ContentLibUtil;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageFileFormat;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageInterpreter;
@@ -92,16 +95,18 @@ public class GetImageAction extends GetAction {
 		} else {
 			sourceImageUrl = new URI(request.getParameter("sourcepath"));
 		}
-		ContentCache cc = null;
-		ServletOutputStream output = response.getOutputStream();
-		if (request.getParameter("thumbnail") != null) {
-			cc = GoobiContentServer.getThumbnailCache();
-		} else {
-			cc = GoobiContentServer.getContentCache();
-		}
-		String myUniqueID = getContentCacheIdForRequest(request, config);
-		String targetExtension = request.getParameter("format");
+
 		try {
+			ContentCache cc = null;
+			ServletOutputStream output = response.getOutputStream();
+			if (request.getParameter("thumbnail") != null) {
+				cc = GoobiContentServer.getThumbnailCache();
+			} else {
+				cc = GoobiContentServer.getContentCache();
+			}
+			String myUniqueID = getContentCacheIdForRequest(request, config);
+			String targetExtension = request.getParameter("format");
+
 			boolean ignoreCache = false;
 			/* check if cache should be ignored */
 			if (request.getParameter("ignoreCache") != null) {
@@ -234,8 +239,7 @@ public class GetImageAction extends GetAction {
 					myWatermark, false, ImageManager.BOTTOM);
 
 			ImageFileFormat targetFormat = ImageFileFormat.getImageFileFormatFromFileExtension(targetExtension);
-			ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read
-																			// file
+			ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read file
 
 			/*
 			 * -------------------------------- set file name and attachment header from parameter or from configuration
@@ -551,44 +555,93 @@ public class GetImageAction extends GetAction {
 		} catch (UnsupportedEncodingException e) {
 
 		}
-		return myId;
 
+		return myId;
 	}
 
-	public byte[] getImage(Map<String, String> params) {
+	/**
+	 * 
+	 * @param params
+	 * @param inConfig
+	 * @return
+	 */
+	private String getContentCacheIdForParamMap(Map<String, String[]> params, ContentServerConfiguration inConfig) {
+		StringBuffer cacheId = new StringBuffer();
+
+		String pi = null;
+		String imageNo = null;
+		String width = null;
+		String height = null;
+		String rotate = null;
+		String scale = null;
+		String watermarkText = null;
+		for (String s : params.keySet()) {
+			String[] values = params.get(s);
+			if (s.equals("sourcepath")) {
+				String[] sourcePathSplit = values[0].split("[/]");
+				if (sourcePathSplit.length >= 2) {
+					pi = sourcePathSplit[sourcePathSplit.length - 2];
+					imageNo = sourcePathSplit[sourcePathSplit.length - 1];
+				}
+				if (StringUtils.isNotEmpty(imageNo)) {
+					imageNo = imageNo.substring(0, imageNo.indexOf("."));
+				}
+			} else if (s.equals("width")) {
+				width = values[0];
+			} else if (s.equals("height")) {
+				height = values[0];
+			} else if (s.equals("rotate")) {
+				rotate = values[0];
+			} else if (s.equals("scale")) {
+				scale = values[0];
+			} else if (s.equals("watermarkText")) {
+				watermarkText = values[0];
+			}
+		}
+
+		cacheId.append(pi);
+		cacheId.append("_" + imageNo);
+		cacheId.append("_" + width);
+		cacheId.append("_" + height);
+		cacheId.append("_" + rotate);
+		cacheId.append("_" + scale);
+		if (watermarkText != null) {
+			cacheId.append("_" + new URLEncoder().encode(watermarkText));
+		}
+
+		return cacheId.toString();
+	}
+
+	public byte[] getImage(Map<String, String[]> params) throws URISyntaxException, IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
 		/*
 		 * -------------------------------- get central configuration --------------------------------
 		 */
 		URI sourceImageUrl = null;
 		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
-		if (!params.get("sourcepath").startsWith("file:") && !params.get("sourcepath").startsWith("http:")) {
-			try {
-				sourceImageUrl = new URI(config.getRepositoryPathImages() + params.get("sourcepath"));
-				sourceImageUrl = new URI(params.get("sourcepath"));
-			} catch (URISyntaxException e) {
-				logger.error(e.getMessage(), e);
-			}
+		if (!params.get("sourcepath")[0].startsWith("file:") && !params.get("sourcepath")[0].startsWith("http:")) {
+			sourceImageUrl = new URI(config.getRepositoryPathImages() + params.get("sourcepath")[0]);
 		} else {
+			sourceImageUrl = new URI(params.get("sourcepath")[0]);
 		}
-
-		String targetExtension = params.get("format");
-
-		ContentCache cc = null;
-		// ServletOutputStream output = response.getOutputStream();
-		if (params.get("thumbnail") != null) {
-			cc = GoobiContentServer.getThumbnailCache();
-		} else {
-			cc = GoobiContentServer.getContentCache();
-		}
-		// TODO generate non-url IDs
-		// String myUniqueID = getContentCacheIdForRequest(request, config);
-		String myUniqueID = "";
 
 		try {
+			ContentCache cc = null;
+			// ServletOutputStream output = response.getOutputStream();
+			if (params.get("thumbnail") != null) {
+				cc = GoobiContentServer.getThumbnailCache();
+			} else {
+				cc = GoobiContentServer.getContentCache();
+			}
+			String myUniqueID = getContentCacheIdForParamMap(params, config);
+			logger.debug("myUniqueId: " + myUniqueID);
+			String targetExtension = params.get("format")[0];
+
 			boolean ignoreCache = false;
 			/* check if cache should be ignored */
 			if (params.get("ignoreCache") != null) {
-				String ignore = params.get("ignoreCache").trim();
+				String ignore = params.get("ignoreCache")[0].trim();
 				ignoreCache = Boolean.parseBoolean(ignore);
 			}
 			boolean useCache = false;
@@ -603,11 +656,10 @@ public class GetImageAction extends GetAction {
 				logger.debug("cache deactivated via configuration");
 			}
 			// Image found in cache
-			// TODO get image object from cache w/o
 			if (!ignoreCache && cc.cacheContains(myUniqueID, targetExtension)) {
 				logger.debug("get file from cache: " + myUniqueID);
-				// cc.writeToStream(output, myUniqueID, targetExtension);
-				return null;
+				cc.writeToStream(baos, myUniqueID, targetExtension);
+				return baos.toByteArray();
 			} else if (ignoreCache == false) {
 				logger.debug("file not found in cache: " + myUniqueID);
 			}
@@ -634,7 +686,7 @@ public class GetImageAction extends GetAction {
 			 * -------------------------------- rotate --------------------------------
 			 */
 			if (params.get("rotate") != null) {
-				angle = Integer.parseInt(params.get("rotate"));
+				angle = Integer.parseInt(params.get("rotate")[0]);
 				logger.debug("rotate image:" + angle);
 			}
 
@@ -642,15 +694,15 @@ public class GetImageAction extends GetAction {
 			 * -------------------------------- scale: scale the image to some percent value --------------------------------
 			 */
 			if (params.get("scale") != null) {
-				scaleX = Integer.parseInt(params.get("scale"));
+				scaleX = Integer.parseInt(params.get("scale")[0]);
 				scaleY = scaleX;
 				scaleType = ImageManager.SCALE_BY_PERCENT;
 				logger.debug("scale image to percent:" + scaleX);
 			}
 
 			if (params.get("width") != null && params.get("height") != null) {
-				scaleX = Integer.parseInt(params.get("width"));
-				scaleY = Integer.parseInt(params.get("height"));
+				scaleX = Integer.parseInt(params.get("width")[0]);
+				scaleY = Integer.parseInt(params.get("height")[0]);
 				scaleType = ImageManager.SCALE_TO_BOX;
 			}
 
@@ -658,7 +710,7 @@ public class GetImageAction extends GetAction {
 			 * -------------------------------- width: scale image to fixed width --------------------------------
 			 */
 			else if (params.get("width") != null) {
-				scaleX = Integer.parseInt(params.get("width"));
+				scaleX = Integer.parseInt(params.get("width")[0]);
 				scaleY = 0;
 				scaleType = ImageManager.SCALE_BY_WIDTH;
 				logger.debug("scale image to width:" + scaleX);
@@ -668,7 +720,7 @@ public class GetImageAction extends GetAction {
 			 * -------------------------------- height: scale image to fixed height --------------------------------
 			 */
 			else if (params.get("height") != null) {
-				scaleY = Integer.parseInt(params.get("height"));
+				scaleY = Integer.parseInt(params.get("height")[0]);
 				scaleX = 0;
 				scaleType = ImageManager.SCALE_BY_HEIGHT;
 				logger.debug("scale image to height:" + scaleY);
@@ -679,7 +731,7 @@ public class GetImageAction extends GetAction {
 			 */
 			if (params.get("highlight") != null) {
 				highlightCoordinateList = new LinkedList<String>();
-				String highlight = params.get("highlight");
+				String highlight = params.get("highlight")[0];
 				StrTokenizer areas = new StrTokenizer(highlight, "$");
 				for (String area : areas.getTokenArray()) {
 					StrTokenizer coordinates = new StrTokenizer(area, ",");
@@ -694,9 +746,7 @@ public class GetImageAction extends GetAction {
 			if (params.get("ignoreWatermark") == null) {
 				if (config.getWatermarkUse()) {
 					File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
-					// myWatermark = Watermark.generateWatermark(request, watermarkfile);
-					// TODO generateWatermark w/o request
-
+					myWatermark = Watermark.generateWatermark(params, watermarkfile);
 				}
 			}
 
@@ -709,32 +759,31 @@ public class GetImageAction extends GetAction {
 					myWatermark, false, ImageManager.BOTTOM);
 
 			ImageFileFormat targetFormat = ImageFileFormat.getImageFileFormatFromFileExtension(targetExtension);
-			ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read
-																			// file
+			ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read file
 
 			/*
 			 * -------------------------------- set file name and attachment header from parameter or from configuration
 			 * --------------------------------
 			 */
-			StringBuilder targetFileName = new StringBuilder();
-			if (config.getSendImageAsAttachment()) {
-				targetFileName.append("attachment; ");
-			}
-			targetFileName.append("filename=");
-
-			if (params.get("targetFileName") != null) {
-				targetFileName.append(params.get("targetFileName"));
-			} else {
-				String filename = ContentLibUtil.getCustomizedFileName(config.getDefaultFileNameImages(), "." + targetFormat.getFileExtension());
-				targetFileName.append(filename);
-			}
+			// StringBuilder targetFileName = new StringBuilder();
+			// if (config.getSendImageAsAttachment()) {
+			// targetFileName.append("attachment; ");
+			// }
+			// targetFileName.append("filename=");
+			//
+			// if (params.get("targetFileName") != null) {
+			// targetFileName.append(params.get("targetFileName"));
+			// } else {
+			// String filename = ContentLibUtil.getCustomizedFileName(config.getDefaultFileNameImages(), "." + targetFormat.getFileExtension());
+			// targetFileName.append(filename);
+			// }
 
 			/*
 			 * -------------------------------- resolution --------------------------------
 			 */
 			if (params.get("resolution") != null) {
-				wi.setXResolution(Float.parseFloat(params.get("resolution")));
-				wi.setYResolution(Float.parseFloat(params.get("resolution")));
+				wi.setXResolution(Float.parseFloat(params.get("resolution")[0]));
+				wi.setYResolution(Float.parseFloat(params.get("resolution")[0])); // TODO Is this correct?
 			} else {
 				wi.setXResolution(config.getDefaultResolution());
 				wi.setYResolution(config.getDefaultResolution());
@@ -743,29 +792,28 @@ public class GetImageAction extends GetAction {
 			/*
 			 * -------------------------------- write target image to stream --------------------------------
 			 */
-			// if (cc != null && !cc.isCacheSizeExceeded()) {
-			// logger.info("write file to cache and servlet response: " + cc.getFileForId(myUniqueID, targetExtension));
-			// // new CacheOutputStream(wi, cc.getFileForId( myUniqueID,
-			// // targetExtension), output);
-			// FileOutputStream fos = new FileOutputStream(cc.getFileForId(myUniqueID, targetExtension));
-			// wi.writeToStream(fos, null);
-			// }
+			if (cc != null && !cc.isCacheSizeExceeded()) {
+				logger.info("write file to cache and servlet response: " + cc.getFileForId(myUniqueID, targetExtension));
+				// new CacheOutputStream(wi, cc.getFileForId( myUniqueID,
+				// targetExtension), output);
+				FileOutputStream fos = new FileOutputStream(cc.getFileForId(myUniqueID, targetExtension));
+				wi.writeToStream(fos, baos);
+			}
 
-			return wi.getImageByteStream();
-		}
-		// catch (CacheException e) {
-		// logger.warn("CacheException", e);
-		// }
-		catch (MalformedURLException e) {
+			if (baos.size() == 0) {
+				wi.writeToStream(null, baos);
+			}
+
+			return baos.toByteArray();
+		} catch (CacheException e) {
+			logger.warn("CacheException", e);
+		} catch (MalformedURLException e) {
 			logger.error(e.getMessage(), e);
 		} catch (ImageManipulatorException e) {
 			logger.error(e.getMessage(), e);
-		} catch (URISyntaxException e) {
+		} catch (WatermarkException e) {
 			logger.error(e.getMessage(), e);
 		}
-		// catch (WatermarkException e) {
-		// logger.error(e.getMessage(), e);
-		// }
 
 		return null;
 	}
