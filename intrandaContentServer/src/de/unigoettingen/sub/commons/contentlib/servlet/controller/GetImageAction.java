@@ -569,14 +569,15 @@ public class GetImageAction extends GetAction {
 		StringBuffer cacheId = new StringBuffer();
 
 		String pi = null;
-		String imageNo = null;
-		String width = null;
-		String height = null;
-		String rotate = null;
-		String scale = null;
+		String imageNo = "-";
+		String width = "-";
+		String height = "-";
+		String rotate = "-";
+		String scale = "-";
 		String watermarkText = null;
 		for (String s : params.keySet()) {
 			String[] values = params.get(s);
+			logger.debug("param: " + s);
 			if (s.equals("sourcepath")) {
 				String[] sourcePathSplit = values[0].split("[/]");
 				if (sourcePathSplit.length >= 2) {
