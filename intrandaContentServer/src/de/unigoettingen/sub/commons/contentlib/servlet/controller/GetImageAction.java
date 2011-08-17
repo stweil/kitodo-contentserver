@@ -104,7 +104,8 @@ public class GetImageAction extends GetAction {
 			} else {
 				cc = GoobiContentServer.getContentCache();
 			}
-			String myUniqueID = getContentCacheIdForRequest(request, config);
+			// String myUniqueID = getContentCacheIdForRequest(request, config);
+			String myUniqueID = getContentCacheIdForParamMap(request.getParameterMap(), config);
 			String targetExtension = request.getParameter("format");
 
 			boolean ignoreCache = false;
