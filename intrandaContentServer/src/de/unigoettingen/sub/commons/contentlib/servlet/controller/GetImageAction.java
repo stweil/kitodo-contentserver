@@ -652,7 +652,7 @@ public class GetImageAction extends GetAction {
 			} else {
 				useCache = config.getContentCacheUse();
 			}
-			if (cc == null || !useCache) {
+			if (cc == null || !useCache || params.get("highlight") != null) {
 				ignoreCache = true;
 				cc = null;
 				logger.debug("cache deactivated via configuration");
@@ -794,7 +794,7 @@ public class GetImageAction extends GetAction {
 			/*
 			 * -------------------------------- write target image to stream --------------------------------
 			 */
-			if (cc != null && !cc.isCacheSizeExceeded()) {
+			if (cc != null && !cc.isCacheSizeExceeded() && highlightColor == null) {
 				logger.info("write file to cache and servlet response: " + cc.getFileForId(myUniqueID, targetExtension));
 				// new CacheOutputStream(wi, cc.getFileForId( myUniqueID,
 				// targetExtension), output);
