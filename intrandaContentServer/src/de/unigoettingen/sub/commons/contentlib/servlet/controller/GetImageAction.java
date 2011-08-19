@@ -51,6 +51,7 @@ import org.goobi.presentation.contentServlet.controller.GoobiContentServer;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
+import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManagerException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManipulatorException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ContentLibUtil;
@@ -614,7 +615,7 @@ public class GetImageAction extends GetAction {
 		return cacheId.toString();
 	}
 
-	public byte[] getImage(Map<String, String[]> params) throws URISyntaxException, IOException {
+	public byte[] getImage(Map<String, String[]> params) throws URISyntaxException, IOException, ImageManagerException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		/*

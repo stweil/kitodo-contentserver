@@ -26,6 +26,8 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.LinkedList;
 
+import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManagerException;
+
 /************************************************************************************
  * the error image to show or to embedd in pdf file, of no exception in a jsp file can be shown
  * 
@@ -58,8 +60,9 @@ public class ErrorImage {
 	 * Writes the whole Image as a JPEG Image!
 	 * 
 	 * @param ostream the outputstream to write to
+	 * @throws ImageManagerException 
 	 */
-	public void renderAsJPG(OutputStream ostream) {
+	public void renderAsJPG(OutputStream ostream) throws ImageManagerException {
 		// get image 
 		ImageManager imagemanager = new ImageManager(uri);
 		ImageInterpreter myInterpreter = imagemanager.getMyInterpreter();

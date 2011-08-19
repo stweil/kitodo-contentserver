@@ -153,7 +153,7 @@ public class StreamUtils {
 			File f = new File(filepath);
 			inStream = new FileInputStream(f);
 
-		} else if (url.getProtocol().equalsIgnoreCase("")) {
+		} else if (url.getProtocol().length() == 0) {
 			String filepath = url.getFile();
 			// we just have the relative path, need to find the absolute path
 			String path = basepath + filepath;

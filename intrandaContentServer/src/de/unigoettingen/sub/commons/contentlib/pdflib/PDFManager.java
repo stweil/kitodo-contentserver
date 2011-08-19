@@ -357,9 +357,10 @@ public class PDFManager {
 	 *             the malformed url exception
 	 * @throws PDFManagerException
 	 *             the PDF manager exception
+	 * @throws ImageManagerException 
 	 *******************************************************************************************************/
 	private PdfPageLabels addAllPages(PdfPageSize pagesizemode, PdfWriter writer, Document pdfdoc, Watermark myWatermark)
-			throws ImageInterpreterException, IOException, MalformedURLException, PDFManagerException {
+			throws ImageInterpreterException, IOException, MalformedURLException, PDFManagerException, ImageManagerException {
 
 		PdfPageLabels pagelabels = new PdfPageLabels();
 		int pageadded = 0;

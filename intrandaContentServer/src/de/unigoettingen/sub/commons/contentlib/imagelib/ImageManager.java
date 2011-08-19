@@ -31,12 +31,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManagerException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManipulatorException;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageManipulator.MergingMode;
 
 /************************************************************************************
- * central Image Manager for all kinds of image handlings, wraps all
- * functionalities of the {@link ImageManipulator}
+ * central Image Manager for all kinds of image handlings, wraps all functionalities of the {@link ImageManipulator}
  * 
  * @version 06.01.2009
  * @author Steffen Hankiewicz
@@ -89,10 +89,9 @@ public class ImageManager {
 	/************************************************************************************
 	 * simple Constructor for given {@link URL}
 	 * 
-	 * @param url
-	 *            the URL to use
+	 * @param url the URL to use
 	 ************************************************************************************/
-	public ImageManager(URL url) {
+	public ImageManager(URL url) throws ImageManagerException {
 		init(url, httpproxyhost, httpproxyport, httpproxyuser, httpproxypassword);
 	}
 
@@ -102,8 +101,9 @@ public class ImageManager {
 	 * @param httpproxyport
 	 * @param httpproxyuser
 	 * @param httpproxypassword
+	 * @throws ImageManagerException 
 	 */
-	public ImageManager(URL url, String httpproxyhost, String httpproxyport, String httpproxyuser, String httpproxypassword) {
+	public ImageManager(URL url, String httpproxyhost, String httpproxyport, String httpproxyuser, String httpproxypassword) throws ImageManagerException {
 		init(url, httpproxyhost, httpproxyport, httpproxyuser, httpproxypassword);
 	}
 
@@ -113,13 +113,15 @@ public class ImageManager {
 	 * @param httpproxyport
 	 * @param httpproxyuser
 	 * @param httpproxypassword
+	 * @throws ImageManagerException 
 	 */
-	public void init(URL url, String httpproxyhost, String httpproxyport, String httpproxyuser, String httpproxypassword) {
+	public void init(URL url, String httpproxyhost, String httpproxyport, String httpproxyuser, String httpproxypassword) throws ImageManagerException {
 		try {
 			myInterpreter = ImageFileFormat.getInterpreter(url, httpproxyhost, httpproxyport, httpproxyuser, httpproxypassword);
+			logger.debug("url: " + url);
 		} catch (Exception e) {
 			logger.error("Error while getting ImageInterpreter", e);
-			// @TODO throw exception here
+			throw new ImageManagerException(e);
 		}
 
 		parameters = new HashMap<Integer, Integer>();
@@ -147,7 +149,8 @@ public class ImageManager {
 	 * @param httpproxyuser
 	 * @param httpproxypassword
 	 */
-	public ImageManager(URL url, HashMap<Integer, Integer> inParameters, String httpproxyhost, String httpproxyport, String httpproxyuser, String httpproxypassword) {
+	public ImageManager(URL url, HashMap<Integer, Integer> inParameters, String httpproxyhost, String httpproxyport, String httpproxyuser,
+			String httpproxypassword) {
 		// get the right Interpreter and read the image using the url
 		init2(url, inParameters, httpproxyhost, httpproxyport, httpproxyuser, httpproxypassword);
 	}
@@ -160,7 +163,8 @@ public class ImageManager {
 	 * @param httpproxyuser
 	 * @param httpproxypassword
 	 */
-	public void init2(URL url, HashMap<Integer, Integer> inParameters, String httpproxyhost, String httpproxyport, String httpproxyuser, String httpproxypassword) {
+	public void init2(URL url, HashMap<Integer, Integer> inParameters, String httpproxyhost, String httpproxyport, String httpproxyuser,
+			String httpproxypassword) {
 		parameters = inParameters;
 		try {
 			myInterpreter = ImageFileFormat.getInterpreter(url, httpproxyhost, httpproxyport, httpproxyuser, httpproxypassword);
@@ -177,8 +181,7 @@ public class ImageManager {
 	}
 
 	/*************************************************************************************
-	 * @param myInterpreter
-	 *            the myInterpreter to set
+	 * @param myInterpreter the myInterpreter to set
 	 ************************************************************************************/
 	public void setMyInterpreter(ImageInterpreter myInterpreter) {
 		this.myInterpreter = myInterpreter;
@@ -192,28 +195,20 @@ public class ImageManager {
 	}
 
 	/************************************************************************************
-	 * @param outputStream
-	 *            the outputStream to set
+	 * @param outputStream the outputStream to set
 	 ***********************************************************************************/
 	public void setOutputStream(OutputStream outputStream) {
 		this.outputStream = outputStream;
 	}
 
 	/**
-	 * Scales and rotates an image. Rotation is optional. If no rotation is
-	 * needed, the angle must be set to 0 <br/>
+	 * Scales and rotates an image. Rotation is optional. If no rotation is needed, the angle must be set to 0 <br/>
 	 * <br/>
 	 * 
-	 * @param pixelx
-	 *            horizontal size of the new image in pixel; or the scale factor
-	 *            in percent, depending on the scale method
-	 * @param pixely
-	 *            vertical size of the new image in pixel; or the scale factor
-	 *            in percent, depending on the scale method
-	 * @param scaleby
-	 *            defines the scaling method
-	 * @param angle
-	 *            angle for rotation; value will be betwetween 0 and 360
+	 * @param pixelx horizontal size of the new image in pixel; or the scale factor in percent, depending on the scale method
+	 * @param pixely vertical size of the new image in pixel; or the scale factor in percent, depending on the scale method
+	 * @param scaleby defines the scaling method
+	 * @param angle angle for rotation; value will be betwetween 0 and 360
 	 * 
 	 * @return the generated {@link RenderedImage}
 	 * @throws ImageManipulatorException
@@ -223,104 +218,67 @@ public class ImageManager {
 	}
 
 	/**
-	 * Scales an image. Several different modes are possible. It may also draw
-	 * small little boxes for highlighting words into the image. <br/>
+	 * Scales an image. Several different modes are possible. It may also draw small little boxes for highlighting words into the image. <br/>
 	 * <br/>
-	 * If no boxes should be drawn, the coordinates must be set to null. An
-	 * empty List ist NOT sufficient and will cause errors. <br/>
+	 * If no boxes should be drawn, the coordinates must be set to null. An empty List ist NOT sufficient and will cause errors. <br/>
 	 * 
-	 * @param pixelx
-	 *            horizontal size of the new image in pixel; or the scale factor
-	 *            in percent, depending on the scale method
-	 * @param pixely
-	 *            vertical size of the new image in pixel; or the scale factor
-	 *            in percent, depending on the scale method
-	 * @param scaleby
-	 *            defines the scaling method
-	 * @param coordinates
-	 *            a LinkedList containing String. Those strings are representing
-	 *            coordinates: x1,y1,x2,y2 for boxes
-	 * @param inColor
-	 *            color for drawing those boxes
+	 * @param pixelx horizontal size of the new image in pixel; or the scale factor in percent, depending on the scale method
+	 * @param pixely vertical size of the new image in pixel; or the scale factor in percent, depending on the scale method
+	 * @param scaleby defines the scaling method
+	 * @param coordinates a LinkedList containing String. Those strings are representing coordinates: x1,y1,x2,y2 for boxes
+	 * @param inColor color for drawing those boxes
 	 * 
 	 * @return the generated {@link RenderedImage}
 	 * @throws ImageManipulatorException
 	 */
-	public RenderedImage scaleImageByPixel(int pixelx, int pixely, int scaleby, LinkedList<String> coordinates, Color inColor) throws ImageManipulatorException {
+	public RenderedImage scaleImageByPixel(int pixelx, int pixely, int scaleby, LinkedList<String> coordinates, Color inColor)
+			throws ImageManipulatorException {
 		return scaleImageByPixel(pixelx, pixely, scaleby, 0, coordinates, inColor);
 	}
 
 	/**
-	 * Scales and rotates an image. Several different modes are possible. It may
-	 * also draw small little boxes for highlighting words into the image. <br/>
-	 * Rotation is optional. If no rotation is needed, the angle must be set to
-	 * 0 <br/>
-	 * If no boxes should be drawn, the coordinates must be set to null. An
-	 * empty List ist NOT sufficient and will cause errors. <br/>
+	 * Scales and rotates an image. Several different modes are possible. It may also draw small little boxes for highlighting words into the image. <br/>
+	 * Rotation is optional. If no rotation is needed, the angle must be set to 0 <br/>
+	 * If no boxes should be drawn, the coordinates must be set to null. An empty List ist NOT sufficient and will cause errors. <br/>
 	 * 
-	 * @param pixelx
-	 *            horizontal size of the new image in pixel; or the scale factor
-	 *            in percent, depending on the scale method
-	 * @param pixely
-	 *            vertical size of the new image in pixel; or the scale factor
-	 *            in percent, depending on the scale method
-	 * @param scaleby
-	 *            defines the scaling method
-	 * @param angle
-	 *            angle for rotation; value will be betwetween 0 and 360
-	 * @param coordinates
-	 *            a LinkedList containing String. Those strings are representing
-	 *            coordinates: x1,y1,x2,y2 for boxes
-	 * @param inColor
-	 *            color for drawing those boxes
+	 * @param pixelx horizontal size of the new image in pixel; or the scale factor in percent, depending on the scale method
+	 * @param pixely vertical size of the new image in pixel; or the scale factor in percent, depending on the scale method
+	 * @param scaleby defines the scaling method
+	 * @param angle angle for rotation; value will be betwetween 0 and 360
+	 * @param coordinates a LinkedList containing String. Those strings are representing coordinates: x1,y1,x2,y2 for boxes
+	 * @param inColor color for drawing those boxes
 	 * 
 	 * @return the generated {@link RenderedImage}
 	 * @throws ImageManipulatorException
 	 */
-	public RenderedImage scaleImageByPixel(int pixelx, int pixely, int scaleby, int angle, LinkedList<String> coordinates, Color inColor) throws ImageManipulatorException {
+	public RenderedImage scaleImageByPixel(int pixelx, int pixely, int scaleby, int angle, LinkedList<String> coordinates, Color inColor)
+			throws ImageManipulatorException {
 
 		return scaleImageByPixel(pixelx, pixely, scaleby, angle, coordinates, inColor, null, false, 0);
 	}
 
 	/**
-	 * Scales and rotates an image. Several different modes are possible. It may
-	 * also draw small little boxes for highlighting words into the image. If a
-	 * watermark is given, the watermark can also be added. <br/>
-	 * Rotation is optional. If no rotation is needed, the angle must be set to
-	 * 0 <br/>
-	 * If no boxes should be drawn, the coordinates must be set to null. An
-	 * empty List ist NOT sufficient and will cause errors. <br/>
-	 * If a watermark is set, all watermark related parameters must be set as
-	 * well. However setting the watermark is optional. If the watermark is set
+	 * Scales and rotates an image. Several different modes are possible. It may also draw small little boxes for highlighting words into the image.
+	 * If a watermark is given, the watermark can also be added. <br/>
+	 * Rotation is optional. If no rotation is needed, the angle must be set to 0 <br/>
+	 * If no boxes should be drawn, the coordinates must be set to null. An empty List ist NOT sufficient and will cause errors. <br/>
+	 * If a watermark is set, all watermark related parameters must be set as well. However setting the watermark is optional. If the watermark is set
 	 * to null, no watermark will be added to the image.
 	 * 
-	 * @param pixelx
-	 *            horizontal size of the new image in pixel; or the scale factor
-	 *            in percent, depending on the scale method
-	 * @param pixely
-	 *            vertical size of the new image in pixel; or the scale factor
-	 *            in percent, depending on the scale method
-	 * @param externalscalemethod
-	 *            defines the scaling method
-	 * @param angle
-	 *            angle for rotation; value will be betwetween 0 and 360
-	 * @param coordinates
-	 *            a LinkedList containing String. Those strings are representing
-	 *            coordinates: x1,y1,x2,y2 for boxes
-	 * @param inColor
-	 *            color for drawing those boxes
-	 * @param inWatermark
-	 *            Watermark to be added to the scaled and rotated image
-	 * @param watermarkscale
-	 *            method for adjusting the size of the watermark
-	 * @param watermarkposition
-	 *            tells if watermark should be added to TOP,BOTTOM,RIGHT or LEFT
-	 *            of the image
+	 * @param pixelx horizontal size of the new image in pixel; or the scale factor in percent, depending on the scale method
+	 * @param pixely vertical size of the new image in pixel; or the scale factor in percent, depending on the scale method
+	 * @param externalscalemethod defines the scaling method
+	 * @param angle angle for rotation; value will be betwetween 0 and 360
+	 * @param coordinates a LinkedList containing String. Those strings are representing coordinates: x1,y1,x2,y2 for boxes
+	 * @param inColor color for drawing those boxes
+	 * @param inWatermark Watermark to be added to the scaled and rotated image
+	 * @param watermarkscale method for adjusting the size of the watermark
+	 * @param watermarkposition tells if watermark should be added to TOP,BOTTOM,RIGHT or LEFT of the image
 	 * @return the generated {@link RenderedImage}
 	 * @throws ImageManipulatorException
 	 */
-	public RenderedImage scaleImageByPixel(int pixelx, int pixely, int externalscalemethod, int angle, LinkedList<String> coordinates, Color inColor, Watermark inWatermark,
-			boolean watermarkscale, int watermarkposition) throws ImageManipulatorException {
+	public RenderedImage scaleImageByPixel(int pixelx, int pixely, int externalscalemethod, int angle, LinkedList<String> coordinates, Color inColor,
+			Watermark inWatermark, boolean watermarkscale, int watermarkposition) throws ImageManipulatorException {
 		RenderedImage inImage = null;
 		RenderedImage outImage = null;
 		List<String> draw_coordinates = null;
@@ -333,12 +291,14 @@ public class ImageManager {
 			throw new ImageManipulatorException("Invalid value for angle - must be between 0 and 360 degrees");
 		}
 
-//		if ((angle > 0) && (coordinates != null) && (coordinates.size() > 0)) {
-//			throw new ImageManipulatorException("Can't rotate angle, when box cordinates are used!");
-//		}
+		// if ((angle > 0) && (coordinates != null) && (coordinates.size() > 0)) {
+		// throw new ImageManipulatorException("Can't rotate angle, when box cordinates are used!");
+		// }
 
 		// get image
-		inImage = myInterpreter.getRenderedImage();
+		if (myInterpreter != null) {
+			inImage = myInterpreter.getRenderedImage();
+		}
 
 		if (inImage == null) {
 			throw new ImageManipulatorException("Can't get RenderedImage from ImageInterpreter");
@@ -392,10 +352,10 @@ public class ImageManager {
 			float intpercenty = ((float) pixely / 100);
 
 			internalScaling_x = (myInterpreter.getXResolution() / xres);
-//			internalScaling_x = (DPI_DEFAULT / xres);
+			// internalScaling_x = (DPI_DEFAULT / xres);
 			internalScaling_x = internalScaling_x * intpercentx;
 			internalScaling_y = (myInterpreter.getXResolution() / yres);
-//			internalScaling_y = (DPI_DEFAULT / yres);
+			// internalScaling_y = (DPI_DEFAULT / yres);
 			internalScaling_y = internalScaling_y * intpercenty;
 
 		} else {
@@ -435,8 +395,6 @@ public class ImageManager {
 			throw new ImageManipulatorException("wrong scalemethod");
 		}
 
-	
-
 		// ----------------------------------------------------------------------------------------------------
 		// draw boxes, but only if we don't rotate the image
 		// ----------------------------------------------------------------------------------------------------
@@ -446,7 +404,7 @@ public class ImageManager {
 			}
 			outImage = ImageManipulator.drawBoxes(outImage, draw_coordinates, inColor);
 		}
-		
+
 		// ----------------------------------------------------------------------------------------------------
 		// rotate image
 		// ----------------------------------------------------------------------------------------------------
@@ -471,8 +429,8 @@ public class ImageManager {
 					internalScaling_y = (float) outImage.getHeight() / (float) watermarkRi.getHeight();
 					internalScaling_x = internalScaling_y;
 				}
-				logger.debug("Scaling watermark: image size:" + outImage.getWidth() + " / " + outImage.getHeight() + "   watermark size:" + watermarkRi.getWidth() + " / "
-						+ watermarkRi.getHeight() + "\n scalefactor:" + internalScaling_x);
+				logger.debug("Scaling watermark: image size:" + outImage.getWidth() + " / " + outImage.getHeight() + "   watermark size:"
+						+ watermarkRi.getWidth() + " / " + watermarkRi.getHeight() + "\n scalefactor:" + internalScaling_x);
 				// scale watermark
 				watermarkRi = ImageManipulator.scaleNextNeighbor(watermarkRi, internalScaling_x, internalScaling_y);
 			}
@@ -516,8 +474,7 @@ public class ImageManager {
 	}
 
 	/**
-	 * @param httpproxyhost
-	 *            the httpproxyhost to set
+	 * @param httpproxyhost the httpproxyhost to set
 	 */
 	public void setHttpproxyhost(String httpproxyhost) {
 		this.httpproxyhost = httpproxyhost;
@@ -531,8 +488,7 @@ public class ImageManager {
 	}
 
 	/**
-	 * @param httpproxyport
-	 *            the httpproxyport to set
+	 * @param httpproxyport the httpproxyport to set
 	 */
 	public void setHttpproxyport(String httpproxyport) {
 		this.httpproxyport = httpproxyport;
@@ -546,8 +502,7 @@ public class ImageManager {
 	}
 
 	/**
-	 * @param httpproxyuser
-	 *            the httpproxyuser to set
+	 * @param httpproxyuser the httpproxyuser to set
 	 */
 	public void setHttpproxyuser(String httpproxyuser) {
 		this.httpproxyuser = httpproxyuser;
@@ -561,8 +516,7 @@ public class ImageManager {
 	}
 
 	/**
-	 * @param httpproxypassword
-	 *            the httpproxypassword to set
+	 * @param httpproxypassword the httpproxypassword to set
 	 */
 	public void setHttpproxypassword(String httpproxypassword) {
 		this.httpproxypassword = httpproxypassword;
