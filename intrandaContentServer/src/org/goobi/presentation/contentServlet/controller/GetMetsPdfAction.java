@@ -118,7 +118,7 @@ public class GetMetsPdfAction implements Action {
 			myWatermark = Watermark.generateWatermark(request, watermarkfile);
 		}
 		OutputStream myOutStream = response.getOutputStream();
-		ContentCache cc = GoobiContentServer.getContentCache();
+		ContentCache cc = GoobiContentServer.getPdfCache();
 		String myUniqueID = getContentCacheIdForRequest(request, config);
 		setTargetNameAndMimeType(request, response, config);
 		try {

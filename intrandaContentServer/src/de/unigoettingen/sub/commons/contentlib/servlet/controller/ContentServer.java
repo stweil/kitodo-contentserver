@@ -47,6 +47,7 @@ public class ContentServer extends HttpServlet {
 	protected Map<String, Class<? extends Action>> actions = null;
 	private static ContentCache cc;
 	private static ContentCache thumbnailcache;
+	private static ContentCache pdfCache;
 
 	private static final long serialVersionUID = 1L;
 
@@ -64,6 +65,9 @@ public class ContentServer extends HttpServlet {
 			}
 			if (config.getThumbnailCacheUse()) {
 				thumbnailcache = new ContentCache(config.getThumbnailCachePath(), config.getThumbnailCacheSize());
+			}
+			if (config.getPdfCacheUse()) {
+				pdfCache = new ContentCache(config.getPdfCachePath(), config.getPdfCacheSize());
 			}
 		} catch (CacheException e) {
 			throw new ServletException("ContentCache for GoobiContentServer can not be initialized", e);
@@ -155,7 +159,7 @@ public class ContentServer extends HttpServlet {
 	 * @throws CacheException
 	 *************************************************************************************/
 	public static ContentCache getContentCache() throws CacheException {
-		if (cc == null) {
+		if (cc == null && ContentServerConfiguration.getInstance().getContentCacheUse()) {
 			cc = new ContentCache(ContentServerConfiguration.getInstance().getContentCachePath(), ContentServerConfiguration.getInstance()
 					.getContentCacheSize());
 		}
@@ -164,9 +168,27 @@ public class ContentServer extends HttpServlet {
 
 	/**
 	 * @return the thumbnailcache
+	 * @throws CacheException
 	 */
-	public static ContentCache getThumbnailCache() {
+	public static ContentCache getThumbnailCache() throws CacheException {
+		if (thumbnailcache == null && ContentServerConfiguration.getInstance().getThumbnailCacheUse()) {
+			thumbnailcache = new ContentCache(ContentServerConfiguration.getInstance().getThumbnailCachePath(), ContentServerConfiguration
+					.getInstance().getThumbnailCacheSize());
+		}
 		return thumbnailcache;
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @throws CacheException
+	 */
+	public static ContentCache getPdfCache() throws CacheException {
+		if (pdfCache == null && ContentServerConfiguration.getInstance().getPdfCacheUse()) {
+			pdfCache = new ContentCache(ContentServerConfiguration.getInstance().getPdfCachePath(), ContentServerConfiguration.getInstance()
+					.getPdfCacheSize());
+		}
+		return pdfCache;
 	}
 
 }

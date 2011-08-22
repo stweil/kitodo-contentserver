@@ -76,9 +76,9 @@ public class ContentServerConfiguration {
 	 * @return int
 	 ***************************************************************************************************************/
 	public Integer getMaxFileLength() {
-		return config.getInt("maxFileLength[@value]",0) *1024 *1024;
+		return config.getInt("maxFileLength[@value]", 0) * 1024 * 1024;
 	}
-	
+
 	public String getErrorFile() {
 		return config.getString("maxFileLength[@file]");
 	}
@@ -95,11 +95,11 @@ public class ContentServerConfiguration {
 	public String getRepositoryPathPdf() {
 		return config.getString("defaultRepositoryPathPdf[@value]", "");
 	}
-	
+
 	public Boolean getUsePdf() {
 		return config.getBoolean("defaultRepositoryPathPdf[@usage]", false);
 	}
-	
+
 	/************************************************************************************
 	 * get path of repository from configuration
 	 * 
@@ -145,7 +145,6 @@ public class ContentServerConfiguration {
 		return config.getBoolean("contentCache[@useShortFileNames]");
 	}
 
-	
 	public String getThumbnailCachePath() {
 		return config.getString("thumbnailCache[@path]");
 	}
@@ -176,7 +175,43 @@ public class ContentServerConfiguration {
 	public Boolean getThumbnailCacheUseShortFileNames() {
 		return config.getBoolean("thumbnailCache[@useShortFileNames]");
 	}
-	
+
+	/************************************************************************************
+	 * get boolean if pdf cache should be used or not
+	 * 
+	 * @return value if cache should be used as Boolean
+	 ************************************************************************************/
+	public Boolean getPdfCacheUse() {
+		return config.getBoolean("pdfCache[@useCache]");
+	}
+
+	/************************************************************************************
+	 * get boolean if pdf cache should use short file names
+	 * 
+	 * @return value if pdf should use short file names as Boolean
+	 ************************************************************************************/
+	public Boolean getPdfCacheUseShortFileNames() {
+		return config.getBoolean("pdfCache[@useShortFileNames]");
+	}
+
+	/************************************************************************************
+	 * get maximum size of pdf cache from configuration
+	 * 
+	 * @return maximum size to pdf cache as {@link Long}
+	 ************************************************************************************/
+	public Long getPdfCacheSize() {
+		return config.getLong("pdfCache[@size]", 100);
+	}
+
+	/************************************************************************************
+	 * get path of pdf cache from configuration
+	 * 
+	 * @return path to pdf cache as {@link String}
+	 ************************************************************************************/
+	public String getPdfCachePath() {
+		return config.getString("pdfCache[@path]");
+	}
+
 	/************************************************************************************
 	 * get default resolution from configuration
 	 * 
@@ -272,8 +307,7 @@ public class ContentServerConfiguration {
 	}
 
 	/************************************************************************************
-	 * get default value for pdf generation: convert all images always to
-	 * rendered image before sending it to iText
+	 * get default value for pdf generation: convert all images always to rendered image before sending it to iText
 	 * 
 	 * @return alwaysUseRenderedImage as {@link Boolean}
 	 ************************************************************************************/
@@ -282,8 +316,7 @@ public class ContentServerConfiguration {
 	}
 
 	/************************************************************************************
-	 * get default value for pdf generation: compress all images always to jpeg
-	 * image before sending it to iText
+	 * get default value for pdf generation: compress all images always to jpeg image before sending it to iText
 	 * 
 	 * @return alwaysUseRenderedImage as {@link Boolean}
 	 ************************************************************************************/
