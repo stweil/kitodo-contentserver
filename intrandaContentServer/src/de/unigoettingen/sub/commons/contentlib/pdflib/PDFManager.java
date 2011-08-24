@@ -829,19 +829,21 @@ public class PDFManager {
 		JpegInterpreter jpint = new JpegInterpreter(ri);
 		jpint.setXResolution(myInterpreter.getXResolution());
 		jpint.setYResolution(myInterpreter.getYResolution());
-		try {
-			switch (preferredEmbeddingType) {
-			case LOSSLESSJPEG2000:
-				jpint.setWriterCompressionType(JpegTwoThousandInterpreter.LOSSLESS);
-				break;
-			case LOSSYJPEG2000:
-				jpint.setWriterCompressionType(JpegTwoThousandInterpreter.LOSSY);
-				jpint.setWriterCompressionValue(80);
-				break;
+		if (preferredEmbeddingType != null) {
+			try {
+				switch (preferredEmbeddingType) {
+				case LOSSLESSJPEG2000:
+					jpint.setWriterCompressionType(JpegTwoThousandInterpreter.LOSSLESS);
+					break;
+				case LOSSYJPEG2000:
+					jpint.setWriterCompressionType(JpegTwoThousandInterpreter.LOSSY);
+					jpint.setWriterCompressionValue(80);
+					break;
+				}
+			} catch (ParameterNotSupportedException e) {
+				logger.debug("Error: ", e);
+				e.printStackTrace();
 			}
-		} catch (ParameterNotSupportedException e) {
-			logger.debug("Error: ", e);
-			e.printStackTrace();
 		}
 		jpint.writeToStream(null, bytesoutputstream);
 	}
