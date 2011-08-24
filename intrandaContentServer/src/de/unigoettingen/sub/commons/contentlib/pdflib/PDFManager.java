@@ -234,8 +234,7 @@ public class PDFManager {
 	/***************************************************************************************************************
 	 * Constructor for {@link PDFManager}
 	 * 
-	 * @param inPages
-	 *            {@link Map} with {@link UrlImage}
+	 * @param inPages {@link Map} with {@link UrlImage}
 	 ***************************************************************************************************************/
 	public PDFManager(Map<Integer, UrlImage> inPages) {
 		imageURLs = inPages;
@@ -245,10 +244,8 @@ public class PDFManager {
 	/***************************************************************************
 	 * Constructor for {@link PDFManager}.
 	 * 
-	 * @param inPages
-	 *            a {@link Map} with {@link PdfPage}
-	 * @param inPdfa
-	 *            a boolean set to true, if the pdf should be written in pdf/a mode
+	 * @param inPages a {@link Map} with {@link PdfPage}
+	 * @param inPdfa a boolean set to true, if the pdf should be written in pdf/a mode
 	 ****************************************************************************/
 	public PDFManager(Map<Integer, UrlImage> inPages, boolean inPdfa) {
 		this.pdfa = inPdfa;
@@ -259,22 +256,15 @@ public class PDFManager {
 	/***************************************************************************
 	 * Creates a PDF, which is streams to the OutputStream out.
 	 * 
-	 * @param out
-	 *            {@link OutputStream}
-	 * @param pagesizemode
-	 *            {@link PdfPageSize}
+	 * @param out {@link OutputStream}
+	 * @param pagesizemode {@link PdfPageSize}
 	 * 
 	 * 
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws FileNotFoundException
-	 *             the file not found exception
-	 * @throws ImageManagerException
-	 *             the image manager exception
-	 * @throws PDFManagerException
-	 *             the PDF manager exception
-	 * @throws ImageInterpreterException
-	 *             the image interpreter exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws FileNotFoundException the file not found exception
+	 * @throws ImageManagerException the image manager exception
+	 * @throws PDFManagerException the PDF manager exception
+	 * @throws ImageInterpreterException the image interpreter exception
 	 * @throws URISyntaxException
 	 ****************************************************************************/
 	public void createPDF(OutputStream out, PdfPageSize pagesizemode, Watermark myWatermark) throws ImageManagerException, FileNotFoundException,
@@ -340,24 +330,17 @@ public class PDFManager {
 	/******************************************************************************************************
 	 * Adds the all pages.
 	 * 
-	 * @param pagesizemode
-	 *            {@link PdfPageSize}
-	 * @param writer
-	 *            {@link PdfWriter}
-	 * @param pdfdoc
-	 *            {@link Document}
+	 * @param pagesizemode {@link PdfPageSize}
+	 * @param writer {@link PdfWriter}
+	 * @param pdfdoc {@link Document}
 	 * @return {@link PdfPageLabels}
 	 * 
 	 * 
-	 * @throws ImageInterpreterException
-	 *             the image interpreter exception
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws MalformedURLException
-	 *             the malformed url exception
-	 * @throws PDFManagerException
-	 *             the PDF manager exception
-	 * @throws ImageManagerException 
+	 * @throws ImageInterpreterException the image interpreter exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws MalformedURLException the malformed url exception
+	 * @throws PDFManagerException the PDF manager exception
+	 * @throws ImageManagerException
 	 *******************************************************************************************************/
 	private PdfPageLabels addAllPages(PdfPageSize pagesizemode, PdfWriter writer, Document pdfdoc, Watermark myWatermark)
 			throws ImageInterpreterException, IOException, MalformedURLException, PDFManagerException, ImageManagerException {
@@ -415,7 +398,7 @@ public class PDFManager {
 					try {
 						String pdfpath = ContentServerConfiguration.getInstance().getRepositoryPathPdf();
 						UrlImage copy = new PDFPage(pdfpage);
-						
+
 						URL pdfurl = new URL(url.toString().replace(ContentServerConfiguration.getInstance().getRepositoryPathImages(), pdfpath)
 								.replace(url.toString().substring(url.toString().lastIndexOf(".")), ".pdf"));
 						if (new File(pdfurl.toURI()).exists()) {
@@ -836,14 +819,10 @@ public class PDFManager {
 	 * Writes JPEG to outputstream from {@link RenderedImage}. This method is used by
 	 * {@link PDFManager#generatePdfImageFromInterpreter(ImageInterpreter, Embedd, boolean, Watermark, URL)}
 	 * 
-	 * @param bytesoutputstream
-	 *            {@link ByteArrayOutputStream}
-	 * @param ri
-	 *            {@link RenderedImage}
-	 * @param preferredEmbeddingType
-	 *            {@link Embedd}
-	 * @param myInterpreter
-	 *            {@link ImageInterpreter}
+	 * @param bytesoutputstream {@link ByteArrayOutputStream}
+	 * @param ri {@link RenderedImage}
+	 * @param preferredEmbeddingType {@link Embedd}
+	 * @param myInterpreter {@link ImageInterpreter}
 	 ***************************************************************************************************************/
 	private void writeJpegFromRenderedImageToStream(ByteArrayOutputStream bytesoutputstream, RenderedImage ri, Embedd preferredEmbeddingType,
 			ImageInterpreter myInterpreter) {
@@ -871,17 +850,12 @@ public class PDFManager {
 	 * Generates {@link Image} from {@link ImageInterpreter} that we can embedd in PDF. Used by
 	 * {@link PDFManager#addAllPages(PdfPageSize, PdfWriter, Document, Watermark)}
 	 * 
-	 * @param myInterpreter
-	 *            {@link ImageInterpreter}
-	 * @param preferredEmbeddingType
-	 *            {@link Embedd}
+	 * @param myInterpreter {@link ImageInterpreter}
+	 * @param preferredEmbeddingType {@link Embedd}
 	 * 
-	 * @param errorPage
-	 *            {@link Boolean} is this an errorpage ?
-	 * @param watermark
-	 *            {@link Watermark}
-	 * @param errorUrl
-	 *            {@link URL} link to image, that caused the error
+	 * @param errorPage {@link Boolean} is this an errorpage ?
+	 * @param watermark {@link Watermark}
+	 * @param errorUrl {@link URL} link to image, that caused the error
 	 * 
 	 * @return {@link Image} or null
 	 * 
@@ -889,10 +863,8 @@ public class PDFManager {
 	 * @throws MalformedURLException
 	 * @throws BadElementException
 	 * 
-	 * @throws ImageInterpreterException
-	 *             - if we can't generate Watermark
-	 * @throws ImageManipulatorException
-	 *             - if we can't generate Watermark
+	 * @throws ImageInterpreterException - if we can't generate Watermark
+	 * @throws ImageManipulatorException - if we can't generate Watermark
 	 ***************************************************************************************************************/
 	private Image generatePdfImageFromInterpreter(ImageInterpreter myInterpreter, Embedd preferredEmbeddingType, boolean errorPage,
 			Watermark watermark, URL errorUrl) throws BadElementException, MalformedURLException, IOException, ImageInterpreterException,
@@ -974,8 +946,7 @@ public class PDFManager {
 	/***************************************************************************************************************
 	 * Generate error watermark with the text and url of missing image
 	 * 
-	 * @param errorUrl
-	 *            {@link String} url of the image that does not exists
+	 * @param errorUrl {@link String} url of the image that does not exists
 	 * @return {@link Watermark} with error message about image that does not exists..
 	 * @throws FileNotFoundException
 	 * @throws ImageInterpreterException
@@ -1023,17 +994,13 @@ public class PDFManager {
 	/**
 	 * Creates the pdf writer.
 	 * 
-	 * @param out
-	 *            the out
-	 * @param writer
-	 *            the writer
-	 * @param pdfdoc
-	 *            the pdfdoc
+	 * @param out the out
+	 * @param writer the writer
+	 * @param pdfdoc the pdfdoc
 	 * 
 	 * @return the pdf writer
 	 * 
-	 * @throws PDFManagerException
-	 *             the PDF manager exception
+	 * @throws PDFManagerException the PDF manager exception
 	 */
 	private PdfWriter createPDFWriter(OutputStream out, Document pdfdoc) throws PDFManagerException {
 		PdfWriter writer = null;
@@ -1107,17 +1074,13 @@ public class PDFManager {
 	/**
 	 * Sets the default size of the page and creates the pdf document (com.lowagie.text.Document) instance.
 	 * 
-	 * @param pagesizemode
-	 *            the pagesizemode
-	 * @param pagesize
-	 *            the pagesize
+	 * @param pagesizemode the pagesizemode
+	 * @param pagesize the pagesize
 	 * 
 	 * @return the pdf-document instance
 	 * 
-	 * @throws ImageInterpreterException
-	 *             the image interpreter exception
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
+	 * @throws ImageInterpreterException the image interpreter exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	private Document setPDFPageSizeForFirstPage(PdfPageSize pagesizemode, Rectangle pagesize, int footer) throws ImageInterpreterException,
 			IOException {
@@ -1211,12 +1174,9 @@ public class PDFManager {
 	 * ************************************************************************* Sets all the bookmarks which have the same page name for this page.
 	 * Te hierachical relationships between bookmarks are recognized
 	 * 
-	 * @param writer
-	 *            the writer
-	 * @param pdfdestination
-	 *            The PDF destination of the page
-	 * @param pagenumber
-	 *            the name of the page ****************************************** ******************************
+	 * @param writer the writer
+	 * @param pdfdestination The PDF destination of the page
+	 * @param pagenumber the name of the page ****************************************** ******************************
 	 */
 	private void setBookmarksForPage(PdfWriter writer, PdfDestination pdfdestination, Integer pagenumber) {
 		PdfContentByte cb = writer.getDirectContent();
@@ -1253,12 +1213,9 @@ public class PDFManager {
 	 * ************************************************************************* checks all children of a bookmark and see if any of them fits to the
 	 * appropriate page name/ page number.
 	 * 
-	 * @param parent
-	 *            the parent
-	 * @param pdfdestination
-	 *            the pdfdestination
-	 * @param pagenumber
-	 *            ************************************************************** **********
+	 * @param parent the parent
+	 * @param pdfdestination the pdfdestination
+	 * @param pagenumber ************************************************************** **********
 	 */
 	private void checkChildrenBookmarks(PDFBookmark parent, PdfDestination pdfdestination, Integer pagenumber) {
 		for (PDFBookmark child : parent.getChildren()) {
@@ -1297,8 +1254,7 @@ public class PDFManager {
 	/**
 	 * ************************************************************************* find parent {@link PDFBookmark} from given {@link PDFBookmark}.
 	 * 
-	 * @param inBookmark
-	 *            given {@link PDFBookmark}
+	 * @param inBookmark given {@link PDFBookmark}
 	 * 
 	 * @return parent {@link PDFBookmark} ***************************************************************** *******
 	 */
@@ -1322,10 +1278,8 @@ public class PDFManager {
 	 * ************************************************************************* find parent {@link PDFBookmark} in branch from given
 	 * {@link PDFBookmark}.
 	 * 
-	 * @param inBookmark
-	 *            given {@link PDFBookmark}
-	 * @param topBookmark
-	 *            given {@link PDFBookmark}
+	 * @param inBookmark given {@link PDFBookmark}
+	 * @param topBookmark given {@link PDFBookmark}
 	 * 
 	 * @return parent {@link PDFBookmark} ***************************************************************** *******
 	 */
@@ -1348,8 +1302,7 @@ public class PDFManager {
 	/**
 	 * Write xmp metadata.
 	 * 
-	 * @param inWriter
-	 *            the in writer
+	 * @param inWriter the in writer
 	 */
 	private void writeXMPMetadata(PdfWriter inWriter) {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -1416,8 +1369,7 @@ public class PDFManager {
 	/**
 	 * ************************************************************************* Setter for creator.
 	 * 
-	 * @param creator
-	 *            the creator to set ******************************************** ****************************
+	 * @param creator the creator to set ******************************************** ****************************
 	 */
 	public void setCreator(String creator) {
 		this.creator = creator;
@@ -1435,8 +1387,7 @@ public class PDFManager {
 	/**
 	 * ************************************************************************* Setter for author.
 	 * 
-	 * @param author
-	 *            the author to set ********************************************* ***************************
+	 * @param author the author to set ********************************************* ***************************
 	 */
 	public void setAuthor(String author) {
 		this.author = author;
@@ -1454,8 +1405,7 @@ public class PDFManager {
 	/**
 	 * ************************************************************************* Setter for title.
 	 * 
-	 * @param title
-	 *            the title to set ********************************************** **************************
+	 * @param title the title to set ********************************************** **************************
 	 */
 	public void setTitle(String title) {
 		this.title = title;
@@ -1473,8 +1423,7 @@ public class PDFManager {
 	/**
 	 * ************************************************************************* Setter for subject.
 	 * 
-	 * @param subject
-	 *            the subject to set ******************************************** ****************************
+	 * @param subject the subject to set ******************************************** ****************************
 	 */
 	public void setSubject(String subject) {
 		this.subject = subject;
@@ -1492,8 +1441,7 @@ public class PDFManager {
 	/**
 	 * ************************************************************************* Setter for keyword.
 	 * 
-	 * @param keyword
-	 *            the keyword to set ******************************************** ****************************
+	 * @param keyword the keyword to set ******************************************** ****************************
 	 */
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
@@ -1512,8 +1460,7 @@ public class PDFManager {
 	 * ************************************************************************* Sets Image names. The HashMap contains an integer number as a string
 	 * for identifying the page number and the name of the page. The {@link Integer} for the image has to start at 1.
 	 * 
-	 * @param imageNames
-	 *            the imageNames to set, first page Integer must start with 1 *** ************************************************************
+	 * @param imageNames the imageNames to set, first page Integer must start with 1 *** ************************************************************
 	 *            *********
 	 */
 	public void setImageNames(Map<Integer, String> imageNames) {
@@ -1532,8 +1479,7 @@ public class PDFManager {
 	/**
 	 * Sets the iccprofile.
 	 * 
-	 * @param iccprofile
-	 *            the iccprofile to set
+	 * @param iccprofile the iccprofile to set
 	 */
 	public void setIccprofile(ICC_Profile iccprofile) {
 		this.iccprofile = iccprofile;
@@ -1551,8 +1497,7 @@ public class PDFManager {
 	/**
 	 * ************************************************************************* Setter for rootBookmarkList.
 	 * 
-	 * @param structureList
-	 *            the structure list
+	 * @param structureList the structure list
 	 */
 	public void setStructureList(List<? extends Structure> structureList) {
 		this.structureList = PDFBookmark.convertList(structureList);
@@ -1562,8 +1507,7 @@ public class PDFManager {
 	 * This is the only mandatory method which must be called before createPDF is called and the PDF is created. The HashMap must contain a String for
 	 * order (an integer number as a string) and the URL
 	 * 
-	 * @param imageURLs
-	 *            the imageURLs to set
+	 * @param imageURLs the imageURLs to set
 	 */
 	public void setImageURLs(HashMap<Integer, UrlImage> imageURLs) {
 		this.imageURLs = imageURLs;
@@ -1582,8 +1526,7 @@ public class PDFManager {
 	/**
 	 * Sets the pdftitlepages.
 	 * 
-	 * @param pdftitlepages
-	 *            the pdftitlepages to set
+	 * @param pdftitlepages the pdftitlepages to set
 	 */
 	public void setPdftitlepages(HashMap<Integer, PDFTitlePage> pdftitlepages) {
 		this.pdftitlepages = pdftitlepages;
@@ -1601,8 +1544,7 @@ public class PDFManager {
 	/**
 	 * ************************************************************************* Setter for pdftitlepage.
 	 * 
-	 * @param pdftitlepage
-	 *            the pdftitlepage to set *************************************** *********************************
+	 * @param pdftitlepage the pdftitlepage to set *************************************** *********************************
 	 */
 	public void setPdftitlepage(PDFTitlePage pdftitlepage) {
 		this.pdftitlepage = pdftitlepage;
@@ -1629,27 +1571,29 @@ public class PDFManager {
 	/**
 	 * Sets the always use rendered image.
 	 * 
-	 * @param alwaysUseRenderedImage
-	 *            the alwaysUseRenderedImage to set
+	 * @param alwaysUseRenderedImage the alwaysUseRenderedImage to set
 	 */
 	// TODO: there is a bug in here, since it only works correctly if this
 	// method is called before setAlwaysCompressToJPEG
 	public void setAlwaysUseRenderedImage(boolean alwaysUseRenderedImage) {
 		this.alwaysUseRenderedImage = alwaysUseRenderedImage;
-		// set everything to rendered image
-		this.embeddBitonalImage = this.embeddGreyscaleImage = this.embeddColorImage = Embedd.RENDEREDIMAGE;
+		if (alwaysUseRenderedImage) {
+			// set everything to rendered image
+			this.embeddBitonalImage = this.embeddGreyscaleImage = this.embeddColorImage = Embedd.RENDEREDIMAGE;
+		}
 	}
 
 	/**
 	 * Sets the always compress to jpeg.
 	 * 
-	 * @param alwaysCompressToJPEG
-	 *            the alwaysCompressToJPEG to set
+	 * @param alwaysCompressToJPEG the alwaysCompressToJPEG to set
 	 */
 	public void setAlwaysCompressToJPEG(boolean alwaysCompressToJPEG) {
 		this.alwaysCompressToJPEG = alwaysCompressToJPEG;
-		// set everything to jpeg
-		this.embeddBitonalImage = this.embeddGreyscaleImage = this.embeddColorImage = Embedd.JPEG;
+		if (alwaysCompressToJPEG) {
+			// set everything to jpeg
+			this.embeddBitonalImage = this.embeddGreyscaleImage = this.embeddColorImage = Embedd.JPEG;
+		}
 	}
 
 	//
@@ -1668,8 +1612,7 @@ public class PDFManager {
 	/**
 	 * Sets the httpproxyhost.
 	 * 
-	 * @param httpproxyhost
-	 *            the httpproxyhost to set
+	 * @param httpproxyhost the httpproxyhost to set
 	 */
 	public void setHttpproxyhost(String httpproxyhost) {
 		this.httpproxyhost = httpproxyhost;
@@ -1687,8 +1630,7 @@ public class PDFManager {
 	/**
 	 * Sets the httpproxyport.
 	 * 
-	 * @param httpproxyport
-	 *            the httpproxyport to set
+	 * @param httpproxyport the httpproxyport to set
 	 */
 	public void setHttpproxyport(String httpproxyport) {
 		this.httpproxyport = httpproxyport;
@@ -1706,8 +1648,7 @@ public class PDFManager {
 	/**
 	 * Sets the httpproxyuser.
 	 * 
-	 * @param httpproxyuser
-	 *            the httpproxyuser to set
+	 * @param httpproxyuser the httpproxyuser to set
 	 */
 	public void setHttpproxyuser(String httpproxyuser) {
 		this.httpproxyuser = httpproxyuser;
@@ -1725,8 +1666,7 @@ public class PDFManager {
 	/**
 	 * Sets the httpproxypassword.
 	 * 
-	 * @param httpproxypassword
-	 *            the httpproxypassword to set
+	 * @param httpproxypassword the httpproxypassword to set
 	 */
 	public void setHttpproxypassword(String httpproxypassword) {
 		this.httpproxypassword = httpproxypassword;
@@ -1735,8 +1675,7 @@ public class PDFManager {
 	/**
 	 * Gets the page size from a string.
 	 * 
-	 * @param strPageSize
-	 *            the str page size
+	 * @param strPageSize the str page size
 	 * 
 	 * @return {@link PdfPageSize}
 	 */
