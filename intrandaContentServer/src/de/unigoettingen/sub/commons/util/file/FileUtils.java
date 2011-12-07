@@ -48,6 +48,25 @@ public class FileUtils {
 		String extension = inFileName.substring(dotPos).trim();
 		return extension;
 	}
+	
+	/**
+	 * 
+	 * Gets the filename without extension from file name.
+	 * 
+	 * @param inFileName
+	 *            the file name as String
+	 * 
+	 * @return the filename without extension from file name as String
+	 */
+	public static String getFileNameWithoutExtensionFromFileName(String inFileName) {
+		int dotPos = inFileName.lastIndexOf(".") + 1; //$NON-NLS-1$
+		if (dotPos > 1) {
+			String name = inFileName.substring(0, dotPos - 1).trim();
+			return name;
+		} else
+			return inFileName;
+	}
+
 
 	/**
 	 * Gets the file extension from a File as String.
