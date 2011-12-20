@@ -17,6 +17,10 @@ public class Util {
 		File basefolder;
 		// TODO: GDZ: Do we really need to depend on Log4J here? I don't think so...
 		URL url = Loader.getResource("");
+		
+		if (!url.getProtocol().startsWith("file"))
+			return new File(".");
+		
 		try {
 			basefolder = new File(url.toURI());
 		} catch (URISyntaxException ue) {

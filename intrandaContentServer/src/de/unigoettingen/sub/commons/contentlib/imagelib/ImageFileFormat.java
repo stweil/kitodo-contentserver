@@ -226,7 +226,7 @@ public enum ImageFileFormat {
 		} else if (mt.equals("image/jp2")) {
 			return JP2;
 		} else {
-			return JPG;
+			return null;
 		}
 	}
 

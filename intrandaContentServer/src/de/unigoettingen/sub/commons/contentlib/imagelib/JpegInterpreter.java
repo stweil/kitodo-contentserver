@@ -162,6 +162,8 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 		if (resunits != null) {
 			resunits_int = Integer.parseInt(resunits);
 		}
+		
+
 
 		String xres_str = this.getXdensity(domNode);
 		if (xres_str != null) {
@@ -177,6 +179,11 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 			if (resunits_int == 2) {
 				this.yResolution = this.yResolution / 2.54f;
 			}
+		}
+		
+		if (resunits == null || resunits_int == 0 || xResolution <= 1.0 || yResolution <= 1.0) {
+			xResolution = defaultXResolution;
+			yResolution = defaultYResolution;
 		}
 
 		String colordepth_str = this.getSamplePrecision(domNode);
@@ -231,7 +238,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 			// create metadata by creating an XML tree
 			ImageWriteParam writerParam = writer.getDefaultWriteParam();
 			ImageTypeSpecifier its = new ImageTypeSpecifier(noAlphaBi);
-
+			
 			// ImageTypeSpecifier its = new
 			// ImageTypeSpecifier(image.getColorModel(),
 			// image.getSampleModel());
