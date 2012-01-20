@@ -272,7 +272,17 @@ public class GetImageAction extends GetAction {
 				wi.setXResolution(config.getDefaultResolution());
 				wi.setYResolution(config.getDefaultResolution());
 			}
-
+			
+			if (request.getParameter("compression") != null) {
+				String value = request.getParameter("compression");
+				try {
+				int intvalue = Integer.parseInt(value);
+				wi.setWriterCompressionValue(intvalue);
+				} catch (Exception e) {
+					// value is not a number, use default value
+				}
+			}
+			
 			/*
 			 * -------------------------------- write target image to stream --------------------------------
 			 */
@@ -291,157 +301,7 @@ public class GetImageAction extends GetAction {
 
 	}
 
-	// /************************************************************************************
-	// * exectute all image actions (rotation, scaling etc.) and send image back
-	// * to output stream of the servlet, after setting correct mime type
-	// *
-	// * @param request
-	// * {@link HttpServletRequest} of ServletRequest
-	// * @param response
-	// * {@link HttpServletResponse} for writing to response output
-	// * stream
-	// * @throws IOException
-	// * @throws ServletException
-	// * @throws ContentLibException
-	// * @throws URISyntaxException
-	// ************************************************************************************/
-	// public void run(ServletContext servletContext, HttpServletRequest
-	// request, HttpServletResponse response)
-	// throws ServletException, IOException, ContentLibException,
-	// URISyntaxException {
-	// super.run(servletContext, request, response);
-	//
-	// /* --------------------------------
-	// * get central configuration and retrieve source image from url
-	// * --------------------------------*/
-	// ContentServerConfiguration config =
-	// ContentServerConfiguration.getInstance();
-	// URI sourceImageUrl = new URI(config.getRepositoryPath() +
-	// request.getParameter("sourcepath"));
-	// String sourceImageExtension =
-	// Helper.getFileExtensionFromFileName(request.getParameter("sourcepath"));
-	// FileInputStream inputFileStream = new FileInputStream(new
-	// File(sourceImageUrl));
-	//
-	// try {
-	//
-	// ImageManager sourcemanager = new ImageManager(sourceImageUrl.toURL());
-	// ImageInterpreter ii = sourcemanager.getMyInterpreter();
-	//
-	// /* --------------------------------
-	// * read image
-	// * --------------------------------*/
-	// // ImageFileFormat sourceFormat =
-	// ImageFileFormat.getImageFileFormatFromFileExtension(sourceImageExtension);
-	// // ImageInterpreter ii = sourceFormat.getInterpreter(inputFileStream); //
-	// read file
-	// RenderedImage ri = ii.getRenderedImage(); // get the image
-	//
-	// ImageManipulator im = ImageManipulator.instance();
-	// /* --------------------------------
-	// * rotate
-	// * --------------------------------*/
-	// if (request.getParameterMap().containsKey("rotate")) {
-	// double angle = Double.parseDouble(request.getParameter("rotate"));
-	// logger.debug("rotate image:" + angle);
-	// ri = im.rotate(ri, angle, "bilinear");
-	// }
-	//
-	// /* --------------------------------
-	// * scale
-	// * --------------------------------*/
-	// if (request.getParameterMap().containsKey("scale")) {
-	// float scale = Float.parseFloat(request.getParameter("scale"));
-	// logger.debug("scale image:" + scale);
-	// ri = im.scaleInterpolationBilinear(ri, scale, scale);
-	// }
-	//
-	// /* --------------------------------
-	// * scalewidth
-	// * --------------------------------*/
-	// if (request.getParameterMap().containsKey("scalewidth")) {
-	// float scalewidth = Float.parseFloat(request.getParameter("scalewidth"));
-	// logger.debug("scale image width:" + scalewidth);
-	//
-	// }
-	//
-	// /* --------------------------------
-	// * highlight
-	// * --------------------------------*/
-	// if (request.getParameterMap().containsKey("highlight")) {
-	// LinkedList<String> coordinateList = new LinkedList<String>();
-	// String highlight = request.getParameter("highlight");
-	// StrTokenizer areas = new StrTokenizer(highlight, "$");
-	// for (String area : areas.getTokenArray()) {
-	// StrTokenizer coordinates = new StrTokenizer(area, ",");
-	// coordinateList.add(coordinates.getContent());
-	// }
-	// ri = im.drawBoxes(ri, coordinateList, config.getDefaultHighlightColor());
-	// }
-	//
-	// /* --------------------------------
-	// * prepare target
-	// * --------------------------------*/
-	// String targetExtension = request.getParameter("format");
-	// ImageFileFormat targetFormat =
-	// ImageFileFormat.getImageFileFormatFromFileExtension(targetExtension);
-	// ImageInterpreter wi = targetFormat.getInterpreter(ri); // read file
-	//
-	// /* --------------------------------
-	// * insert watermark, if it should be used
-	// * --------------------------------*/
-	// if (config.getWatermarkUse()) {
-	// Watermark wm = new Watermark(wi.getWidth(), wi.getHeight());
-	// wm.readConfiguration(new File(new
-	// URI(config.getWatermarkConfigFilePath())));
-	// // get rendered image of watermark
-	// RenderedImage wmRi = wm.getRenderedImage();
-	// // merge rendered image of watermark with image
-	// ri = im.mergeImages(ri, wmRi, ImageManipulator.VERTICALLY);
-	// }
-	//
-	// /* --------------------------------
-	// * set file name and attachment header from parameter or from
-	// configuration
-	// * --------------------------------*/
-	// StringBuilder targetFileName = new StringBuilder();
-	// if (config.getSendImageAsAttachment()) {
-	// targetFileName.append("attachment; ");
-	// }
-	// targetFileName.append("filename=");
-	//
-	// if (request.getParameter("targetFileName") != null) {
-	// targetFileName.append(request.getParameter("targetFileName"));
-	// } else {
-	// String filename =
-	// Helper.getCustomizedFileName(config.getDefaultFileNameImages(), "."
-	// + targetFormat.getFileExtension());
-	// targetFileName.append(filename);
-	// }
-	// response.setHeader("Content-Disposition", targetFileName.toString());
-	// response.setContentType(targetFormat.getMimeType());
-	//
-	// /* --------------------------------
-	// * resolution
-	// * --------------------------------*/
-	// if (request.getParameter("resolution") != null) {
-	// wi.setXResolution(Float.parseFloat(request.getParameter("resolution")));
-	// wi.setYResolution(Float.parseFloat(request.getParameter("resolution")));
-	// } else {
-	// wi.setXResolution(config.getDefaultResolution());
-	// wi.setYResolution(config.getDefaultResolution());
-	// }
-	//
-	// /* --------------------------------
-	// * write target image to stream
-	// * --------------------------------*/
-	// wi.writeToStream(response.getOutputStream());
-	//
-	// } finally {
-	// /* close open stream */
-	// inputFileStream.close();
-	// }
-	// }
+
 
 	/************************************************************************************
 	 * validate all parameters of request for image handling, throws IllegalArgumentException if one request parameter is not valid

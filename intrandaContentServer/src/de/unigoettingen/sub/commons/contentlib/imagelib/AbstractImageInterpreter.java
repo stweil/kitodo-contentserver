@@ -61,6 +61,9 @@ public class AbstractImageInterpreter {
 	 * @return the xResolution
 	 **************************************************************************/
 	public float getXResolution() {
+		if (xResolution <= 1f) {
+			return 72;
+		}
 		return xResolution;
 	}
 
@@ -78,6 +81,9 @@ public class AbstractImageInterpreter {
 	 * @return the yResolution
 	 */
 	public float getYResolution() {
+		if (yResolution <= 1f) {
+			return 72;
+		}
 		return yResolution;
 	}
 
