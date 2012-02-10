@@ -276,8 +276,8 @@ public class PDFCreator {
 
 		// setting for PDFManager
 		pdfmanager = new PDFManager(allPages);
-		pdfmanager.setAlwaysCompressToJPEG(pdfconfig.isPdfDefaultAlwaysCompressToJPEG());
 		pdfmanager.setAlwaysUseRenderedImage(pdfconfig.isPdfDefaultAlwaysUseRenderedImage());
+		pdfmanager.setAlwaysCompressToJPEG(pdfconfig.isPdfDefaultAlwaysCompressToJPEG());
 		pdfmanager.setPdfa(pdfconfig.isWriteAsPdfA());
 		
 		// set pages

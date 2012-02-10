@@ -1581,7 +1581,10 @@ public class PDFManager {
 		this.alwaysUseRenderedImage = alwaysUseRenderedImage;
 		if (alwaysUseRenderedImage) {
 			// set everything to rendered image
-			this.embeddBitonalImage = this.embeddGreyscaleImage = this.embeddColorImage = Embedd.RENDEREDIMAGE;
+			// this.embeddBitonalImage = this.embeddGreyscaleImage = this.embeddColorImage = Embedd.RENDEREDIMAGE;
+
+			// DIPF hack: do not apply this setting for bitonal images
+			this.embeddGreyscaleImage = this.embeddColorImage = Embedd.RENDEREDIMAGE;
 		}
 	}
 
@@ -1594,7 +1597,10 @@ public class PDFManager {
 		this.alwaysCompressToJPEG = alwaysCompressToJPEG;
 		if (alwaysCompressToJPEG) {
 			// set everything to jpeg
-			this.embeddBitonalImage = this.embeddGreyscaleImage = this.embeddColorImage = Embedd.JPEG;
+			// this.embeddBitonalImage = this.embeddGreyscaleImage = this.embeddColorImage = Embedd.JPEG;
+			
+			// DIPF hack: do not apply this setting for bitonal images
+			this.embeddGreyscaleImage = this.embeddColorImage = Embedd.JPEG;
 		}
 	}
 

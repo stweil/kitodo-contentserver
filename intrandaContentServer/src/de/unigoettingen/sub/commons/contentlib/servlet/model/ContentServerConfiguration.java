@@ -321,7 +321,7 @@ public class ContentServerConfiguration {
 	 * @return alwaysUseRenderedImage as {@link Boolean}
 	 ************************************************************************************/
 	public Boolean getPdfDefaultAlwaysCompressToJPEG() {
-		return config.getBoolean("defaultPdfConfig[@alwaysUseRenderedImage]", false);
+		return config.getBoolean("defaultPdfConfig[@alwaysCompressToJPEG]", false);
 	}
 
 	/************************************************************************************
