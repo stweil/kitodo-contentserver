@@ -7,10 +7,23 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedList;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Image;
+import com.lowagie.text.pdf.PdfCopyFields;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfWriter;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManagerException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManipulatorException;
@@ -72,7 +85,8 @@ public class ImageHelper {
 		return null;
 	}
 
-	public static void covertImageToTIFF(String sourcePath, String destPath, int compression) throws ParameterNotSupportedException, MalformedURLException, ImageManagerException {
+	public static void covertImageToTIFF(String sourcePath, String destPath, int compression) throws ParameterNotSupportedException, MalformedURLException,
+			ImageManagerException {
 		ImageManager sourcemanager = new ImageManager(new File(sourcePath).toURI().toURL());
 
 		RenderedImage renderedImage = getRenderedImage(sourcemanager);
@@ -131,8 +145,7 @@ public class ImageHelper {
 	 */
 	public static RenderedImage getRenderedImage(ImageManager sourcemanager) {
 		/*
-		 * -------------------------------- set the defaults
-		 * --------------------------------
+		 * -------------------------------- set the defaults --------------------------------
 		 */
 		int angle = 0;
 		int scaleX = 100;
@@ -145,7 +158,8 @@ public class ImageHelper {
 		RenderedImage targetImage = null;
 
 		try {
-			targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor, myWatermark, false, ImageManager.BOTTOM);
+			targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor, myWatermark, false,
+					ImageManager.BOTTOM);
 		} catch (ImageManipulatorException e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -155,8 +169,7 @@ public class ImageHelper {
 
 	public static RenderedImage scaleImage(ImageManager sourcemanager, int width, int height) {
 		/*
-		 * -------------------------------- set the defaults
-		 * --------------------------------
+		 * -------------------------------- set the defaults --------------------------------
 		 */
 		int angle = 0;
 		int scaleX = 100;
@@ -167,13 +180,11 @@ public class ImageHelper {
 		Watermark myWatermark = null;
 
 		/*
-		 * -------------------------------- rotate
-		 * --------------------------------
+		 * -------------------------------- rotate --------------------------------
 		 */angle = 0;
 
 		/*
-		 * -------------------------------- width: scale image to fixed width
-		 * --------------------------------
+		 * -------------------------------- width: scale image to fixed width --------------------------------
 		 */
 
 		scaleX = width;
@@ -195,15 +206,15 @@ public class ImageHelper {
 		}
 
 		/*
-		 * -------------------------------- prepare target
-		 * --------------------------------
+		 * -------------------------------- prepare target --------------------------------
 		 */
 		// change to true if watermark should scale
 
 		RenderedImage targetImage = null;
 
 		try {
-			targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor, myWatermark, false, ImageManager.BOTTOM);
+			targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor, myWatermark, false,
+					ImageManager.BOTTOM);
 
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -214,8 +225,7 @@ public class ImageHelper {
 
 	public static RenderedImage rotateImage(ImageManager sourcemanager, int angle) {
 		/*
-		 * -------------------------------- set the defaults
-		 * --------------------------------
+		 * -------------------------------- set the defaults --------------------------------
 		 */
 		int scaleX = 100;
 		int scaleY = 100;
@@ -225,15 +235,15 @@ public class ImageHelper {
 		Watermark myWatermark = null;
 
 		/*
-		 * -------------------------------- prepare target
-		 * --------------------------------
+		 * -------------------------------- prepare target --------------------------------
 		 */
 		// change to true if watermark should scale
 
 		RenderedImage targetImage = null;
 
 		try {
-			targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor, myWatermark, false, ImageManager.BOTTOM);
+			targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor, myWatermark, false,
+					ImageManager.BOTTOM);
 
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -259,8 +269,8 @@ public class ImageHelper {
 																		// file
 
 		/*
-		 * -------------------------------- set file name and attachment header
-		 * from parameter or from configuration --------------------------------
+		 * -------------------------------- set file name and attachment header from parameter or from configuration
+		 * --------------------------------
 		 */
 
 		wi.setXResolution(100);
@@ -287,7 +297,8 @@ public class ImageHelper {
 		logger.debug("finished"); //$NON-NLS-1$
 	}
 
-	public static void writeTIFFImage(RenderedImage targetImage, String targetPath, int compression, float xResolution, float yResolution) throws ParameterNotSupportedException {
+	public static void writeTIFFImage(RenderedImage targetImage, String targetPath, int compression, float xResolution, float yResolution)
+			throws ParameterNotSupportedException {
 		ImageFileFormat targetFormat = ImageFileFormat.TIFF;
 		ImageInterpreter wi = targetFormat.getInterpreter(targetImage);
 		wi.setWriterCompressionType(compression);
@@ -319,8 +330,8 @@ public class ImageHelper {
 																		// file
 
 		/*
-		 * -------------------------------- set file name and attachment header
-		 * from parameter or from configuration --------------------------------
+		 * -------------------------------- set file name and attachment header from parameter or from configuration
+		 * --------------------------------
 		 */
 
 		wi.setXResolution(100);
@@ -357,8 +368,8 @@ public class ImageHelper {
 																		// file
 
 		/*
-		 * -------------------------------- set file name and attachment header
-		 * from parameter or from configuration --------------------------------
+		 * -------------------------------- set file name and attachment header from parameter or from configuration
+		 * --------------------------------
 		 */
 
 		wi.setXResolution(100);
@@ -407,26 +418,19 @@ public class ImageHelper {
 	}
 
 	/*
-	 * public static String createThumbsForDir(String dirName, String
-	 * thumbDirName, int width, int height, boolean force) {
+	 * public static String createThumbsForDir(String dirName, String thumbDirName, int width, int height, boolean force) {
 	 * 
 	 * 
-	 * File dir = new File(dirName); File tempdir = new File(dirName +
-	 * File.separator + thumbDirName);
+	 * File dir = new File(dirName); File tempdir = new File(dirName + File.separator + thumbDirName);
 	 * 
-	 * if (tempdir.exists()) { if (!force) return tempdir.getAbsolutePath();
-	 * else if (!FileUtils.deleteDir(tempdir)) {
-	 * logger.error("FEHLER: Thumbnail-Directory konnte nicht gel�scht werden."
-	 * ); return null; } }
+	 * if (tempdir.exists()) { if (!force) return tempdir.getAbsolutePath(); else if (!FileUtils.deleteDir(tempdir)) {
+	 * logger.error("FEHLER: Thumbnail-Directory konnte nicht gel�scht werden." ); return null; } }
 	 * 
-	 * if (!tempdir.mkdirs()) {
-	 * logger.error("Thumbnail-Directory konnte nicht geschrieben werden.");
-	 * return null; }
+	 * if (!tempdir.mkdirs()) { logger.error("Thumbnail-Directory konnte nicht geschrieben werden."); return null; }
 	 * 
 	 * ArrayList<String> filterList = new ArrayList<String>();
 	 * 
-	 * filterList.add("tif"); filterList.add("tiff"); filterList.add("jpg");
-	 * filterList.add("jpeg");
+	 * filterList.add("tif"); filterList.add("tiff"); filterList.add("jpg"); filterList.add("jpeg");
 	 * 
 	 * FileExtensionsFilter filter = new FileExtensionsFilter(filterList);
 	 * 
@@ -436,13 +440,11 @@ public class ImageHelper {
 	 * 
 	 * String extension = "jpg";
 	 * 
-	 * String targetFileName = tempdir.getAbsolutePath() + File.separator +
-	 * exchangeFileExtension(origFile.getName(), extension);
+	 * String targetFileName = tempdir.getAbsolutePath() + File.separator + exchangeFileExtension(origFile.getName(), extension);
 	 * 
 	 * logger.info("Target Filename: " + targetFileName);
 	 * 
-	 * writeImage( scaleImage(openImage(origFile.getAbsolutePath()), width,
-	 * height), targetFileName);
+	 * writeImage( scaleImage(openImage(origFile.getAbsolutePath()), width, height), targetFileName);
 	 * 
 	 * }
 	 * 
@@ -491,60 +493,48 @@ public class ImageHelper {
 
 		System.out.println("START"); //$NON-NLS-1$
 
-		
-		String[] fileNameList = {"meinjp2000.jp2", "b1126181x_0001.JP2", "b1126181x_0001.tif"};
-		
-		for (int i = 0; i < fileNameList.length; i++) {
+		String path = "/opt/digiverso/viewer/tiff/"; //$NON-NLS-1$
+		String targetpath = "/opt/digiverso/viewer/cache/"; //$NON-NLS-1$
 
-			SystemHelper.dumpMemory();
+		String[] fileNameList = { "00000001.tif" };
+		File[] imageFileList = new File(path, "PPN654596379").listFiles(ImageFilter);
+//		for (int i = 0; i < fileNameList.length; i++) {
+//			imageFileList[i] = new File(path, fileNameList[i]);
+//			// SystemHelper.dumpMemory();
+//			//
+//			//
+//			// long startMillis = System.currentTimeMillis();
+//			//
+//			//			System.out.println("Bild: " + fileNameList[i]); //$NON-NLS-1$
+//			//			String path = "C:\\Users\\Karsten\\Desktop\\testbilder\\0000000" + i + ".jpg"; //$NON-NLS-1$
+//			//			String path = "C:\\Users\\Karsten\\Desktop\\testbilder\\00000000.jpg"; //$NON-NLS-1$
+//			////			String targetpath = "C:\\Users\\Karsten\\Desktop\\testbilder\\res" + i + ".tiff"; //$NON-NLS-1$
+//			//
+//			//
+//			// // ImageManager imageManager = openImage(path);
+//			// // System.out.println("Time0: " + (System.currentTimeMillis()-startMillis));
+//			// // RenderedImage renderedImage = imageManager.getMyInterpreter().getRenderedImage();
+//			// // writeTIFFImageTest(renderedImage, targetpath);
+//			//
+//			//
+//			// System.out.println("--------------");
+//
+//		}
 
-			
-			long startMillis = System.currentTimeMillis();
-			
-			System.out.println("Bild: " + fileNameList[i]); //$NON-NLS-1$
-//			String path = "C:\\Users\\Karsten\\Desktop\\testbilder\\0000000" + i + ".jpg"; //$NON-NLS-1$
-//			//String path = "C:\\Users\\Karsten\\Desktop\\testbilder\\00000000.jpg"; //$NON-NLS-1$
-//			String targetpath = "C:\\Users\\Karsten\\Desktop\\testbilder\\res" + i + ".tiff"; //$NON-NLS-1$
-			
-			String path = "C:\\Users\\Karsten\\Desktop\\testbilder\\" + fileNameList[i]; //$NON-NLS-1$
-			String targetpath = "C:\\Users\\Karsten\\Desktop\\testbilder\\res" + fileNameList[i] + ".tif"; //$NON-NLS-1$
-
-			ImageManager imageManager = openImage(path);
-			
-			System.out.println("Time0: " + (System.currentTimeMillis()-startMillis));
-			
-			
-			//RenderedImage renderedImage = scaleImage(imageManager, imageManager.getMyInterpreter().getWidth(), imageManager.getMyInterpreter().getHeight());
-			//RenderedImage renderedImage = scaleImage(imageManager, 100, 100);
-			RenderedImage renderedImage = imageManager.getMyInterpreter().getRenderedImage();
-
-			System.out.println("Time1: " + (System.currentTimeMillis()-startMillis));
-			
-			System.out.println(path);
-			System.out.println(targetpath);
-			System.out.println(imageManager.getMyInterpreter().getXResolution());
-			System.out.println(imageManager.getMyInterpreter().getYResolution());
-
-			// try {
-			// writeTIFFImage(renderedImage, targetpath,
-			// TiffInterpreter.COMPRESSION_NONE,
-			// imageManager.getMyInterpreter().getXResolution(),
-			// imageManager.getMyInterpreter().getYResolution());
-			//
-			// } catch (ParameterNotSupportedException e) {
-			// logger.error("Error: " + e.getMessage());
-			// }
-
-			writeTIFFImageTest(renderedImage, targetpath);
-			
-			System.out.println("Time2: " + (System.currentTimeMillis()-startMillis));
-
-			System.out.println("--------------");
-
+		ImageHelper helper = new ImageHelper();
+		try {
+			helper.doGeneration(imageFileList, new File(targetpath, "test.pdf"));
+		} catch (OutOfMemoryError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		System.out.println("STOP"); //$NON-NLS-1$
-		
-		
 
 	}
 
@@ -579,4 +569,117 @@ public class ImageHelper {
 		String[] extensions = { "*.jpg", "*.jpeg", "*.tiff", "*.tif" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		return extensions;
 	}
+
+	public void doGeneration(File[] imageFiles, File pdfFile) throws IOException, DocumentException, OutOfMemoryError {
+
+		if (imageFiles.length > 0) {
+
+			// allImages = reverseFileList(allImages);
+			Document pdfDocument = null;
+			@SuppressWarnings("unused")
+			int pageCount = 1;
+			PdfWriter pdfWriter = null;
+
+			pdfDocument = new Document();
+			FileOutputStream outputPdfFile = new FileOutputStream(pdfFile);
+			pdfWriter = PdfWriter.getInstance(pdfDocument, outputPdfFile);
+			pdfDocument.open();
+
+			for (File imageFile : imageFiles) {
+				addPage(imageFile, pdfWriter, pdfDocument, 1, 0);
+				pageCount++;
+			}
+
+			pdfDocument.close();
+			try {
+				if (outputPdfFile != null)
+					outputPdfFile.close();
+			} catch (IOException e) {
+				logger.warn("Error on closing fileoutputstream");
+			}
+		}
+	}
+
+	private void addFrontPage(File frontPage, File pdfFile) throws IOException, DocumentException {
+		File tempFile = new File(pdfFile.getParent(), System.currentTimeMillis() + ".pdf");
+		pdfFile.renameTo(tempFile);
+		PdfReader reader1 = new PdfReader(frontPage.getAbsolutePath());
+		PdfReader reader2 = new PdfReader(tempFile.getAbsolutePath());
+		PdfCopyFields copy = new PdfCopyFields(new FileOutputStream(pdfFile));
+		copy.addDocument(reader1);
+		copy.addDocument(reader2);
+		copy.close();
+		if (tempFile != null && tempFile.isFile())
+			tempFile.delete();
+	}
+
+	private void addPage(File imageFile, PdfWriter pdfWriter, Document pdfDocument, float shrinkRatio, float rotationDegree) throws DocumentException,
+			IOException {
+
+		float pointsPerInch = 200.0f;
+		Image pageImage = null;
+		float pageImageHeight = 0, pageImageWidth = 0;
+		boolean lowMemory = (shrinkRatio == 1 ? false : true);
+
+		URL inputImage = imageFile.toURI().toURL();
+
+		pdfWriter.setFullCompression();
+		pdfWriter.setStrictImageSequence(true);
+		pdfWriter.setLinearPageMode();
+
+		logger.debug("Out of memory on loading image for pdf generation");
+//		 ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		 BufferedImage bitmap = ImageIO.read(imageFile);
+		// logger.debug( "Size of temporary image bitmap: Width = " + bitmap.getWidth() + "; Height = " + bitmap.getHeight());
+		System.out.println("Reading file " + imageFile.getAbsolutePath());
+		pageImage = Image.getInstance(bitmap, null, false);
+//		 stream.close();
+		
+		pageImage.setRotationDegrees(-rotationDegree);
+		logger.debug("Image dimensions: Width = " + pageImage.getWidth() + "; Height = " + pageImage.getHeight());
+		pageImageHeight = pageImage.getHeight();
+		pageImageWidth = pageImage.getWidth();
+		pageImage.setAbsolutePosition(0, 0);
+		// Rectangle pageRect = new Rectangle(pageImageWidth/shrinkRatio, pageImageHeight/shrinkRatio);
+		com.lowagie.text.Rectangle pageRect = new com.lowagie.text.Rectangle(pageImageWidth, pageImageHeight);
+		logger.debug("Creating rectangle: Width = " + pageRect.getWidth() + "; Height = " + pageRect.getHeight());
+		pdfDocument.setPageSize(pageRect);
+
+		if (pdfDocument.isOpen()) {
+			pdfDocument.newPage();
+			pdfWriter.getDirectContent().addImage(pageImage);
+
+		} else {
+			pdfDocument.open();
+			pdfWriter.getDirectContent().addImage(pageImage);
+		}
+	}
+	
+	public static FilenameFilter ImageFilter = new FilenameFilter() {
+		@Override
+		public boolean accept(File dir, String name) {
+			boolean validImage = false;
+			// jpeg
+			if (name.endsWith("jpg") || name.endsWith("JPG") || name.endsWith("jpeg") || name.endsWith("JPEG")) {
+				validImage = true;
+			}
+			if (name.endsWith(".tif") || name.endsWith(".TIF")) {
+				validImage = true;
+			}
+			// png
+			if (name.endsWith(".png") || name.endsWith(".PNG")) {
+				validImage = true;
+			}
+			// gif
+			if (name.endsWith(".gif") || name.endsWith(".GIF")) {
+				validImage = true;
+			}
+			// jpeg2000
+			if (name.endsWith(".jp2") || name.endsWith(".JP2")) {
+				validImage = true;
+			}
+
+			return validImage;
+		}
+	};
 }
