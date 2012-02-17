@@ -71,7 +71,6 @@ public class PDFCreator {
 			MetadataExtractor inMetadataExtractor, StructureMetadataExtractor inBookmarkExtractor, Watermark myWatermark)
 			throws ImageManagerException, FileNotFoundException, IOException, PDFManagerException,
 			ImageInterpreterException, URISyntaxException, MetsException {
-
 		PDFManager pdfmanager = null;
 
 		String creator = "";
@@ -304,7 +303,7 @@ public class PDFCreator {
 			ICC_Profile iccprofile = ICC_Profile.getInstance(pdfconfig.getIccinputfilename());
 			pdfmanager.setIccprofile(iccprofile);
 		}	
-
+	
 		pdfmanager.createPDF(out, pdfconfig.getPagesize(), myWatermark);
 	}
 

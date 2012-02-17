@@ -86,7 +86,6 @@ public class Watermark {
 	public Watermark(int width, int heigth) {
 		this.width = width;
 		this.height = heigth;
-
 		watermarkImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
 		// set white background
@@ -493,6 +492,13 @@ public class Watermark {
 
 	protected HashMap<Integer, String> getReplacedWatermarkComponents() {
 		return replacedWatermarkComponents;
+	}
+	
+	public void clear() {
+		if(watermarkImage != null) {
+		watermarkImage.flush();
+		watermarkImage = null;
+		}
 	}
 
 }

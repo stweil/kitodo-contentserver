@@ -518,6 +518,7 @@ public class ImageManager {
 		if (outImage == null) {
 			throw new ImageManipulatorException("Can't create a RenderedImage object, outImage is null");
 		}
+		inImage = null;
 		return outImage;
 	}
 

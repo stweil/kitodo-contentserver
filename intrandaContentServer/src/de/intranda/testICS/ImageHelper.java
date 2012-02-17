@@ -496,34 +496,35 @@ public class ImageHelper {
 		String path = "/opt/digiverso/viewer/tiff/"; //$NON-NLS-1$
 		String targetpath = "/opt/digiverso/viewer/cache/"; //$NON-NLS-1$
 
-		String[] fileNameList = { "00000001.tif" };
-		File[] imageFileList = new File(path, "PPN654596379").listFiles(ImageFilter);
-//		for (int i = 0; i < fileNameList.length; i++) {
-//			imageFileList[i] = new File(path, fileNameList[i]);
-//			// SystemHelper.dumpMemory();
-//			//
-//			//
-//			// long startMillis = System.currentTimeMillis();
-//			//
-//			//			System.out.println("Bild: " + fileNameList[i]); //$NON-NLS-1$
-//			//			String path = "C:\\Users\\Karsten\\Desktop\\testbilder\\0000000" + i + ".jpg"; //$NON-NLS-1$
-//			//			String path = "C:\\Users\\Karsten\\Desktop\\testbilder\\00000000.jpg"; //$NON-NLS-1$
-//			////			String targetpath = "C:\\Users\\Karsten\\Desktop\\testbilder\\res" + i + ".tiff"; //$NON-NLS-1$
-//			//
-//			//
-//			// // ImageManager imageManager = openImage(path);
-//			// // System.out.println("Time0: " + (System.currentTimeMillis()-startMillis));
-//			// // RenderedImage renderedImage = imageManager.getMyInterpreter().getRenderedImage();
-//			// // writeTIFFImageTest(renderedImage, targetpath);
-//			//
-//			//
-//			// System.out.println("--------------");
-//
-//		}
+		String[] fileNameList = { "gehtnicht00000002.jpg" };
+//		File[] imageFileList = new File(path, "PPN654596379").listFiles(ImageFilter);
+		File[] imageFileList = new File[fileNameList.length];
+		for (int i = 0; i < fileNameList.length; i++) {
+			imageFileList[i] = new File(path, fileNameList[i]);
+			// SystemHelper.dumpMemory();
+			//
+			//
+			// long startMillis = System.currentTimeMillis();
+			//
+			//			System.out.println("Bild: " + fileNameList[i]); //$NON-NLS-1$
+			//			String path = "C:\\Users\\Karsten\\Desktop\\testbilder\\0000000" + i + ".jpg"; //$NON-NLS-1$
+			//			String path = "C:\\Users\\Karsten\\Desktop\\testbilder\\00000000.jpg"; //$NON-NLS-1$
+			////			String targetpath = "C:\\Users\\Karsten\\Desktop\\testbilder\\res" + i + ".tiff"; //$NON-NLS-1$
+			//
+			//
+			// // ImageManager imageManager = openImage(path);
+			// // System.out.println("Time0: " + (System.currentTimeMillis()-startMillis));
+			// // RenderedImage renderedImage = imageManager.getMyInterpreter().getRenderedImage();
+			// // writeTIFFImageTest(renderedImage, targetpath);
+			//
+			//
+			// System.out.println("--------------");
+
+		}
 
 		ImageHelper helper = new ImageHelper();
 		try {
-			helper.doGeneration(imageFileList, new File(targetpath, "test.pdf"));
+			helper.doGeneration(imageFileList, new File(targetpath, "gehtnicht.pdf"));
 		} catch (OutOfMemoryError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -591,6 +592,7 @@ public class ImageHelper {
 			}
 
 			pdfDocument.close();
+			pdfWriter.close();
 			try {
 				if (outputPdfFile != null)
 					outputPdfFile.close();
@@ -633,6 +635,7 @@ public class ImageHelper {
 		// logger.debug( "Size of temporary image bitmap: Width = " + bitmap.getWidth() + "; Height = " + bitmap.getHeight());
 		System.out.println("Reading file " + imageFile.getAbsolutePath());
 		pageImage = Image.getInstance(bitmap, null, false);
+		bitmap.flush();
 //		 stream.close();
 		
 		pageImage.setRotationDegrees(-rotationDegree);
@@ -653,6 +656,8 @@ public class ImageHelper {
 			pdfDocument.open();
 			pdfWriter.getDirectContent().addImage(pageImage);
 		}
+		pdfWriter.flush();
+		System.gc();
 	}
 	
 	public static FilenameFilter ImageFilter = new FilenameFilter() {

@@ -84,6 +84,8 @@ public class GetImageAction extends GetAction {
 	 ************************************************************************************/
 	public void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException,
 			ContentLibException, URISyntaxException {
+		long startTime = System.currentTimeMillis();
+		
 		super.run(servletContext, request, response);
 
 		/*
@@ -239,7 +241,10 @@ public class GetImageAction extends GetAction {
 
 			RenderedImage targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor,
 					myWatermark, false, ImageManager.BOTTOM);
-
+			if(myWatermark != null) {
+				myWatermark.clear();
+				myWatermark = null;
+			}
 			ImageFileFormat targetFormat = ImageFileFormat.getImageFileFormatFromFileExtension(targetExtension);
 			ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read file
 
@@ -295,10 +300,12 @@ public class GetImageAction extends GetAction {
 			} else {
 				wi.writeToStream(null, output);
 			}
+			wi.clear();
 		} catch (CacheException e) {
 			logger.warn("CacheException", e);
 		}
-
+		long endTime = System.currentTimeMillis();
+		logger.info("Content server time to process request: " + (endTime-startTime) + " ms");
 	}
 
 

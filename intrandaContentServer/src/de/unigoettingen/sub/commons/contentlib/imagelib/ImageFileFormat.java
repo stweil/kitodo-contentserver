@@ -117,7 +117,12 @@ public enum ImageFileFormat {
 			// check extension
 			iff = getImageFileFormatFromFileExtension(url.toString());
 		}
-		return iff.getInterpreter(StreamUtils.getInputStreamFromUrl(url));
+		InputStream myInputStream = StreamUtils.getInputStreamFromUrl(url);
+		ImageInterpreter myInterpreter =  iff.getInterpreter(myInputStream);
+		if(myInputStream != null) {
+			myInputStream.close();
+		}
+		return myInterpreter;
 	}
 
 	/************************************************************************************

@@ -139,8 +139,20 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 		} catch (IOException e) {
 			logger.error(e);
 		}
-		String nativeFormatName = imageMetadata.getNativeMetadataFormatName();
-		Node domNode = imageMetadata.getAsTree(nativeFormatName);
+		String nativeFormatName = null;
+		Node domNode = null;
+		try {
+		nativeFormatName = imageMetadata.getNativeMetadataFormatName();
+		domNode = imageMetadata.getAsTree(nativeFormatName);
+		} catch (NullPointerException e) {
+			try {
+			logger.warn("Unbable to read image metadata. Attempting to read format name only");
+			nativeFormatName = imagereader.getFormatName();
+			domNode = imageMetadata.getAsTree(nativeFormatName);
+			} catch (IOException e2) {
+				logger.error("Error reading image metadata", e2);
+			}
+		}
 
 		// get new metadata - this is not very sophisticated parsing the DOM
 		// tree - needs to be replaced by
@@ -196,6 +208,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 			this.samplesPerPixel = Integer.parseInt(samplesperpixel_str);
 		}
 		try {
+			iis.flush();
 			iis.close();
 		} catch (Exception e) {
 		}

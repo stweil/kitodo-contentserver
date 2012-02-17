@@ -196,4 +196,5 @@ public interface ImageInterpreter {
 	 */
 	public void setWriterCompressionValue(int value) throws ParameterNotSupportedException;
 
+	public void clear();
 }

@@ -220,6 +220,15 @@ public class GetPdfAction extends GetAction {
 			pdfmanager.createPDF(response.getOutputStream(), PdfPageSize.ORIGINAL, myWatermark);
 		} catch (URISyntaxException e) {
 			throw new ContentLibPdfException("error while creating pdf file", e);
+		} catch (IOException e) {
+			throw e;
+		} catch (ContentLibException e) {
+			throw e;
+		} finally {
+			if(response.getOutputStream() != null) {
+				response.getOutputStream().flush();
+				response.getOutputStream().close();
+			}
 		}
 	}
 

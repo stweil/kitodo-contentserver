@@ -218,11 +218,21 @@ public class GetPdfMultiMetsAction extends GetMetsPdfAction {
 			/* -------------------------------- 
 			 * close all
 			 * -------------------------------- */
+			try {
 			inputFileStream.close();
 			pdfdoc.close();
 			writer.close();
+			} catch(Error e2) {
+				logger.warn("Caught unknown error when closing the pdf writer. Probably due to a broken pipe");
+			} finally {
 			myOutStream.flush();
 			myOutStream.close();
+			}
+		} finally {
+			if(myOutStream != null) {
+				myOutStream.flush();
+				myOutStream.close();
+			}
 		}
 	}
 

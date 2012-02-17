@@ -98,4 +98,16 @@ public class CacheOutputStream extends FileOutputStream {
 		this.os.write(b, off, len);
 		super.write(b, off, len);
 	}
+	
+	@Override
+	public void flush() throws IOException {
+		this.os.flush();
+		super.flush();
+	}
+	
+	@Override
+	public void close() throws IOException {
+		this.os.close();
+		super.close();
+	}
 }

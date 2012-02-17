@@ -282,6 +282,15 @@ public class AbstractImageInterpreter {
 		throw pnse;
 	}
 	
+	public void clear() {
+		logger.debug("Cleanung up ImageInterpreter");
+		logger.debug("Free memory before operation: " + Runtime.getRuntime().freeMemory());
+		rawbytes = null;
+//		Runtime.getRuntime().runFinalization();
+//		Runtime.getRuntime().gc();
+		logger.debug("Free memory after operation: " + Runtime.getRuntime().freeMemory());
+	}
+	
 	/**
 	 * Prints a node with all subnodes; just for debugging
 	 * 

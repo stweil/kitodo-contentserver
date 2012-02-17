@@ -20,6 +20,7 @@
  * limitations under the License.
  */
 package org.goobi.presentation.contentServlet.controller;
+
 import gov.loc.mets.DivType;
 import gov.loc.mets.DivType.Mptr;
 
@@ -31,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -43,12 +45,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.lowagie.text.BadElementException;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.ExceptionConverter;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfWriter;
 
@@ -75,9 +79,8 @@ import de.unigoettingen.sub.commons.util.datasource.Structure;
 import de.unigoettingen.sub.commons.util.datasource.UrlImage;
 
 /************************************************************************************
- * pdf action for all kinds of simple pdf handlings first of all validate all
- * request parameters, and than interprete all request parameters for correct
- * image handling
+ * pdf action for all kinds of simple pdf handlings first of all validate all request parameters, and than interprete all request parameters
+ * for correct image handling
  * 
  * @version 02.01.2009
  * @author Steffen Hankiewicz
@@ -85,33 +88,29 @@ import de.unigoettingen.sub.commons.util.datasource.UrlImage;
 public class GetMetsPdfAction implements Action {
 	private static final Logger logger = Logger.getLogger(GetMetsPdfAction.class);
 	private Watermark myWatermark = null;
-	
+
 	/************************************************************************************
-	 * exectute mets handling and generation of pdf file and send pdf back to
-	 * output stream of the servlet, after setting correct mime type
+	 * exectute mets handling and generation of pdf file and send pdf back to output stream of the servlet, after setting correct mime type
 	 * 
 	 * @param request
 	 *            {@link HttpServletRequest} of ServletRequest
 	 * @param response
-	 *            {@link HttpServletResponse} for writing to response output
-	 *            stream
+	 *            {@link HttpServletResponse} for writing to response output stream
 	 * @throws IOException
 	 * @throws ServletException
 	 * @throws ContentLibException
 	 * @throws URISyntaxException
 	 * @throws CacheException
 	 ************************************************************************************/
-	public void run(ServletContext servletContext, HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException,
-			MetsException, ContentLibException, URISyntaxException,
-			CacheException {
+	public void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException,
+			MetsException, ContentLibException, URISyntaxException, CacheException {
 
 		/* first of all validation */
 		validateParameters(request);
 
-		/* --------------------------------
-		 * get central configuration and retrieve source image from url
-		 * --------------------------------*/
+		/*
+		 * -------------------------------- get central configuration and retrieve source image from url --------------------------------
+		 */
 		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
 		if (config.getWatermarkUse()) {
 			File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
@@ -122,16 +121,16 @@ public class GetMetsPdfAction implements Action {
 		String myUniqueID = getContentCacheIdForRequest(request, config);
 		setTargetNameAndMimeType(request, response, config);
 		try {
-			/* --------------------------------
-			 * ask ContentCache, if object already exists
-			 * --------------------------------*/
+			/*
+			 * -------------------------------- ask ContentCache, if object already exists --------------------------------
+			 */
 			boolean ignoreCache = false;
 			/* check if cache should be ignored */
 			if (request.getParameter("ignoreCache") != null) {
 				String ignore = request.getParameter("ignoreCache").trim();
 				ignoreCache = Boolean.parseBoolean(ignore);
 			}
-			if (cc == null || !config.getContentCacheUse()) {
+			if (cc == null || !config.getPdfCacheUse()) {
 				ignoreCache = true;
 				cc = null;
 				logger.debug("cache deactivated via configuration");
@@ -146,9 +145,10 @@ public class GetMetsPdfAction implements Action {
 				logger.debug("file not found in cache: " + myUniqueID);
 			}
 
-			/* --------------------------------
-			 * if Cache is not used, parse mets file name and add it to repository path
-			 * --------------------------------*/
+			/*
+			 * -------------------------------- if Cache is not used, parse mets file name and add it to repository path
+			 * --------------------------------
+			 */
 			String metsFile = request.getParameter("metsFile");
 			if (!metsFile.endsWith(".xml")) {
 				metsFile += ".xml";
@@ -156,9 +156,9 @@ public class GetMetsPdfAction implements Action {
 			URL fullMetsPath = new URL(config.getRepositoryPathMets() + metsFile);
 			logger.debug("mets file to parse: " + fullMetsPath);
 
-			/* --------------------------------
-			 * open METS file 
-			 * --------------------------------*/
+			/*
+			 * -------------------------------- open METS file --------------------------------
+			 */
 			METSParser metsparser = new METSParser(fullMetsPath, true);
 			SimplePDFMetadataExtractor spme = new SimplePDFMetadataExtractor();
 			spme.activateDFGConfiguration();
@@ -167,10 +167,10 @@ public class GetMetsPdfAction implements Action {
 			metsparser.setMetadataextractor(spme);
 			metsparser.setStructureMetadataExtractor(new SimpleStructureMetadataExtractor());
 
-			/* --------------------------------
-			 * check if filegroup is defined in request parameter, 
-			 * else take it from config file
-			 * --------------------------------*/
+			/*
+			 * -------------------------------- check if filegroup is defined in request parameter, else take it from config file
+			 * --------------------------------
+			 */
 			String strMetsFileGroup = request.getParameter("metsFileGroup");
 			if (strMetsFileGroup == null) {
 				strMetsFileGroup = config.getDefaultMetsFileGroup();
@@ -178,9 +178,9 @@ public class GetMetsPdfAction implements Action {
 			metsparser.setFilegroupsuseattributevalue(strMetsFileGroup);
 			logger.debug("Using METS file group: " + strMetsFileGroup);
 
-			/* --------------------------------
-			 * check divID as parameter, else use upper most divID
-			 * --------------------------------*/
+			/*
+			 * -------------------------------- check divID as parameter, else use upper most divID --------------------------------
+			 */
 			String divID = request.getParameter("divID");
 			DivType pdfdiv = null;
 			if (StringUtils.isNotBlank(divID)) {
@@ -210,8 +210,7 @@ public class GetMetsPdfAction implements Action {
 
 						List<DivType> children = uplogdiv.getDivList();
 						if ((children == null) || (children.size() == 0)) {
-							throw new ContentLibPdfException(
-									"Can't create PDF; can't find a div");
+							throw new ContentLibPdfException("Can't create PDF; can't find a div");
 						}
 						pdfdiv = children.get(0); // the first child
 					}
@@ -220,22 +219,21 @@ public class GetMetsPdfAction implements Action {
 			spme.calculateMetadata(pdfdiv, metsparser);
 			metsparser.getAllFilesForRelatedDivs(pdfdiv.getID()); // get page names
 
-			/* --------------------------------
-			 * get list of files and pagenames
-			 * --------------------------------*/
+			/*
+			 * -------------------------------- get list of files and pagenames --------------------------------
+			 */
 			Map<Integer, UrlImage> myPages = metsparser.getImageMap();
-			//			HashMap<Integer, URL> myURLs = metsparser.getPageUrls();
+			// HashMap<Integer, URL> myURLs = metsparser.getPageUrls();
 			Map<Integer, String> myNames = metsparser.getPageNames();
 			List<? extends Structure> pDFBookmarks = metsparser.getStructureList();
-			//			PDFManager pdfmanager = new PDFManager(myURLs);
+			// PDFManager pdfmanager = new PDFManager(myURLs);
 			PDFManager pdfmanager = new PDFManager(myPages, true);
 
 			setPdfManagerDefaults(request, config, pdfmanager);
 
-			
-			/* --------------------------------
-			 * set pdf meta data
-			 * --------------------------------*/
+			/*
+			 * -------------------------------- set pdf meta data --------------------------------
+			 */
 			if (spme.getPdftitle() != null) {
 				String title = spme.getPdftitle().trim();
 				pdfmanager.setTitle(title);
@@ -249,11 +247,10 @@ public class GetMetsPdfAction implements Action {
 				pdfmanager.setSubject(spme.getPdfkeywords());
 			}
 
-			/* --------------------------------
-			 * if configured create PDF title page
-			 * - either read its path from config file and fill it with mets content
-			 * - or if given as url parameter use it directly without any change
-			 * --------------------------------*/
+			/*
+			 * -------------------------------- if configured create PDF title page - either read its path from config file and fill it with
+			 * mets content - or if given as url parameter use it directly without any change --------------------------------
+			 */
 			if (config.getPdfTitlePageUse()) {
 				PDFTitlePage pdftp = new PDFTitlePage();
 
@@ -263,32 +260,28 @@ public class GetMetsPdfAction implements Action {
 				} else {
 					pdftp.readConfiguration(config.getPdfTitlePageConfigFile());
 					if (spme.getPdf_titlepage_line1() != null) {
-						PDFTitlePageLine ptl = new PDFTitlePageLine(spme
-								.getPdf_titlepage_line1());
+						PDFTitlePageLine ptl = new PDFTitlePageLine(spme.getPdf_titlepage_line1());
 						ptl.setLinetype(2);
 						ptl.setFontsize(14);
 						pdftp.addPDFTitlePageLine(ptl);
 					}
 
 					if (spme.getPdf_titlepage_line2() != null) {
-						PDFTitlePageLine ptl = new PDFTitlePageLine(spme
-								.getPdf_titlepage_line2());
+						PDFTitlePageLine ptl = new PDFTitlePageLine(spme.getPdf_titlepage_line2());
 						ptl.setLinetype(2);
 						ptl.setFontsize(10);
 						pdftp.addPDFTitlePageLine(ptl);
 					}
 
 					if (spme.getPdf_titlepage_line3() != null) {
-						PDFTitlePageLine ptl = new PDFTitlePageLine(spme
-								.getPdf_titlepage_line3());
+						PDFTitlePageLine ptl = new PDFTitlePageLine(spme.getPdf_titlepage_line3());
 						ptl.setLinetype(2);
 						ptl.setFontsize(10);
 						pdftp.addPDFTitlePageLine(ptl);
 					}
 
 					if (spme.getPdf_titlepage_line4() != null) {
-						PDFTitlePageLine ptl = new PDFTitlePageLine(spme
-								.getPdf_titlepage_line4());
+						PDFTitlePageLine ptl = new PDFTitlePageLine(spme.getPdf_titlepage_line4());
 						ptl.setLinetype(2);
 						ptl.setFontsize(10);
 						pdftp.addPDFTitlePageLine(ptl);
@@ -297,9 +290,9 @@ public class GetMetsPdfAction implements Action {
 				pdfmanager.setPdftitlepage(pdftp);
 			}
 
-			/* --------------------------------
-			 * set page names and bookmarks
-			 * --------------------------------*/
+			/*
+			 * -------------------------------- set page names and bookmarks --------------------------------
+			 */
 			if ((myNames != null) && (myNames.size() > 0)) {
 				pdfmanager.setImageNames(myNames);
 			}
@@ -307,19 +300,17 @@ public class GetMetsPdfAction implements Action {
 				pdfmanager.setStructureList(pDFBookmarks);
 			}
 
-			/* --------------------------------
-			 * write pdf to response stream (and cache)
-			 * --------------------------------*/
+			/*
+			 * -------------------------------- write pdf to response stream (and cache) --------------------------------
+			 */
 			/* remove file from cache, if cache should be used and file present */
 			if (cc != null) {
 				cc.delete(myUniqueID, "pdf");
 			}
 			/* if cache size is exceeded write it to response stream only */
 			if (cc != null && !cc.isCacheSizeExceeded()) {
-				logger.info("write file to cache and servlet response: "
-						+ cc.getFileForId(myUniqueID, "pdf"));
-				myOutStream = new CacheOutputStream(
-						cc.getFileForId(myUniqueID, "pdf"), response.getOutputStream());
+				logger.info("write file to cache and servlet response: " + cc.getFileForId(myUniqueID, "pdf"));
+				myOutStream = new CacheOutputStream(cc.getFileForId(myUniqueID, "pdf"), response.getOutputStream());
 			} else if (cc == null) {
 				logger.info("file will not be written to cache, cache is deactivated in configuration");
 			} else if (cc.isCacheSizeExceeded()) {
@@ -342,16 +333,14 @@ public class GetMetsPdfAction implements Action {
 			 * Generate Watermark
 			 *---------------------------------*/
 			String errorString = e.getClass().getName() + ": " + e.getMessage();
-			String jpgfile = new File(Util.getBaseFolderAsFile(),
-					"errorfile.jpg").getAbsolutePath();
+			String jpgfile = new File(Util.getBaseFolderAsFile(), "errorfile.jpg").getAbsolutePath();
 			logger.debug("errorfile to embedd: " + jpgfile);
 			FileInputStream inputFileStream = new FileInputStream(jpgfile);
-			RenderedImage ri = ServletWatermark.generateErrorWatermark(inputFileStream,
-					errorString).getRenderedImage();
+			RenderedImage ri = ServletWatermark.generateErrorWatermark(inputFileStream, errorString).getRenderedImage();
 
-			/* -------------------------------- 
-			 * prepare target and read created image
-			 * -------------------------------- */
+			/*
+			 * -------------------------------- prepare target and read created image --------------------------------
+			 */
 			BufferedImage buffImage = ImageManipulator.fromRenderedToBuffered(ri);
 			Image pdfImage;
 			try {
@@ -359,24 +348,43 @@ public class GetMetsPdfAction implements Action {
 				pdfdoc.add(pdfImage);
 			} catch (BadElementException e1) {
 				logger.error("error while adding pdfImage", e);
-				throw new ContentLibException("wrapped BadElementException",
-						e1);
+				throw new ContentLibException("wrapped BadElementException", e1);
 			} catch (DocumentException e2) {
 				logger.error("error while adding pdfImage", e);
 				throw new ContentLibException("wrapped DocumentException", e2);
-			}
-			/* -------------------------------- 
-			 * close all
-			 * -------------------------------- */
-			inputFileStream.close();
-			pdfdoc.close();
-			writer.close();
+			} finally {
+				/*
+				 * -------------------------------- close all --------------------------------
+				 */
+				try {
+					if (inputFileStream != null)
+						inputFileStream.close();
+					if (pdfdoc != null)
+						pdfdoc.close();
+					if (writer != null)
+						writer.close();
+				} catch (ExceptionConverter e2) {
+					logger.warn("Caught ExceptionConverter object");
+				} finally {
 
-			/* on errors remove incomplete file from cache */
-			myOutStream.flush();
-			myOutStream.close();
-			if (cc != null && cc.cacheContains(myUniqueID, "pdf")) {
-				cc.delete(myUniqueID, "pdf");
+					/* on errors remove incomplete file from cache */
+					try {
+					if (myOutStream != null) {
+						myOutStream.flush();
+						myOutStream.close();
+					}
+					}catch (Exception e2) {
+						logger.debug("Caught unknown Exception");
+					}
+					if (cc != null && cc.cacheContains(myUniqueID, "pdf")) {
+						cc.delete(myUniqueID, "pdf");
+					}
+				}
+			}
+		} finally {
+			if (myOutStream != null) {
+				myOutStream.flush();
+				myOutStream.close();
 			}
 		}
 	}
@@ -392,21 +400,19 @@ public class GetMetsPdfAction implements Action {
 	 *            {@link PDFManager} where to set the properties
 	 * @throws IOException
 	 ************************************************************************************/
-	protected void setPdfManagerDefaults(HttpServletRequest request,
-			ContentServerConfiguration config, PDFManager pdfmanager)
-			throws IOException {
-		
+	protected void setPdfManagerDefaults(HttpServletRequest request, ContentServerConfiguration config, PDFManager pdfmanager) throws IOException {
+
 		pdfmanager.setAlwaysUseRenderedImage(config.getPdfDefaultAlwaysUseRenderedImage());
 		pdfmanager.setAlwaysCompressToJPEG(config.getPdfDefaultAlwaysCompressToJPEG());
 
 		if (config.getWatermarkUse()) {
 			try {
-			File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
-			if (request.getParameterMap().containsKey("watermarkText")) {
+				File watermarkfile = new File(new URI(config.getWatermarkConfigFilePath()));
+				if (request.getParameterMap().containsKey("watermarkText")) {
 					myWatermark = new Watermark(watermarkfile, request.getParameter("watermarkText"));
-			} else {
-				myWatermark = new Watermark(watermarkfile);
-			}
+				} else {
+					myWatermark = new Watermark(watermarkfile);
+				}
 			} catch (WatermarkException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -415,13 +421,13 @@ public class GetMetsPdfAction implements Action {
 				e.printStackTrace();
 			}
 		}
-		/* --------------------------------
-		 * set ICC profile 
-		 * --------------------------------*/
+		/*
+		 * -------------------------------- set ICC profile --------------------------------
+		 */
 
 		File iccfile = new File(Util.getBaseFolderAsFile(), "sRGB.icc");
 		ICC_Profile icc = null;
-		
+
 		if (!iccfile.exists()) {
 			InputStream is = GetMetsPdfAction.class.getResourceAsStream("sRGB.icc");
 			if (is != null) {
@@ -430,20 +436,18 @@ public class GetMetsPdfAction implements Action {
 		} else {
 			icc = ICC_Profile.getInstance(iccfile.getAbsolutePath());
 		}
-		
+
 		if (icc != null) {
 			pdfmanager.setIccprofile(icc);
 		} else {
 			logger.error("No ICC profile given!");
 		}
 
-		/* --------------------------------
-		 * check if pdf should be written as pdf/A, 
-		 * if configured in request parameter, 
-		 * else take it from config file
-		 * --------------------------------*/
-		boolean pdfa = Boolean.parseBoolean(getParameterFromRequestOrConfig(
-				"writeAsPdfA", request));
+		/*
+		 * -------------------------------- check if pdf should be written as pdf/A, if configured in request parameter, else take it from
+		 * config file --------------------------------
+		 */
+		boolean pdfa = Boolean.parseBoolean(getParameterFromRequestOrConfig("writeAsPdfA", request));
 		pdfmanager.setPdfa(pdfa);
 	}
 
@@ -454,18 +458,17 @@ public class GetMetsPdfAction implements Action {
 	 *            {@link HttpServletRequest} of ServletRequest
 	 ************************************************************************************/
 	protected PdfPageSize getPageSize(HttpServletRequest request) {
-		/* --------------------------------
-		 * check if page size is defined in request 
-		 * else take it from config file
-		 * --------------------------------*/
+		/*
+		 * -------------------------------- check if page size is defined in request else take it from config file
+		 * --------------------------------
+		 */
 		String strPageSize = getParameterFromRequestOrConfig("pagesize", request);
-		
+
 		return PDFManager.getPageSizefromString(strPageSize);
 	}
 
 	/************************************************************************************
-	 * set target file name and mime type for response depending on request and
-	 * config
+	 * set target file name and mime type for response depending on request and config
 	 * 
 	 * @param request
 	 *            {@link HttpServletRequest} of ServletRequest
@@ -474,11 +477,11 @@ public class GetMetsPdfAction implements Action {
 	 * @param config
 	 *            instance of ContentServerConfiguration
 	 ************************************************************************************/
-	protected void setTargetNameAndMimeType(HttpServletRequest request,
-			HttpServletResponse response, ContentServerConfiguration config) {
-		/* --------------------------------
-		 * set file name and attachment header from parameter or from configuration
-		 * --------------------------------*/
+	protected void setTargetNameAndMimeType(HttpServletRequest request, HttpServletResponse response, ContentServerConfiguration config) {
+		/*
+		 * -------------------------------- set file name and attachment header from parameter or from configuration
+		 * --------------------------------
+		 */
 		StringBuilder targetFileName = new StringBuilder();
 		if (config.getSendPdfAsAttachment()) {
 			targetFileName.append("attachment; ");
@@ -487,8 +490,7 @@ public class GetMetsPdfAction implements Action {
 		if (request.getParameter("targetFileName") != null) {
 			targetFileName.append(request.getParameter("targetFileName"));
 		} else {
-			String filename = ContentLibUtil.getCustomizedFileName(config
-					.getDefaultFileNamePdf(), ".pdf");
+			String filename = ContentLibUtil.getCustomizedFileName(config.getDefaultFileNamePdf(), ".pdf");
 			targetFileName.append(filename);
 		}
 		response.setHeader("Content-Disposition", targetFileName.toString());
@@ -496,18 +498,16 @@ public class GetMetsPdfAction implements Action {
 	}
 
 	/************************************************************************************
-	 * validate all parameters of request for mets handling, throws
-	 * IllegalArgumentException if one request parameter is not valid
+	 * validate all parameters of request for mets handling, throws IllegalArgumentException if one request parameter is not valid
 	 * 
 	 * @param request
 	 *            {@link HttpServletRequest} of ServletRequest
 	 * @throws IllegalArgumentException
 	 ************************************************************************************/
-	public void validateParameters(HttpServletRequest request)
-			throws IllegalArgumentException {
+	public void validateParameters(HttpServletRequest request) throws IllegalArgumentException {
 		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
 
-		/* validate repository  */
+		/* validate repository */
 		if (config.getRepositoryPathMets() == null) {
 			throw new IllegalArgumentException("no repository url defined");
 		}
@@ -520,20 +520,16 @@ public class GetMetsPdfAction implements Action {
 		}
 
 		/* validate pagesize */
-		//TODO: Look a the method getPageSize, this shouldn't be here
+		// TODO: Look a the method getPageSize, this shouldn't be here
 		String strPageSize = request.getParameter("pagesize");
 		logger.debug("Page size is " + strPageSize);
-		if (strPageSize != null
-				&& !ContentLibUtil.getAllPdfSizesAsList().contains(strPageSize)) {
-			throw new IllegalArgumentException(
-					"unknown pagesize used; value has be one of: "
-							+ ContentLibUtil.getAllPdfSizesAsList().toString());
+		if (strPageSize != null && !ContentLibUtil.getAllPdfSizesAsList().contains(strPageSize)) {
+			throw new IllegalArgumentException("unknown pagesize used; value has be one of: " + ContentLibUtil.getAllPdfSizesAsList().toString());
 		}
 
 		/* metsFile has to be not blank */
 		if (StringUtils.isBlank(request.getParameter("metsFile"))) {
-			throw new IllegalArgumentException(
-					"parameter metsFile can not be null or empty");
+			throw new IllegalArgumentException("parameter metsFile can not be null or empty");
 		}
 		logger.debug("METS file " + request.getParameter("metsFile"));
 	}
@@ -541,16 +537,17 @@ public class GetMetsPdfAction implements Action {
 	/*************************************************************************************
 	 * generate an ID for a pdf file, to cache it under an unique name
 	 * 
-	 * @param request the current {@link HttpServletRequest}
-	 * @param inConfig current internal {@link ContentServerConfiguration} objekt
+	 * @param request
+	 *            the current {@link HttpServletRequest}
+	 * @param inConfig
+	 *            current internal {@link ContentServerConfiguration} objekt
 	 ************************************************************************************/
-	private String getContentCacheIdForRequest(HttpServletRequest request,
-			ContentServerConfiguration inConfig) {
+	private String getContentCacheIdForRequest(HttpServletRequest request, ContentServerConfiguration inConfig) {
 		String myId = request.getParameter("metsFile");
 		if (request.getParameter("divID") != null) {
 			myId += "_" + request.getParameter("divID").trim();
 		}
-		
+
 		Boolean useShortFileNames = false;
 		try {
 			useShortFileNames = inConfig.getContentCacheUseShortFileNames();
@@ -559,34 +556,28 @@ public class GetMetsPdfAction implements Action {
 		}
 
 		if (useShortFileNames) {
-			myId += "_pdfA"
-					+ getParameterFromRequestOrConfig("writeAsPdfA", request);
-			myId += "_"
-					+ getParameterFromRequestOrConfig("metsFileGroup", request);
-			myId += "_"
-					+ getParameterFromRequestOrConfig("pdftitlepage", request);
+			myId += "_pdfA" + getParameterFromRequestOrConfig("writeAsPdfA", request);
+			myId += "_" + getParameterFromRequestOrConfig("metsFileGroup", request);
+			myId += "_" + getParameterFromRequestOrConfig("pdftitlepage", request);
 			myId += "_" + getParameterFromRequestOrConfig("pagesize", request);
 		}
 		return myId;
 	}
 
 	/*************************************************************************************
-	 * get parameter either from request or else the default value from config
-	 * file
+	 * get parameter either from request or else the default value from config file
 	 * 
 	 * @param inParam
 	 *            the requested parameter
 	 * @return the value from request or config file
 	 ************************************************************************************/
-	protected String getParameterFromRequestOrConfig(String inParam,
-			HttpServletRequest request) {
+	protected String getParameterFromRequestOrConfig(String inParam, HttpServletRequest request) {
 		/* take it from request if present */
 		String value = request.getParameter(inParam);
 		if (StringUtils.isNotBlank(value)) {
 			return value.trim();
 		} else {
-			ContentServerConfiguration config = ContentServerConfiguration
-					.getInstance();
+			ContentServerConfiguration config = ContentServerConfiguration.getInstance();
 			/* if not in request given, take it from config file */
 			if (inParam.equals("writeAsPdfA")) {
 				return config.getPdfDefaultWritePdfA().toString();

@@ -14,7 +14,7 @@
     * sample: <defaultResolution value="600" />
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <defaultResolution value="600" />
-	<maxFileLength value="999" file="file:/C:/digiverso/viewer/tiff/filetolarge.tif"/>
+	<maxFileLength value="999" file="file:///opt/digiverso/viewer/tiff/filetolarge.tif"/>
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * default file names for pdf or image (file extension will be automatically added); 
     * define if sending of images or pdf should be with header "attachment" or not;
@@ -40,7 +40,7 @@
 	*	- pagesize						   default page size for pdf generation; possible values are 'A4', 'original' and 'A4Box' 
     * sample: <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="true" metsFileGroup="DEFAULT" writeAsPdfA="true" pagesize="A4"/> 
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="false" metsFileGroup="PRESENTATION" writeAsPdfA="false" pagesize="original"/>
+    <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="true" metsFileGroup="PRESENTATION" writeAsPdfA="false" pagesize="original"/>
     
     <!--########################################################## 
     *#############################################################
@@ -51,7 +51,7 @@
     *###########################################################-->
  
 	 <defaultRepositoryPathPdf
-		value="file:/C:/digiverso/viewer/pdf/" usage="true" /> 
+		value="file:///opt/digiverso/viewer/pdf/" usage="true" /> 
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	* default path to repository for all image processing requests
@@ -62,7 +62,7 @@
 	
 	
  <defaultRepositoryPathImages
-		value="file:/C:/digiverso/viewer/tiff/" /> 
+		value="file:///opt/digiverso/viewer/tiff/" /> 
 		
 		
   <!-- for ucc 
@@ -78,7 +78,7 @@
     * configuration if watermark should be used and url for watermark content configuration file
     * sample: <watermark use="true" configFile="file:/home/goobi/config/watermarkconfig.xml" />
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-	<watermark use="false" configFile="file:/C:/Eclipse/workspace/DigiversoPresentation/src/watermark_example_config.xml" />
+	<watermark use="false" configFile="file:///home/florian/workspace/IntrandaContentServer/src/watermark_example_config.xml" />
   
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * configuration for the error watermark if message should not be shown on jsp echo page 
@@ -103,7 +103,7 @@
 	* sample: <defaultRepositoryPath value="file:/home/goobi/metsRepository/" /> 
 	*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 	<defaultRepositoryPathMets
-		value="file:/C:/digiverso/viewer/indexed_mets/" />
+		value="file:///opt/digiverso/viewer/indexed_mets/" />
   
   	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * configuration if titlepage for pdf file should be generated and 
@@ -112,7 +112,7 @@
     * sample: <defaultRepositoryPath value="file:/home/goobi/config/pdftitlepage.xml" /> 
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <pdfTitlePage use="true"
-        configFile="file:/C:/Eclipse/workspace/intrandaContentServer/src/pdftitlepage.xml" />	
+        configFile="file:///home/florian/workspace/intrandaContentServer/src/pdftitlepage.xml" />	
 
      <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * path to contentCache and maximum size in MB
@@ -124,7 +124,7 @@
     *
     * sample: <contentCache useCache="false" path="/home/goobi/gcsCache" size="300"/>
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <contentCache useCache="false" path="C:/digiverso/cache/" size="30000" useShortFileNames="false"/>
-    <thumbnailCache useCache="false" path="C:/digiverso/cache/" size="30000" useShortFileNames="false"/>
-    <pdfCache useCache="false" path="C:/digiverso/cache/" size="30000" useShortFileNames="false"/>
+    <contentCache useCache="true" path="/opt/digiverso/viewer/cache/content" size="30000" useShortFileNames="false"/>
+    <thumbnailCache useCache="true" path="/opt/digiverso/viewer/cache/thumbnails" size="30000" useShortFileNames="false"/>
+    <pdfCache useCache="true" path="/opt/digiverso/viewer/cache/pdf" size="30000" useShortFileNames="false"/>
 </config>
