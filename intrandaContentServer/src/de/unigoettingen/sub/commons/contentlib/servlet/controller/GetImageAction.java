@@ -241,10 +241,6 @@ public class GetImageAction extends GetAction {
 
 			RenderedImage targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor,
 					myWatermark, false, ImageManager.BOTTOM);
-			if(myWatermark != null) {
-				myWatermark.clear();
-				myWatermark = null;
-			}
 			ImageFileFormat targetFormat = ImageFileFormat.getImageFileFormatFromFileExtension(targetExtension);
 			ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read file
 

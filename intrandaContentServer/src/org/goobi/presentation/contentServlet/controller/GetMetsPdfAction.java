@@ -124,6 +124,8 @@ public class GetMetsPdfAction implements Action {
 			/*
 			 * -------------------------------- ask ContentCache, if object already exists --------------------------------
 			 */
+			PDFManager pdfmanager = null;
+			try {
 			boolean ignoreCache = false;
 			/* check if cache should be ignored */
 			if (request.getParameter("ignoreCache") != null) {
@@ -227,7 +229,7 @@ public class GetMetsPdfAction implements Action {
 			Map<Integer, String> myNames = metsparser.getPageNames();
 			List<? extends Structure> pDFBookmarks = metsparser.getStructureList();
 			// PDFManager pdfmanager = new PDFManager(myURLs);
-			PDFManager pdfmanager = new PDFManager(myPages, true);
+			pdfmanager = new PDFManager(myPages, true);
 
 			setPdfManagerDefaults(request, config, pdfmanager);
 
@@ -316,8 +318,12 @@ public class GetMetsPdfAction implements Action {
 			} else if (cc.isCacheSizeExceeded()) {
 				logger.info("file will not be written to cache, maximum cache size exceeded defined configuration");
 			}
+			}catch (NullPointerException e) {
+				throw new NullPointerException("Nullpointer occured before pdf-generation");
+			}
 			/* write to stream */
-			pdfmanager.createPDF(myOutStream, getPageSize(request), myWatermark);
+				if(pdfmanager!=null)
+					pdfmanager.createPDF(myOutStream, getPageSize(request), myWatermark);
 		} catch (Exception e) {
 			logger.error("error while pdf generation (" + e.getClass().getName() + ")", e);
 			Document pdfdoc = new Document();

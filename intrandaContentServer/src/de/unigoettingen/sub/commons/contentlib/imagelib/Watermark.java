@@ -494,11 +494,12 @@ public class Watermark {
 		return replacedWatermarkComponents;
 	}
 	
-	public void clear() {
-		if(watermarkImage != null) {
-		watermarkImage.flush();
-		watermarkImage = null;
-		}
-	}
+	//Watermark will be reused, so don't clear it
+//	public void clear() {
+//		if(watermarkImage != null) {
+//		watermarkImage.flush();
+//		watermarkImage = null;
+//		}
+//	}
 
 }

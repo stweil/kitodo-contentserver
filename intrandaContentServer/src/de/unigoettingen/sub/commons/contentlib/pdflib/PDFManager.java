@@ -324,6 +324,7 @@ public class PDFManager {
 			// the key contains the page number (as integer), the String
 			// contains the Page name
 			// ----------------------------------------------------------------------
+
 			pagelabels = addAllPages(pagesizemode, writer, pdfdoc, myWatermark);
 
 			// add page labels
@@ -369,6 +370,8 @@ public class PDFManager {
 			writer.close();
 		} catch(IllegalStateException e) {
 			logger.warn("Caught IllegalStateException when closing pdf document.");
+		} catch(NullPointerException e) {
+			throw new NullPointerException("Nullpointer occured while closing pdfwriter");
 		}
 		logger.debug("PDF document and writer closed");
 	}
@@ -516,7 +519,6 @@ public class PDFManager {
 							// -------------------------------------------------------------------------------------
 							// Try to generate image
 							// -------------------------------------------------------------------------------------
-
 							pdfImage = generatePdfImageFromInterpreter(myInterpreter, preferredEmbeddingType, errorPage, watermark, errorUrl);
 
 							// -------------------------------------------------------------------------------------
@@ -990,11 +992,19 @@ public class PDFManager {
 				ri = addwatermark(ri, watermark, ImageManager.TOP);
 				myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
 			} else if (watermark != null) {
+				try {
 				ri = addwatermark(ri, watermark, 2);
 				myInterpreter.setHeight(myInterpreter.getHeight() + watermark.getRenderedImage().getHeight());
+				}catch (NullPointerException e) {
+					throw new NullPointerException("Error while loading watermark");
+				}
 			}
-
+ 
+			try {
 			writeJpegFromRenderedImageToStream(bytesoutputstream, ri, preferredEmbeddingType, myInterpreter);
+			} catch (NullPointerException e) {
+				throw new NullPointerException("Error while rendering Image");
+			}
 			break;
 		// ----------------------------------------------------------------------------------------------------
 		case LOSSLESSJPEG2000:
@@ -1097,7 +1107,6 @@ public class PDFManager {
 
 		//free watermark memory
 		watermarkRi = null;
-		inWatermark.clear();
 		
 		return outImage;
 	}
