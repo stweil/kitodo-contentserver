@@ -325,7 +325,7 @@ public class GetMetsPdfAction implements Action {
 				if(pdfmanager!=null)
 					pdfmanager.createPDF(myOutStream, getPageSize(request), myWatermark);
 		} catch (Exception e) {
-			logger.error("error while pdf generation (" + e.getClass().getName() + ")", e);
+			logger.error("error during pdf generation (" + e.getClass().getName() + ")", e);
 			Document pdfdoc = new Document();
 			PdfWriter writer;
 			try {

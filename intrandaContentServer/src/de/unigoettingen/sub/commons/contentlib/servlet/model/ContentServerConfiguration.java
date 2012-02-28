@@ -387,5 +387,14 @@ public class ContentServerConfiguration {
 	public String getDefaultMetsFileGroup() {
 		return config.getString("defaultPdfConfig[@metsFileGroup]", "DEFAULT");
 	}
+	
+	/************************************************************************************
+	 * get boolean if image footers (watermark) should scale with the image
+	 * 
+	 * @return value if cache should use short file names as Boolean
+	 ************************************************************************************/
+	public Boolean getScaleWatermark() {
+		return config.getBoolean("watermark[@scale]", false);
+	}
 
 }

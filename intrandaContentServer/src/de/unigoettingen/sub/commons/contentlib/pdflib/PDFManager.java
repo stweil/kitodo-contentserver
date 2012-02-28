@@ -532,11 +532,9 @@ public class PDFManager {
 								RenderedImage ri = null;
 								if (preferredEmbeddingType == embeddBitonalImage) {
 									ImageManager sourcemanager = new ImageManager(url);
-									boolean watermarkscale = true; // should we scale
+									boolean watermarkscale = ContentServerConfiguration.getInstance().getScaleWatermark(); // should we scale
 									// the watermark ?
 									ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, watermarkscale,
-											ImageManager.BOTTOM);
-									ri = sourcemanager.scaleImageByPixel(3000, 0, ImageManager.SCALE_BY_WIDTH, 0, null, null, watermark, false,
 											ImageManager.BOTTOM);
 									myInterpreter = sourcemanager.getMyInterpreter();
 								} else {

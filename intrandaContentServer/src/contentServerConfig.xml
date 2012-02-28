@@ -40,7 +40,7 @@
 	*	- pagesize						   default page size for pdf generation; possible values are 'A4', 'original' and 'A4Box' 
     * sample: <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="true" metsFileGroup="DEFAULT" writeAsPdfA="true" pagesize="A4"/> 
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="true" metsFileGroup="PRESENTATION" writeAsPdfA="false" pagesize="original"/>
+    <defaultPdfConfig alwaysUseRenderedImage="true" alwaysCompressToJPEG="true" metsFileGroup="PRESENTATION" writeAsPdfA="false" pagesize="A4"/>
     
     <!--########################################################## 
     *#############################################################
@@ -78,7 +78,7 @@
     * configuration if watermark should be used and url for watermark content configuration file
     * sample: <watermark use="true" configFile="file:/home/goobi/config/watermarkconfig.xml" />
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-	<watermark use="false" configFile="file:///home/florian/workspace/IntrandaContentServer/src/watermark_example_config.xml" />
+	<watermark use="true" scale = "false" configFile="file:///home/florian/workspace/intrandaContentServer/src/watermark_example_config.xml" />
   
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * configuration for the error watermark if message should not be shown on jsp echo page 

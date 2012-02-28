@@ -49,6 +49,8 @@ import org.apache.log4j.Logger;
 import org.goobi.presentation.contentServlet.controller.ContentCache;
 import org.goobi.presentation.contentServlet.controller.GoobiContentServer;
 
+import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
+
 import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManagerException;
@@ -62,8 +64,8 @@ import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
 import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfiguration;
 
 /************************************************************************************
- * Image action for all kinds of image handlings first of all validate all request parameters, and than interprete all request parameters for correct
- * image handling
+ * Image action for all kinds of image handlings first of all validate all request parameters, and than interprete all request parameters
+ * for correct image handling
  * 
  * @version 20.11.2010
  * @author Steffen Hankiewicz
@@ -73,10 +75,13 @@ public class GetImageAction extends GetAction {
 	private static final Logger logger = Logger.getLogger(GetImageAction.class);
 
 	/************************************************************************************
-	 * exectute all image actions (rotation, scaling etc.) and send image back to output stream of the servlet, after setting correct mime type
+	 * exectute all image actions (rotation, scaling etc.) and send image back to output stream of the servlet, after setting correct mime
+	 * type
 	 * 
-	 * @param request {@link HttpServletRequest} of ServletRequest
-	 * @param response {@link HttpServletResponse} for writing to response output stream
+	 * @param request
+	 *            {@link HttpServletRequest} of ServletRequest
+	 * @param response
+	 *            {@link HttpServletResponse} for writing to response output stream
 	 * @throws IOException
 	 * @throws ServletException
 	 * @throws ContentLibException
@@ -85,7 +90,7 @@ public class GetImageAction extends GetAction {
 	public void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException,
 			ContentLibException, URISyntaxException {
 		long startTime = System.currentTimeMillis();
-		
+
 		super.run(servletContext, request, response);
 
 		/*
@@ -139,7 +144,8 @@ public class GetImageAction extends GetAction {
 			}
 
 			// /*
-			// * -------------------------------- if there is an internal request from goobiContentServer, you have to overwrite the sourcepath with
+			// * -------------------------------- if there is an internal request from goobiContentServer, you have to overwrite the
+			// sourcepath with
 			// * given attribute for image url --------------------------------
 			// */
 			// if (request.getAttribute("sourcepath") != null) {
@@ -238,9 +244,14 @@ public class GetImageAction extends GetAction {
 			 * -------------------------------- prepare target --------------------------------
 			 */
 			// change to true if watermark should scale
-
-			RenderedImage targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor,
-					myWatermark, false, ImageManager.BOTTOM);
+			RenderedImage targetImage = null;
+			if (config.getScaleWatermark()) {
+				targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor, myWatermark, true,
+						ImageManager.BOTTOM);
+			} else {
+				targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor, myWatermark, false,
+						ImageManager.BOTTOM);
+			}
 			ImageFileFormat targetFormat = ImageFileFormat.getImageFileFormatFromFileExtension(targetExtension);
 			ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read file
 
@@ -273,17 +284,17 @@ public class GetImageAction extends GetAction {
 				wi.setXResolution(config.getDefaultResolution());
 				wi.setYResolution(config.getDefaultResolution());
 			}
-			
+
 			if (request.getParameter("compression") != null) {
 				String value = request.getParameter("compression");
 				try {
-				int intvalue = Integer.parseInt(value);
-				wi.setWriterCompressionValue(intvalue);
+					int intvalue = Integer.parseInt(value);
+					wi.setWriterCompressionValue(intvalue);
 				} catch (Exception e) {
 					// value is not a number, use default value
 				}
 			}
-			
+
 			/*
 			 * -------------------------------- write target image to stream --------------------------------
 			 */
@@ -301,15 +312,21 @@ public class GetImageAction extends GetAction {
 			logger.warn("CacheException", e);
 		}
 		long endTime = System.currentTimeMillis();
-		logger.info("Content server time to process request: " + (endTime-startTime) + " ms");
+		logger.debug("Content server time to process request: " + (endTime - startTime) + " ms");
+//		try {
+//			CommonUtils.appendTextFile("Image request for file " + new File(sourceImageUrl).getAbsolutePath() + "; Time to process: " + (endTime - startTime)
+//					+ " ms\n", new File(de.unigoettingen.sub.commons.contentlib.servlet.Util.getBaseFolderAsFile(), "timeConsumptionLog.txt"));
+//
+//		} catch (IOException e) {
+//			logger.info("Unable to write time log file due to IOException " + e.toString());
+//		}
 	}
-
-
 
 	/************************************************************************************
 	 * validate all parameters of request for image handling, throws IllegalArgumentException if one request parameter is not valid
 	 * 
-	 * @param request {@link HttpServletRequest} of ServletRequest
+	 * @param request
+	 *            {@link HttpServletRequest} of ServletRequest
 	 * @throws IllegalArgumentException
 	 ************************************************************************************/
 	public void validateParameters(HttpServletRequest request) throws IllegalArgumentException {
@@ -383,8 +400,10 @@ public class GetImageAction extends GetAction {
 	/*************************************************************************************
 	 * generate an ID for a pdf file, to cache it under an unique name
 	 * 
-	 * @param request the current {@link HttpServletRequest}
-	 * @param inConfig current internal {@link ContentServerConfiguration} objekt
+	 * @param request
+	 *            the current {@link HttpServletRequest}
+	 * @param inConfig
+	 *            current internal {@link ContentServerConfiguration} objekt
 	 ************************************************************************************/
 	private String getContentCacheIdForRequest(HttpServletRequest request, ContentServerConfiguration inConfig) {
 		String myId = "";
@@ -620,9 +639,11 @@ public class GetImageAction extends GetAction {
 			 * -------------------------------- prepare target --------------------------------
 			 */
 			// change to true if watermark should scale
-
-			RenderedImage targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor,
-					myWatermark, false, ImageManager.BOTTOM);
+			boolean scaleWatermark = false;
+			if (config.getScaleWatermark())
+				scaleWatermark = true;
+			RenderedImage targetImage = sourcemanager.scaleImageByPixel(scaleX, scaleY, scaleType, angle, highlightCoordinateList, highlightColor, myWatermark,
+					scaleWatermark, ImageManager.BOTTOM);
 
 			ImageFileFormat targetFormat = ImageFileFormat.getImageFileFormatFromFileExtension(targetExtension);
 			ImageInterpreter wi = targetFormat.getInterpreter(targetImage); // read file
@@ -640,7 +661,8 @@ public class GetImageAction extends GetAction {
 			// if (params.get("targetFileName") != null) {
 			// targetFileName.append(params.get("targetFileName"));
 			// } else {
-			// String filename = ContentLibUtil.getCustomizedFileName(config.getDefaultFileNameImages(), "." + targetFormat.getFileExtension());
+			// String filename = ContentLibUtil.getCustomizedFileName(config.getDefaultFileNameImages(), "." +
+			// targetFormat.getFileExtension());
 			// targetFileName.append(filename);
 			// }
 

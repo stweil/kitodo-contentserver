@@ -184,7 +184,8 @@ public class ImageManipulator {
 
 		if (mode == MergingMode.VERTICALLY) {
 			if (inImage1.getWidth() != inImage2.getWidth()) {
-
+				throw new ImageManipulatorException(
+						"images have different height");
 			}
 			targetimagewidth = inImage1.getWidth();
 			targetimageheight = inImage1.getHeight() + inImage2.getHeight();
