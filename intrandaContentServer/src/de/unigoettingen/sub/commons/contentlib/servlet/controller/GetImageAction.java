@@ -53,8 +53,6 @@ import org.apache.log4j.Logger;
 import org.goobi.presentation.contentServlet.controller.ContentCache;
 import org.goobi.presentation.contentServlet.controller.GoobiContentServer;
 
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
-
 import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManagerException;
@@ -409,6 +407,7 @@ public class GetImageAction extends GetAction {
 	 * @param inConfig
 	 *            current internal {@link ContentServerConfiguration} objekt
 	 ************************************************************************************/
+	@SuppressWarnings("unused")
 	private String getContentCacheIdForRequest(HttpServletRequest request, ContentServerConfiguration inConfig) {
 		String myId = "";
 		Map<String, String[]> myIdMap = request.getParameterMap();

@@ -25,8 +25,6 @@
  */
 package de.intranda.testICS;
 
-import org.apache.log4j.Logger;
-
 public class SystemHelper {
 	
 	

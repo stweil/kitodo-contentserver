@@ -42,10 +42,10 @@
       <p size="9">In this case we kindly ask you to submit us a voucher copy of your publication.  </p>
 
         <p size="9">Contact:</p>
-        <p size="9">Universitaetsbibliothek Kiel</p>
-        <p size="9">Leibnizstr. 9</p>
-        <p size="9">24118 Kiel</p>
+        <p size="9">Universitaetsbibliothek XY</p>
+        <p size="9">Musterstraße. 9</p>
+        <p size="9">12345 Musterstadt</p>
         <p size="9">Germany</p>
-        <p size="9">Email: auskunft@ub.uni-kiel.de</p> 
+        <p size="9">Email: auskunft@example.com</p> 
     </termsconditions>
 </pdftitlepage>

@@ -75,7 +75,8 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 	int writerCompressionValue = 80;
 
 	/************************************************************************************
-	 * Constructor for {@link JpegInterpreter} to read an jpeg image from given {@link InputStream}
+	 * Constructor for {@link JpegInterpreter} to read an jpeg image from given
+	 * {@link InputStream}
 	 * 
 	 * @param inStream
 	 *            {@link InputStream}
@@ -106,10 +107,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 		try {
 			inputStream = new ByteArraySeekableStream(imagebytes);
 		} catch (IOException e1) {
-			try {
-				inputStream.close();
-			} catch (Exception e) {
-			}
+
 			logger.error("Can't transform the image's byte array to stream");
 			ImageInterpreterException iie = new ImageInterpreterException("Can't transform the image's byte array to stream");
 			throw iie;
@@ -127,6 +125,12 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 			// the
 			// rendered
 			// image
+			try {
+				if (inputStream != null) {
+					inputStream.close();
+				}
+			} catch (Exception e) {
+			}
 		} catch (IOException ioe) {
 			logger.error("Can't read jpeg image", ioe);
 			throw new ImageInterpreterException("Can't read the input stream", ioe);
@@ -146,13 +150,13 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 		String nativeFormatName = null;
 		Node domNode = null;
 		try {
-		nativeFormatName = imageMetadata.getNativeMetadataFormatName();
-		domNode = imageMetadata.getAsTree(nativeFormatName);
+			nativeFormatName = imageMetadata.getNativeMetadataFormatName();
+			domNode = imageMetadata.getAsTree(nativeFormatName);
 		} catch (NullPointerException e) {
 			try {
-			logger.warn("Unbable to read image metadata. Attempting to read format name only");
-			nativeFormatName = imagereader.getFormatName();
-			domNode = imageMetadata.getAsTree(nativeFormatName);
+				logger.warn("Unbable to read image metadata. Attempting to read format name only");
+				nativeFormatName = imagereader.getFormatName();
+				domNode = imageMetadata.getAsTree(nativeFormatName);
 			} catch (IOException e2) {
 				logger.error("Error reading image metadata", e2);
 			}
@@ -178,8 +182,6 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 		if (resunits != null) {
 			resunits_int = Integer.parseInt(resunits);
 		}
-		
-
 
 		String xres_str = this.getXdensity(domNode);
 		if (xres_str != null) {
@@ -196,7 +198,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 				this.yResolution = this.yResolution / 2.54f;
 			}
 		}
-		
+
 		if (resunits == null || resunits_int == 0 || xResolution <= 1.0 || yResolution <= 1.0) {
 			xResolution = defaultXResolution;
 			yResolution = defaultYResolution;
@@ -255,7 +257,7 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 			// create metadata by creating an XML tree
 			ImageWriteParam writerParam = writer.getDefaultWriteParam();
 			ImageTypeSpecifier its = new ImageTypeSpecifier(noAlphaBi);
-			
+
 			// ImageTypeSpecifier its = new
 			// ImageTypeSpecifier(image.getColorModel(),
 			// image.getSampleModel());
@@ -368,7 +370,8 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 	}
 
 	/**
-	 * Indicates wether the image's bytestream is directly embeddable. jpegs are always embeddable
+	 * Indicates wether the image's bytestream is directly embeddable. jpegs are
+	 * always embeddable
 	 * 
 	 * @return true if pdf bytes are embeddable
 	 */
@@ -576,7 +579,8 @@ public class JpegInterpreter extends AbstractImageInterpreter implements ImageIn
 	}
 
 	/************************************************************************************
-	 * get Dom {@link Node} of attribute from parent {@link Node} with given name
+	 * get Dom {@link Node} of attribute from parent {@link Node} with given
+	 * name
 	 * 
 	 * @param inNode
 	 *            the parent {@link Node}

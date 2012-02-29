@@ -40,7 +40,6 @@ import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 
 import com.lowagie.text.Document;
@@ -627,6 +626,7 @@ public class ImageHelper {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void addFrontPage(File frontPage, File pdfFile) throws IOException, DocumentException {
 		File tempFile = new File(pdfFile.getParent(), System.currentTimeMillis() + ".pdf");
 		pdfFile.renameTo(tempFile);
@@ -640,6 +640,7 @@ public class ImageHelper {
 			tempFile.delete();
 	}
 
+	@SuppressWarnings("unused")
 	private void addPage(File imageFile, PdfWriter pdfWriter, Document pdfDocument, float shrinkRatio, float rotationDegree) throws DocumentException,
 			IOException {
 

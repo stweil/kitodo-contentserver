@@ -14,28 +14,6 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/annotations-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/catalina-ant.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/catalina-ha.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/catalina-tribes.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/catalina.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/ecj-3.7.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/el-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/jai_codec-1.1.2_01.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/jai_core-1.1.2_01.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/jai_imageio-1.0_01.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/jasper-el.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/jasper.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/jsp-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/servlet-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/tomcat-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/tomcat-coyote.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/tomcat-dbcp.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/tomcat-i18n-es.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/tomcat-i18n-fr.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/tomcat-i18n-ja.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/tomcat-jdbc.jar"/>
-	<classpathentry exported="true" kind="lib" path="tomcat-libs/tomcat-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-beanutils-core-1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-cli-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/commons-codec-1.3.jar"/>
@@ -61,6 +39,5 @@
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/xml-apis-1.0.b2.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/xmlbeans-2.4.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/xmlbeans-xpath-2.4.0.jar"/>
-	<classpathentry kind="lib" path="tomcat-libs/mlibwrapper_jai.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

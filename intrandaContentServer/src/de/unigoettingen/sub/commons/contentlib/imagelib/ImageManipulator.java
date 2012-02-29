@@ -43,7 +43,6 @@ import java.util.List;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationBilinear;
 import javax.media.jai.JAI;
-import javax.media.jai.RenderedImageAdapter;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.TransposeDescriptor;
 import javax.media.jai.operator.TransposeType;

@@ -28,7 +28,6 @@ package de.unigoettingen.sub.commons.contentlib.imagelib;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
