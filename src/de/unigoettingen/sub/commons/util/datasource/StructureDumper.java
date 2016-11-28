@@ -21,54 +21,56 @@ package de.unigoettingen.sub.commons.util.datasource;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 /**
  * The Class StructureDumper. A simple class for tests and debugging.
  */
 public class StructureDumper {
-	
-	/** The struct. */
-	List<Structure> structList = null;
-	
-	
-	public StructureDumper (Structure struct) {
-		structList = new ArrayList<Structure>();
-		structList.add(struct);
-	}
-	
 
-	@SuppressWarnings("unchecked")
-	public StructureDumper (StructureSource structSource) {
-		this.structList = (List<Structure>) structSource.getStructureList();
-	}
-	
-	
-	/**
-	 * Dump.
-	 */
-	public void dump () {
-		for (Structure struct: structList) {
-			System.out.println("ROOT: " + struct.getContent());
-			dump(struct, 1);
-		}
-	}
-	
-	/**
-	 * Dump.
-	 * 
-	 * @param struct the struct
-	 * @param level the level
-	 */
-	protected void dump (Structure struct, Integer level) {
-		for (Structure child: struct.getChildren()) {
-			StringBuffer ident = new StringBuffer();
-			for (int i = 0; i < level; i++) {
-				ident.append(" ");
-			}	
-			System.out.println(ident.toString() + "+ "  + child.getContent());
-			if (struct.getChildren().size() != 0) {
-				dump(struct, level + 1);
-			}
-		}
-	}
+    private static final Logger LOGGER = Logger.getLogger(StructureDumper.class);
+
+    /** The struct. */
+    List<Structure> structList = null;
+
+    public StructureDumper(Structure struct) {
+        structList = new ArrayList<Structure>();
+        structList.add(struct);
+    }
+
+    @SuppressWarnings("unchecked")
+    public StructureDumper(StructureSource structSource) {
+        this.structList = (List<Structure>) structSource.getStructureList();
+    }
+
+    /**
+     * Dump.
+     */
+    public void dump() {
+        for (Structure struct : structList) {
+            LOGGER.info("ROOT: " + struct.getContent());
+            dump(struct, 1);
+        }
+    }
+
+    /**
+     * Dump.
+     * 
+     * @param struct the struct
+     * @param level the level
+     */
+    protected void dump(Structure struct, Integer level) {
+        StringBuffer ident = new StringBuffer();
+        for (Structure child : struct.getChildren()) {
+            ident.setLength(0);
+            for (int i = 0; i < level; i++) {
+                ident.append(' ');
+            }
+            LOGGER.info(ident.toString() + "+ " + child.getContent());
+            if (struct.getChildren().size() != 0) {
+                dump(struct, level + 1);
+            }
+        }
+    }
 
 }

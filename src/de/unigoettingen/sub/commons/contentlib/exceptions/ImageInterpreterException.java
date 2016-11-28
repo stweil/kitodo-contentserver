@@ -30,46 +30,45 @@ package de.unigoettingen.sub.commons.contentlib.exceptions;
  * 
  * @version 02.01.2009 
  * @author Steffen Hankiewicz
- * @author Markus Enders
- * **********************************************************************************
+ * @author Markus Enders **********************************************************************************
  */
 public class ImageInterpreterException extends ContentLibImageException {
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 12008110101L;
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID = 12008110101L;
 
-	/**
-	 * Instantiates a new image interpreter exception.
-	 */
-	public ImageInterpreterException() {
-		super();
-	}
+    /**
+     * Instantiates a new image interpreter exception.
+     */
+    public ImageInterpreterException() {
+        super();
+    }
 
-	/**
-	 * Instantiates a new image interpreter exception.
-	 * 
-	 * @param inMessage the in message
-	 */
-	public ImageInterpreterException(final String inMessage) {
-		super(inMessage);
-	}
+    /**
+     * Instantiates a new image interpreter exception.
+     * 
+     * @param inMessage the in message
+     */
+    public ImageInterpreterException(final String inMessage) {
+        super(inMessage);
+    }
 
-	/**
-	 * Instantiates a new image interpreter exception.
-	 * 
-	 * @param incause the incause
-	 */
-	public ImageInterpreterException(final Throwable incause) {
-		super(incause);
-	}
+    /**
+     * Instantiates a new image interpreter exception.
+     * 
+     * @param incause the incause
+     */
+    public ImageInterpreterException(final Throwable incause) {
+        super(incause);
+    }
 
-	/**
-	 * Instantiates a new image interpreter exception.
-	 * 
-	 * @param inMessage the in message
-	 * @param incause the incause
-	 */
-	public ImageInterpreterException(final String inMessage, final Throwable incause) {
-		super(inMessage, incause);
-	}
+    /**
+     * Instantiates a new image interpreter exception.
+     * 
+     * @param inMessage the in message
+     * @param incause the incause
+     */
+    public ImageInterpreterException(final String inMessage, final Throwable incause) {
+        super(inMessage, incause);
+    }
 }

@@ -28,8 +28,7 @@ package de.unigoettingen.sub.commons.simplemets;
 import gov.loc.mets.DivType;
 
 /*************************************************************************************
- * This is just a simple class, for creating the Bookmark's content from the
- * &lt;div&gt; element's metadata. This simple class makes only use of METS,
+ * This is just a simple class, for creating the Bookmark's content from the &lt;div&gt; element's metadata. This simple class makes only use of METS,
  * further extension schemas are not used.
  * 
  * @version 12.01.2009
@@ -38,21 +37,20 @@ import gov.loc.mets.DivType;
  ************************************************************************************/
 public class SimpleStructureMetadataExtractor implements StructureMetadataExtractor {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.unigoettingen.sub.gdz.goobi.contentServlet.BookmarkMetadataExtractor
-	 * #getBookmarkMetadata(gov.loc.mets.DivType)
-	 */
-	public String getStructureMetadata(DivType inDiv, METSParser inParser) {
-		String result = null;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.unigoettingen.sub.gdz.goobi.contentServlet.BookmarkMetadataExtractor #getBookmarkMetadata(gov.loc.mets.DivType)
+     */
+    @Override
+    public String getStructureMetadata(DivType inDiv, METSParser inParser) {
+        String result = null;
 
-		result = inDiv.getLABEL();
-		if (result == null) {
-			result = inDiv.getTYPE();
-		}
-		return result;
-	}
+        result = inDiv.getLABEL();
+        if (result == null) {
+            result = inDiv.getTYPE();
+        }
+        return result;
+    }
 
 }

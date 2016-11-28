@@ -30,42 +30,39 @@ import com.lowagie.text.pdf.PdfReader;
 import de.unigoettingen.sub.commons.util.datasource.AbstractUrlImage;
 import de.unigoettingen.sub.commons.util.datasource.UrlImage;
 
-
 public class PDFPage extends AbstractUrlImage {
-	protected PdfReader pdfreader = null;
+    protected PdfReader pdfreader = null;
 
-	public PDFPage() {
-		super();
-	}
-	
-	/**
-	 * Instantiates a new PDF page.
-	 * 
-	 * @param image the image
-	 */
-	public PDFPage (UrlImage image) {
-		this.pagenumber = image.getPageNumber();
-		this.url = image.getURL();
-	}
+    public PDFPage() {
+        super();
+    }
 
+    /**
+     * Instantiates a new PDF page.
+     * 
+     * @param image the image
+     */
+    public PDFPage(UrlImage image) {
+        this.pagenumber = image.getPageNumber();
+        this.url = image.getURL();
+    }
 
-	/*************************************************************************************
-	 * Getter for pdfreader
-	 * 
-	 * @return the pdfreader
-	 *************************************************************************************/
-	public PdfReader getPdfreader() {
-		return pdfreader;
-	}
+    /*************************************************************************************
+     * Getter for pdfreader
+     * 
+     * @return the pdfreader
+     *************************************************************************************/
+    public PdfReader getPdfreader() {
+        return pdfreader;
+    }
 
-	/**************************************************************************************
-	 * Setter for pdfreader
-	 * 
-	 * @param pdfreader
-	 *            the pdfreader to set
-	 **************************************************************************************/
-	public void setPdfreader(PdfReader pdfreader) {
-		this.pdfreader = pdfreader;
-	}
+    /**************************************************************************************
+     * Setter for pdfreader
+     * 
+     * @param pdfreader the pdfreader to set
+     **************************************************************************************/
+    public void setPdfreader(PdfReader pdfreader) {
+        this.pdfreader = pdfreader;
+    }
 
 }

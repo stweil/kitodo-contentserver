@@ -20,5 +20,5 @@ package de.unigoettingen.sub.commons.util.datasource;
 
 public interface TextSource extends DataSource {
 
-	//TODO: for now just a marker interface, needed later for fulltext handling
+    // TODO: for now just a marker interface, needed later for fulltext handling
 }

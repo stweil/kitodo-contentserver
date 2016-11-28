@@ -26,57 +26,51 @@
 package de.unigoettingen.sub.commons.simplemets.exceptions;
 
 /************************************************************************************
- * A MetsException is thrown whenever a problem occurs, which is related to the
- * contents of the METS file being parsed. This may be related to invalid XML
- * structures, unkown values etc.
+ * A MetsException is thrown whenever a problem occurs, which is related to the contents of the METS file being parsed. This may be related to invalid
+ * XML structures, unkown values etc.
  * 
  * @version 12.01.2009�
  * @author Steffen Hankiewicz
- * @author Markus Enders
- *  ********************************************************************************
+ * @author Markus Enders ********************************************************************************
  */
 public class MetsException extends Exception {
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 5097874287008154951L;
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID = 5097874287008154951L;
 
-	/**
-	 * Instantiates a new mets exception.
-	 */
-	public MetsException() {
-		super();
-	}
+    /**
+     * Instantiates a new mets exception.
+     */
+    public MetsException() {
+        super();
+    }
 
-	/**
-	 * Instantiates a new mets exception.
-	 * 
-	 * @param inMessage
-	 *            the in message
-	 */
-	public MetsException(String inMessage) {
-		super(inMessage);
-	}
+    /**
+     * Instantiates a new mets exception.
+     * 
+     * @param inMessage the in message
+     */
+    public MetsException(String inMessage) {
+        super(inMessage);
+    }
 
-	/**
-	 * Instantiates a new mets exception.
-	 * 
-	 * @param incause
-	 *            the incause
-	 */
-	public MetsException(Throwable incause) {
-		super(incause);
-	}
+    /**
+     * Instantiates a new mets exception.
+     * 
+     * @param incause the incause
+     */
+    public MetsException(Throwable incause) {
+        super(incause);
+    }
 
-	/**
-	 * Instantiates a new mets exception.
-	 * 
-	 * @param inMessage
-	 *            the in message
-	 * @param incause
-	 *            the incause
-	 */
-	public MetsException(String inMessage, Throwable incause) {
-		super(inMessage, incause);
-	}
+    /**
+     * Instantiates a new mets exception.
+     * 
+     * @param inMessage the in message
+     * @param incause the incause
+     */
+    public MetsException(String inMessage, Throwable incause) {
+        super(inMessage, incause);
+    }
 
 }

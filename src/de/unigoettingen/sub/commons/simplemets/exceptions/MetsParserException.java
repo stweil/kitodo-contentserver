@@ -25,11 +25,9 @@
  */
 package de.unigoettingen.sub.commons.simplemets.exceptions;
 
-
 /************************************************************************************
- * A MetsParserException is thrown, whenever an error occurs in the METSParser
- * class which is NOT related to the content of the METS file itself. E.g. if a
- * file or an http stream cannot be opened or other internal problems occure
+ * A MetsParserException is thrown, whenever an error occurs in the METSParser class which is NOT related to the content of the METS file itself. E.g.
+ * if a file or an http stream cannot be opened or other internal problems occure
  * 
  * @version 12.01.2009
  * @author Steffen Hankiewicz
@@ -37,46 +35,42 @@ package de.unigoettingen.sub.commons.simplemets.exceptions;
  * ***********************************************************************************/
 public class MetsParserException extends MetsException {
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 4426591261011049594L;
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID = 4426591261011049594L;
 
-	/**
-	 * Instantiates a new mets parser exception.
-	 */
-	public MetsParserException() {
-		super();
-	}
+    /**
+     * Instantiates a new mets parser exception.
+     */
+    public MetsParserException() {
+        super();
+    }
 
-	/**
-	 * Instantiates a new mets parser exception.
-	 * 
-	 * @param inMessage
-	 *            the in message
-	 */
-	public MetsParserException(String inMessage) {
-		super(inMessage);
-	}
+    /**
+     * Instantiates a new mets parser exception.
+     * 
+     * @param inMessage the in message
+     */
+    public MetsParserException(String inMessage) {
+        super(inMessage);
+    }
 
-	/**
-	 * Instantiates a new mets parser exception.
-	 * 
-	 * @param incause
-	 *            the incause
-	 */
-	public MetsParserException(Throwable incause) {
-		super(incause);
-	}
+    /**
+     * Instantiates a new mets parser exception.
+     * 
+     * @param incause the incause
+     */
+    public MetsParserException(Throwable incause) {
+        super(incause);
+    }
 
-	/**
-	 * Instantiates a new mets parser exception.
-	 * 
-	 * @param inMessage
-	 *            the in message
-	 * @param incause
-	 *            the incause
-	 */
-	public MetsParserException(String inMessage, Throwable incause) {
-		super(inMessage, incause);
-	}
+    /**
+     * Instantiates a new mets parser exception.
+     * 
+     * @param inMessage the in message
+     * @param incause the incause
+     */
+    public MetsParserException(String inMessage, Throwable incause) {
+        super(inMessage, incause);
+    }
 
 }

@@ -31,94 +31,91 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 /**
  * The Class SimpleInputStreamSaver provides a simple way to save the contents of an InputSream in a File.
  */
 public class SimpleInputStreamSaver {
-	
-	/** The file. */
-	File file;
-	
-	/** The is. */
-	InputStream is;
-	
-	/**
-	 * Instantiates a new simple input stream saver.
-	 */
-	public SimpleInputStreamSaver () {
-		
-	}
-	
-	/**
-	 * Instantiates a new simple input stream saver.
-	 * 
-	 * @param file the file to the the contents to.
-	 * @param is the InputStream to save
-	 */
-	public SimpleInputStreamSaver (File file, InputStream is) {
-		this.file = file;
-		this.is = is;
-	}
-	
-	/**
-	 * Safe the contents of the stream
-	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	public void safe () throws IOException {
-		BufferedInputStream bis = new BufferedInputStream(is);
 
-		FileOutputStream fos = new FileOutputStream(file);
-		int bufSize = 1024 * 8;
-		byte[] bytes = new byte[bufSize];
-		int count = bis.read(bytes);
-		while (count != -1 && count <= bufSize) {
-			fos.write(bytes, 0, count);
-			count = bis.read(bytes);
-		}
-		if (count != -1) {
-			fos.write(bytes, 0, count);
-		}
-		fos.close();
-	}
+    /** The file. */
+    File file;
 
-	/**
-	 * Gets the file.
-	 * 
-	 * @return the file
-	 */
-	public File getFile() {
-		return file;
-	}
+    /** The is. */
+    InputStream is;
 
-	/**
-	 * Sets the file.
-	 * 
-	 * @param file the new file
-	 */
-	public void setFile(File file) {
-		this.file = file;
-	}
+    /**
+     * Instantiates a new simple input stream saver.
+     */
+    public SimpleInputStreamSaver() {
+        // may be empty for subclassing
+    }
 
-	/**
-	 * Gets the InputStream.
-	 * 
-	 * @return the InputStream.
-	 */
-	public InputStream getIs() {
-		return is;
-	}
+    /**
+     * Instantiates a new simple input stream saver.
+     * 
+     * @param file the file to the the contents to.
+     * @param is the InputStream to save
+     */
+    public SimpleInputStreamSaver(File file, InputStream is) {
+        this.file = file;
+        this.is = is;
+    }
 
-	/**
-	 * Sets the InputStream.
-	 * 
-	 * @param is the InputStream.
-	 */
-	public void setIs(InputStream is) {
-		this.is = is;
-	}
-	
-	
+    /**
+     * Safe the contents of the stream
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public void safe() throws IOException {
+        BufferedInputStream bis = new BufferedInputStream(is);
+
+        FileOutputStream fos = new FileOutputStream(file);
+        int bufSize = 1024 * 8;
+        byte[] bytes = new byte[bufSize];
+        int count = bis.read(bytes);
+        while (count != -1 && count <= bufSize) {
+            fos.write(bytes, 0, count);
+            count = bis.read(bytes);
+        }
+        if (count != -1) {
+            fos.write(bytes, 0, count);
+        }
+        fos.close();
+    }
+
+    /**
+     * Gets the file.
+     * 
+     * @return the file
+     */
+    public File getFile() {
+        return file;
+    }
+
+    /**
+     * Sets the file.
+     * 
+     * @param file the new file
+     */
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    /**
+     * Gets the InputStream.
+     * 
+     * @return the InputStream.
+     */
+    public InputStream getIs() {
+        return is;
+    }
+
+    /**
+     * Sets the InputStream.
+     * 
+     * @param is the InputStream.
+     */
+    public void setIs(InputStream is) {
+        this.is = is;
+    }
 
 }

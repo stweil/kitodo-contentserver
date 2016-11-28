@@ -45,134 +45,132 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
  * @author Igor Toker
  ************************************************************************************/
 public class WatermarkImage extends WatermarkComponent {
-	private static final Logger logger = Logger.getLogger(WatermarkImage.class);
+    private static final Logger LOGGER = Logger.getLogger(WatermarkImage.class);
 
-	RenderedImage wImage; // actual Image which should be added to the watermark
-	String origin = "left"; // origin of the coordinate system, left or right
-							// upper corner
+    RenderedImage wImage; // actual Image which should be added to the watermark
+    String origin = "left"; // origin of the coordinate system, left or right
+                            // upper corner
 
-	public WatermarkImage(Node configNode) throws WatermarkException {
-		super(configNode);
-		NamedNodeMap nnm = configNode.getAttributes();
-		if (nnm != null) {
-			Node urlnode = nnm.getNamedItem("url");
-			Node xnode = nnm.getNamedItem("x");
-			Node ynode = nnm.getNamedItem("y");
-			Node originnode = nnm.getNamedItem("origin");
+    public WatermarkImage(Node configNode) throws WatermarkException {
+        super(configNode);
+        NamedNodeMap nnm = configNode.getAttributes();
+        if (nnm != null) {
+            Node urlnode = nnm.getNamedItem("url");
+            Node xnode = nnm.getNamedItem("x");
+            Node ynode = nnm.getNamedItem("y");
+            Node originnode = nnm.getNamedItem("origin");
 
-			// x coordinate
-			if (xnode != null) {
-				String value = xnode.getNodeValue();
-				try {
-					this.x = Integer.parseInt(value);
-				} catch (Exception e) {
-					logger.error("Invalid value for x-coordinate for Watermark Image");
-					throw new WatermarkException("Invalid value for x-coordinate for Watermark Image", e);
-				}
-			} else {
-				this.x = 0;
-			}
+            // x coordinate
+            if (xnode != null) {
+                String value = xnode.getNodeValue();
+                try {
+                    this.x = Integer.parseInt(value);
+                } catch (Exception e) {
+                    LOGGER.error("Invalid value for x-coordinate for Watermark Image");
+                    throw new WatermarkException("Invalid value for x-coordinate for Watermark Image", e);
+                }
+            } else {
+                this.x = 0;
+            }
 
-			// y coordinate
-			if (ynode != null) {
-				String value = ynode.getNodeValue();
-				try {
-					this.y = Integer.parseInt(value);
-				} catch (Exception e) {
-					logger.error("Invalid value for y-coordinate for Watermark Image");
-					throw new WatermarkException("Invalid value for y-coordinate for Watermark Image", e);
-				}
-			} else {
-				this.y = 0;
-			}
+            // y coordinate
+            if (ynode != null) {
+                String value = ynode.getNodeValue();
+                try {
+                    this.y = Integer.parseInt(value);
+                } catch (Exception e) {
+                    LOGGER.error("Invalid value for y-coordinate for Watermark Image");
+                    throw new WatermarkException("Invalid value for y-coordinate for Watermark Image", e);
+                }
+            } else {
+                this.y = 0;
+            }
 
-			if (originnode != null) {
-				String value = originnode.getNodeValue();
-				if ((!value.equalsIgnoreCase("left")) && (!value.equalsIgnoreCase("right")) && (!value.equalsIgnoreCase("center"))) {
-					logger.error("origin node has invalid value for Watermark Image");
-					throw new WatermarkException("origin node has invalid value for Watermark Image");
-				} else {
-					origin = value;
-				}
-			}
+            if (originnode != null) {
+                String value = originnode.getNodeValue();
+                if ((!value.equalsIgnoreCase("left")) && (!value.equalsIgnoreCase("right")) && (!value.equalsIgnoreCase("center"))) {
+                    LOGGER.error("origin node has invalid value for Watermark Image");
+                    throw new WatermarkException("origin node has invalid value for Watermark Image");
+                } else {
+                    origin = value;
+                }
+            }
 
-			// image URL, load the actual image
-			if (urlnode != null) {
-				loadImageFromUrl(urlnode.getNodeValue());
-			} else {
-				logger.error("No URL for Watermark Image found");
-				throw new WatermarkException("No URL for Watermark Image found");
-			}
-		}
-	}
+            // image URL, load the actual image
+            if (urlnode != null) {
+                loadImageFromUrl(urlnode.getNodeValue());
+            } else {
+                LOGGER.error("No URL for Watermark Image found");
+                throw new WatermarkException("No URL for Watermark Image found");
+            }
+        }
+    }
 
-	protected void loadImageFromUrl(String value) throws WatermarkException {
-		try {
-			ImageManager im = new ImageManager(new URL(value));
-			ImageInterpreter myInterpreter = im.getMyInterpreter();
-			wImage = myInterpreter.getRenderedImage();
-		} catch (Exception e) {
-			throw new WatermarkException("URL for watermark image " + value + " is invalid URL", e);
-		}
+    protected final void loadImageFromUrl(String value) throws WatermarkException {
+        try {
+            ImageManager im = new ImageManager(new URL(value));
+            ImageInterpreter myInterpreter = im.getMyInterpreter();
+            wImage = myInterpreter.getRenderedImage();
+        } catch (Exception e) {
+            throw new WatermarkException("URL for watermark image " + value + " is invalid URL", e);
+        }
 
-	}
+    }
 
-	/*************************************************************************************
-	 * empty Constructor with inImage as RenderedImage
-	 ************************************************************************************/
-	public WatermarkImage(int id, RenderedImage inImage) {
-		super(id);
-		wImage = inImage;
-	}
+    /*************************************************************************************
+     * empty Constructor with inImage as RenderedImage
+     ************************************************************************************/
+    public WatermarkImage(int id, RenderedImage inImage) {
+        super(id);
+        wImage = inImage;
+    }
 
-	/*************************************************************************************
-	 * Setter for this.wImage
-	 * 
-	 * @param image
-	 *            the wImage to set
-	 ************************************************************************************/
-	protected void setWImage(RenderedImage image) {
-		this.wImage = image;
-	}
+    /*************************************************************************************
+     * Setter for this.wImage
+     * 
+     * @param image the wImage to set
+     ************************************************************************************/
+    protected void setWImage(RenderedImage image) {
+        this.wImage = image;
+    }
 
-	/*************************************************************************************
-	 * This methods renders the WatermarkImage into the Watermark at the given
-	 * coordinates.
-	 * 
-	 ************************************************************************************/
-	public void render() {
-		int actual_x = 0;
-		int actual_y = 0;
+    /*************************************************************************************
+     * This methods renders the WatermarkImage into the Watermark at the given coordinates.
+     * 
+     ************************************************************************************/
+    public void render() {
+        int actual_x = 0;
+        int actual_y = 0;
 
-		if (this.getParent_watermark() == null) {
-			logger.warn("WatermarkImage is not included in any Watermark; can't render WatermarkImage");
-			return;
-		}
+        if (this.getParent_watermark() == null) {
+            LOGGER.warn("WatermarkImage is not included in any Watermark; can't render WatermarkImage");
+            return;
+        }
 
-		Graphics g = this.parent_watermark.getWatermarkImage().createGraphics(); // get
-																					// graphics
-																					// to
-																					// draw
-																					// on
+        Graphics g = this.parentWatermark.getWatermarkImage().createGraphics(); // get
+                                                                                // graphics
+                                                                                // to
+                                                                                // draw
+                                                                                // on
 
-		// PlanarImage img=PlanarImage.wrapRenderedImage(this.getTargetImage());
-		// // get a PlanarImage of the target image
-		BufferedImage bi = ImageManipulator.fromRenderedToBuffered(wImage);
+        // PlanarImage img=PlanarImage.wrapRenderedImage(this.getTargetImage());
+        // // get a PlanarImage of the target image
+        BufferedImage bi = ImageManipulator.fromRenderedToBuffered(wImage);
 
-		// calculate the actual coordinates
-		if (origin.equalsIgnoreCase("LEFT")) {
-			actual_x = this.getX();
-			actual_y = this.getY();
-		} else if (origin.equalsIgnoreCase("RIGHT")) {
-			actual_y = this.getY();
-			actual_x = this.getParent_watermark().getWidth() - wImage.getWidth() - this.getX();
-		} else if (origin.equalsIgnoreCase("CENTER")) {
-			actual_y = this.getY();
-			actual_x = (this.getParent_watermark().getWidth() - wImage.getWidth()) / 2;
-		}
+        // calculate the actual coordinates
+        if (origin.equalsIgnoreCase("LEFT")) {
+            actual_x = this.getX();
+            actual_y = this.getY();
+        } else if (origin.equalsIgnoreCase("RIGHT")) {
+            actual_y = this.getY();
+            actual_x = this.getParent_watermark().getWidth() - wImage.getWidth() - this.getX();
+        } else if (origin.equalsIgnoreCase("CENTER")) {
+            actual_y = this.getY();
+            actual_x = (this.getParent_watermark().getWidth() - wImage.getWidth()) / 2;
+        }
 
-		g.drawImage(bi, actual_x, actual_y, null);
+        g.drawImage(bi, actual_x, actual_y, null);
 
-	}
+    }
 
 }

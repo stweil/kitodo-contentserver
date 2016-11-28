@@ -27,122 +27,120 @@ package de.unigoettingen.sub.commons.contentlib.pdflib;
 
 import java.net.URL;
 
-import de.unigoettingen.sub.commons.contentlib.pdflib.PDFTitlePage;
-
 public class DocumentPart {
 
-	public enum DocumentPartType {
-		PDF, METS;
-	}
+    public enum DocumentPartType {
+        PDF, METS;
+    }
 
-	private URL url;
-	private String divid;
-	private PDFTitlePage titlepage;
-	private DocumentPartType type;
-	private String metsFileGroup;
+    private URL url;
+    private String divid;
+    private PDFTitlePage titlepage;
+    private DocumentPartType type;
+    private String metsFileGroup;
 
-	/**
-	 * Constructor
-	 */
-	@SuppressWarnings("unused")
-	private DocumentPart() {
-		// never call this one from outside
-	}
+    /**
+     * Constructor
+     */
+    @SuppressWarnings("unused")
+    private DocumentPart() {
+        // never call this one from outside
+    }
 
-	/**************************************************************************************
-	 * Constructor incl. divid
-	 *
-	 * @param inURL the url to set
-	 * @param inType the {@link DocumentPartType} to set
-	 **************************************************************************************/
-	public DocumentPart(URL inURL, DocumentPartType inType) {
-		url = inURL;
-		type = inType;
-	}
+    /**************************************************************************************
+     * Constructor incl. divid
+     * 
+     * @param inURL the url to set
+     * @param inType the {@link DocumentPartType} to set
+     **************************************************************************************/
+    public DocumentPart(URL inURL, DocumentPartType inType) {
+        url = inURL;
+        type = inType;
+    }
 
-	/**************************************************************************************
-	 * Constructor incl. divid
-	 *
-	 * @param inURL the url to set
-	 * @param inDivid the divid to set
-	 * @param inType the {@link DocumentPartType} to set
-	 **************************************************************************************/
-	public DocumentPart(URL inURL, String inDivid, DocumentPartType inType) {
-		url = inURL;
-		type = inType;
-		this.divid = inDivid;
-	}
+    /**************************************************************************************
+     * Constructor incl. divid
+     * 
+     * @param inURL the url to set
+     * @param inDivid the divid to set
+     * @param inType the {@link DocumentPartType} to set
+     **************************************************************************************/
+    public DocumentPart(URL inURL, String inDivid, DocumentPartType inType) {
+        url = inURL;
+        type = inType;
+        this.divid = inDivid;
+    }
 
-	/*************************************************************************************
-	 * Getter for url
-	 *
-	 * @return the url
-	 *************************************************************************************/
-	public URL getUrl() {
-		return url;
-	}
+    /*************************************************************************************
+     * Getter for url
+     * 
+     * @return the url
+     *************************************************************************************/
+    public URL getUrl() {
+        return url;
+    }
 
-	/*************************************************************************************
-	 * Getter for type
-	 *
-	 * @return the type
-	 *************************************************************************************/
-	public DocumentPartType getType() {
-		return type;
-	}
+    /*************************************************************************************
+     * Getter for type
+     * 
+     * @return the type
+     *************************************************************************************/
+    public DocumentPartType getType() {
+        return type;
+    }
 
-	/*************************************************************************************
-	 * Getter for divid
-	 *
-	 * @return the divid
-	 *************************************************************************************/
-	public String getDivid() {
-		return divid;
-	}
+    /*************************************************************************************
+     * Getter for divid
+     * 
+     * @return the divid
+     *************************************************************************************/
+    public String getDivid() {
+        return divid;
+    }
 
-	/**************************************************************************************
-	 * Setter for divid
-	 *
-	 * @param divid the divid to set
-	 **************************************************************************************/
-	public void setDivid(String divid) {
-		this.divid = divid;
-	}
+    /**************************************************************************************
+     * Setter for divid
+     * 
+     * @param divid the divid to set
+     **************************************************************************************/
+    public void setDivid(String divid) {
+        this.divid = divid;
+    }
 
-	/*************************************************************************************
-	 * Getter for titlepage
-	 *
-	 * @return the titlepage
-	 *************************************************************************************/
-	public PDFTitlePage getTitlepage() {
-		return titlepage;
-	}
+    /*************************************************************************************
+     * Getter for titlepage
+     * 
+     * @return the titlepage
+     *************************************************************************************/
+    public PDFTitlePage getTitlepage() {
+        return titlepage;
+    }
 
-	/**************************************************************************************
-	 * Setter for titlepage
-	 *
-	 * @param titlepage the titlepage to set
-	 **************************************************************************************/
-	public void setTitlepage(PDFTitlePage titlepage) {
-		this.titlepage = titlepage;
-	}
+    /**************************************************************************************
+     * Setter for titlepage
+     * 
+     * @param titlepage the titlepage to set
+     **************************************************************************************/
+    public void setTitlepage(PDFTitlePage titlepage) {
+        this.titlepage = titlepage;
+    }
 
-	/*************************************************************************************
-	 * Getter for metsFileGroup
-	 *
-	 * @return the metsFileGroup
-	 *************************************************************************************/
-	public String getMetsFileGroup() {
-		return metsFileGroup;
-	}
+    /*************************************************************************************
+     * Getter for metsFileGroup
+     * 
+     * @return the metsFileGroup
+     *************************************************************************************/
+    public String getMetsFileGroup() {
+        return metsFileGroup;
+    }
 
-	/**************************************************************************************
-	 * Setter for metsFileGroup
-	 *
-	 * @param metsFileGroup the metsFileGroup to set
-	 **************************************************************************************/
-	public void setMetsFileGroup(String metsFileGroup) {
-		this.metsFileGroup = metsFileGroup;
-	}
+    /**************************************************************************************
+     * Setter for metsFileGroup
+     * 
+     * @param metsFileGroup the metsFileGroup to set
+     **************************************************************************************/
+    public void setMetsFileGroup(String metsFileGroup) {
+        this.metsFileGroup = metsFileGroup;
+    }
 
 }

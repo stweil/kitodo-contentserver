@@ -40,165 +40,152 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.ParameterNotSupportedE
  * ***********************************************************************************/
 public interface ImageInterpreter {
 
-	/**
-	 * Gets the x resolution.
-	 * 
-	 * @return the x resolution
-	 */
-	public float getXResolution();
+    /**
+     * Gets the x resolution.
+     * 
+     * @return the x resolution
+     */
+    public float getXResolution();
 
-	/**
-	 * Sets the x resolution.
-	 * 
-	 * @param resolution
-	 *            the new x resolution
-	 */
-	public void setXResolution(float resolution);
+    /**
+     * Sets the x resolution.
+     * 
+     * @param resolution the new x resolution
+     */
+    public void setXResolution(float resolution);
 
-	/**
-	 * Gets the y resolution.
-	 * 
-	 * @return the y resolution
-	 */
-	public float getYResolution();
+    /**
+     * Gets the y resolution.
+     * 
+     * @return the y resolution
+     */
+    public float getYResolution();
 
-	/**
-	 * Sets the y resolution.
-	 * 
-	 * @param resolution
-	 *            the new y resolution
-	 */
-	public void setYResolution(float resolution);
+    /**
+     * Sets the y resolution.
+     * 
+     * @param resolution the new y resolution
+     */
+    public void setYResolution(float resolution);
 
-	/**
-	 * Gets the height.
-	 * 
-	 * @return the height
-	 */
-	public int getHeight();
+    /**
+     * Gets the height.
+     * 
+     * @return the height
+     */
+    public int getHeight();
 
-	/**
-	 * Sets the height.
-	 * 
-	 * @param height
-	 *            the new height
-	 */
-	public void setHeight(int height);
+    /**
+     * Sets the height.
+     * 
+     * @param height the new height
+     */
+    public void setHeight(int height);
 
-	/**
-	 * Gets the width.
-	 * 
-	 * @return the width
-	 */
-	public int getWidth();
+    /**
+     * Gets the width.
+     * 
+     * @return the width
+     */
+    public int getWidth();
 
-	/**
-	 * Sets the width.
-	 * 
-	 * @param width
-	 *            the new width
-	 */
-	public void setWidth(int width);
+    /**
+     * Sets the width.
+     * 
+     * @param width the new width
+     */
+    public void setWidth(int width);
 
-	/**
-	 * Gets the colordepth.
-	 * 
-	 * @return the colordepth
-	 */
-	public int getColordepth();
+    /**
+     * Gets the colordepth.
+     * 
+     * @return the colordepth
+     */
+    public int getColordepth();
 
-	/**
-	 * Sets the colordepth.
-	 * 
-	 * @param colordepth
-	 *            the new colordepth
-	 */
-	public void setColordepth(int colordepth);
+    /**
+     * Sets the colordepth.
+     * 
+     * @param colordepth the new colordepth
+     */
+    public void setColordepth(int colordepth);
 
-	/**
-	 * Gets the samplesperpixel.
-	 * 
-	 * @return the samplesperpixel
-	 */
-	public int getSamplesperpixel();
+    /**
+     * Gets the samplesperpixel.
+     * 
+     * @return the samplesperpixel
+     */
+    public int getSamplesperpixel();
 
-	/**
-	 * Sets the samplesperpixel.
-	 * 
-	 * @param samplesperpixel
-	 *            the new samplesperpixel
-	 */
-	public void setSamplesperpixel(int samplesperpixel);
+    /**
+     * Sets the samplesperpixel.
+     * 
+     * @param samplesperpixel the new samplesperpixel
+     */
+    public void setSamplesperpixel(int samplesperpixel);
 
-	/**
-	 * Gets the rendered image.
-	 * 
-	 * @return the rendered image
-	 */
-	public RenderedImage getRenderedImage();
+    /**
+     * Gets the rendered image.
+     * 
+     * @return the rendered image
+     */
+    public RenderedImage getRenderedImage();
 
-	/**
-	 * Pdf bytestream embeddable.
-	 * 
-	 * @return true, if successful
-	 */
-	public boolean pdfBytestreamEmbeddable();
+    /**
+     * Pdf bytestream embeddable.
+     * 
+     * @return true, if successful
+     */
+    public boolean pdfBytestreamEmbeddable();
 
-	/**
-	 * Gets the image byte stream.
-	 * 
-	 * @return the image byte stream
-	 */
-	public byte[] getImageByteStream();
+    /**
+     * Gets the image byte stream.
+     * 
+     * @return the image byte stream
+     */
+    public byte[] getImageByteStream();
 
-	/**
-	 * write the content of the RenderedImage to a stream
-	 * 
-	 * @param outStream
-	 *            the out stream
-	 */
-	public void writeToStream(FileOutputStream  fos, OutputStream outStream);
-	
-	
-	
+    /**
+     * write the content of the RenderedImage to a stream
+     * 
+     * @param outStream the out stream
+     */
+    public void writeToStream(FileOutputStream fos, OutputStream outStream);
 
-	/**
-	 * Gets the writer compression type.
-	 * 
-	 * @return the writer compression type
-	 * @throws ParameterNotSupportedException
-	 *             the parameter not supported exception
-	 */
-	public int getWriterCompressionType() throws ParameterNotSupportedException;
+    public byte[] writeToStreamAndByteArray(OutputStream outStream);
 
-	/**
-	 * Sets the writer compression type.
-	 * 
-	 * @param type
-	 *            the new writer compression type
-	 * @throws ParameterNotSupportedException
-	 *             the parameter not supported exception
-	 */
-	public void setWriterCompressionType(int type) throws ParameterNotSupportedException;
+    /**
+     * Gets the writer compression type.
+     * 
+     * @return the writer compression type
+     * @throws ParameterNotSupportedException the parameter not supported exception
+     */
+    public int getWriterCompressionType() throws ParameterNotSupportedException;
 
-	/**
-	 * Gets the writer compression value.
-	 * 
-	 * @return the writer compression value
-	 * @throws ParameterNotSupportedException
-	 *             the parameter not supported exception
-	 */
-	public int getWriterCompressionValue() throws ParameterNotSupportedException;
+    /**
+     * Sets the writer compression type.
+     * 
+     * @param type the new writer compression type
+     * @throws ParameterNotSupportedException the parameter not supported exception
+     */
+    public void setWriterCompressionType(int type) throws ParameterNotSupportedException;
 
-	/**
-	 * Sets the writer compression value.
-	 * 
-	 * @param value
-	 *            the new writer compression value
-	 * @throws ParameterNotSupportedException
-	 *             the parameter not supported exception
-	 */
-	public void setWriterCompressionValue(int value) throws ParameterNotSupportedException;
+    /**
+     * Gets the writer compression value.
+     * 
+     * @return the writer compression value
+     * @throws ParameterNotSupportedException the parameter not supported exception
+     */
+    public int getWriterCompressionValue() throws ParameterNotSupportedException;
 
-	public void clear();
+    /**
+     * Sets the writer compression value.
+     * 
+     * @param value the new writer compression value
+     * @throws ParameterNotSupportedException the parameter not supported exception
+     */
+    public void setWriterCompressionValue(int value) throws ParameterNotSupportedException;
+
+    public void clear();
+
 }

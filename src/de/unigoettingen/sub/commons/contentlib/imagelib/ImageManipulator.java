@@ -52,473 +52,421 @@ import org.apache.log4j.Logger;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManipulatorException;
 
 /************************************************************************************
- * ImageManipulator is used by ImageManager to calculate Rotation, Scaling,
- * Highlighting etc.
+ * ImageManipulator is used by ImageManager to calculate Rotation, Scaling, Highlighting etc.
  * 
  * @version 06.01.2009
  * @author Steffen Hankiewicz
  * @author Markus Enders
  ************************************************************************************/
-//TODO: Add Wrapper Methods to handle the Image interface
-public class ImageManipulator {
-	/**
-	 * types of MerginsModes for two images
-	 */
-	public enum MergingMode {
-		/** horizontal mode */
-		HORIZONTALLY,
-		/** vertical mode */
-		VERTICALLY;
-	}
+// TODO: Add Wrapper Methods to handle the Image interface
+public final class ImageManipulator {
+    /**
+     * types of MerginsModes for two images
+     */
+    public enum MergingMode {
+        /** horizontal mode */
+        HORIZONTALLY,
+        /** vertical mode */
+        VERTICALLY;
+    }
 
-	private static final Logger logger = Logger
-			.getLogger(ImageManipulator.class);
+    private static final Logger LOGGER = Logger.getLogger(ImageManipulator.class);
 
-	/**************************************************************************************
-	 * hidden default constructor only for the singleton
-	 **************************************************************************************/
-	private ImageManipulator() {
-	}
+    /**************************************************************************************
+     * hidden default constructor only for the singleton
+     **************************************************************************************/
+    private ImageManipulator() {
+    }
 
-	/************************************************************************************
-	 * Scale an image with the InterpolationBilinear scale algorithm
-	 * 
-	 * @param inImage
-	 *            the source {@link RenderedImage}
-	 * @param scalex
-	 *            Scaling for x
-	 * @param scaley
-	 *            Scaling for y
-	 * @return the manipulated {@link RenderedImage}
-	 ************************************************************************************/
-	public static RenderedImage scaleInterpolationBilinear(RenderedImage inImage,
-			float scalex, float scaley) {
+    /************************************************************************************
+     * Scale an image with the InterpolationBilinear scale algorithm
+     * 
+     * @param inImage the source {@link RenderedImage}
+     * @param scalex Scaling for x
+     * @param scaley Scaling for y
+     * @return the manipulated {@link RenderedImage}
+     ************************************************************************************/
+    public static RenderedImage scaleInterpolationBilinear(RenderedImage inImage, float scalex, float scaley) {
 
-		RenderedOp outImage;
+        RenderedOp outImage;
 
-		// set all parameters for scaling
-		ParameterBlock params = new ParameterBlock();
+        // set all parameters for scaling
+        ParameterBlock params = new ParameterBlock();
 
-		params.addSource(inImage);
-		params.add(scalex);
-		params.add(scaley);
-		params.add(0.0F);
-		params.add(0.0F);
-		params.add(new InterpolationBilinear()); // interpolation method
-		// for scaling
-		outImage = JAI.create("scale", params);
+        params.addSource(inImage);
+        params.add(scalex);
+        params.add(scaley);
+        params.add(0.0F);
+        params.add(0.0F);
+        params.add(new InterpolationBilinear()); // interpolation method
+        // for scaling
+        outImage = JAI.create("scale", params);
 
-		// get renderedImage
-		return outImage.createInstance();
-	}
+        // get renderedImage
+        return outImage.createInstance();
+    }
 
-	/************************************************************************************
-	 * Scale an image with the InterpolationBilinear subsamplebinarytogray
-	 * algorithm
-	 * 
-	 * @param inImage
-	 *            the source {@link RenderedImage}
-	 * @param scalex
-	 *            Scaling for x
-	 * @param scaley
-	 *            Scaling for y
-	 * @return the manipulated {@link RenderedImage}
-	 ************************************************************************************/
-	public static RenderedImage scaleSubsampleBinaryToGrey(RenderedImage inImage,
-			float scalex, float scaley) {
+    /************************************************************************************
+     * Scale an image with the InterpolationBilinear subsamplebinarytogray algorithm
+     * 
+     * @param inImage the source {@link RenderedImage}
+     * @param scalex Scaling for x
+     * @param scaley Scaling for y
+     * @return the manipulated {@link RenderedImage}
+     ************************************************************************************/
+    public static RenderedImage scaleSubsampleBinaryToGrey(RenderedImage inImage, float scalex, float scaley) {
 
-		RenderedOp outImage;
+        RenderedOp outImage;
 
-		// set all parameters for scaling
-		ParameterBlock params = new ParameterBlock();
+        // set all parameters for scaling
+        ParameterBlock params = new ParameterBlock();
 
-		//some kind of hack...
-		//-------------------------------
-		if (scalex>1) {
-			scalex = (float)1/scalex;
-		}
-		if (scaley>1) {
-			scaley = (float)1/scaley;
-		}
-		//-------------------------------
-		
-		params.addSource(inImage);
-		params.add(scalex);
-		params.add(scaley);
-		params.add(0.0F);
-		params.add(0.0F);
-		params.add(new InterpolationBilinear()); // interpolationmethod
-		// for scaling
-		outImage = JAI.create("subsamplebinarytogray", params);
+        // some kind of hack...
+        // -------------------------------
+        if (scalex > 1) {
+            scalex = 1 / scalex;
+        }
+        if (scaley > 1) {
+            scaley = 1 / scaley;
+        }
+        // -------------------------------
 
-		// get renderedImage
-		return outImage.createInstance();
-	}
+        params.addSource(inImage);
+        params.add(scalex);
+        params.add(scaley);
+        params.add(0.0F);
+        params.add(0.0F);
+        params.add(new InterpolationBilinear()); // interpolationmethod
+        // for scaling
+        outImage = JAI.create("subsamplebinarytogray", params);
 
-	/************************************************************************************
-	 * merge two images into one image depending on given parametes for
-	 * orientation
-	 * 
-	 * @param inImage1
-	 *            first {@link RenderedImage}
-	 * @param inImage2
-	 *            second {@link RenderedImage}
-	 * @param mode
-	 *            Merging mode
-	 * @return the merged {@link RenderedImage}
-	 * @throws ImageManipulatorException
-	 ************************************************************************************/
-	public static RenderedImage mergeImages(RenderedImage inImage1,
-			RenderedImage inImage2, MergingMode mode)
-			throws ImageManipulatorException {
-		int targetimagewidth = 0;
-		int targetimageheight = 0;
+        // get renderedImage
+        return outImage.createInstance();
+    }
 
-		// check if width or height matches
-		if (mode == MergingMode.HORIZONTALLY) {
-			if (inImage1.getHeight() != inImage2.getHeight()) {
-				throw new ImageManipulatorException(
-						"images have different height");
-			}
-			targetimagewidth = inImage1.getWidth() + inImage2.getWidth();
-			targetimageheight = inImage1.getHeight();
+    /************************************************************************************
+     * merge two images into one image depending on given parametes for orientation
+     * 
+     * @param inImage1 first {@link RenderedImage}
+     * @param inImage2 second {@link RenderedImage}
+     * @param mode Merging mode
+     * @return the merged {@link RenderedImage}
+     * @throws ImageManipulatorException
+     ************************************************************************************/
+    public static RenderedImage mergeImages(RenderedImage inImage1, RenderedImage inImage2, MergingMode mode) throws ImageManipulatorException {
+        int targetimagewidth = 0;
+        int targetimageheight = 0;
 
-		}
+        // check if width or height matches
+        if (mode == MergingMode.HORIZONTALLY) {
+            if (inImage1.getHeight() != inImage2.getHeight()) {
+                throw new ImageManipulatorException("images have different height");
+            }
+            targetimagewidth = inImage1.getWidth() + inImage2.getWidth();
+            targetimageheight = inImage1.getHeight();
 
-		if (mode == MergingMode.VERTICALLY) {
-			if (inImage1.getWidth() != inImage2.getWidth()) {
-				throw new ImageManipulatorException(
-						"images have different height");
-			}
-			targetimagewidth = inImage1.getWidth();
-			targetimageheight = inImage1.getHeight() + inImage2.getHeight();
-		}
+        }
 
-		// create a new RenderedImage (with the targetsize)
-		logger.debug("Merging two images: target image is :" + targetimagewidth
-				+ " x " + targetimageheight);
-		BufferedImage targetBImage = new BufferedImage(targetimagewidth,
-				targetimageheight, BufferedImage.TYPE_INT_RGB);
-		Graphics g = targetBImage.createGraphics(); // get graphics to draw on
+        if (mode == MergingMode.VERTICALLY) {
+            if (inImage1.getWidth() != inImage2.getWidth()) {
+                throw new ImageManipulatorException("images have different height");
+            }
+            targetimagewidth = inImage1.getWidth();
+            targetimageheight = inImage1.getHeight() + inImage2.getHeight();
+        }
 
-		if (mode == MergingMode.VERTICALLY) {
-			// get first image and draw at at coordinate 0/0
-			BufferedImage bi1 = fromRenderedToBuffered(inImage1);
-			g.drawImage(bi1, 0, 0, null);
+        // create a new RenderedImage (with the targetsize)
+        LOGGER.debug("Merging two images: target image is :" + targetimagewidth + " x " + targetimageheight);
+        BufferedImage targetBImage = new BufferedImage(targetimagewidth, targetimageheight, BufferedImage.TYPE_INT_RGB);
+        Graphics g = targetBImage.createGraphics(); // get graphics to draw on
 
-			BufferedImage bi2 = fromRenderedToBuffered(inImage2);
-			g.drawImage(bi2, 0, inImage1.getHeight(), null);
-		} else if (mode == MergingMode.HORIZONTALLY) {
-			// get first image and draw at at coordinate 0/0
-			BufferedImage bi1 = fromRenderedToBuffered(inImage1);
-			g.drawImage(bi1, 0, 0, null);
+        if (mode == MergingMode.VERTICALLY) {
+            // get first image and draw at at coordinate 0/0
+            BufferedImage bi1 = fromRenderedToBuffered(inImage1);
+            g.drawImage(bi1, 0, 0, null);
 
-			BufferedImage bi2 = fromRenderedToBuffered(inImage2);
-			g.drawImage(bi2, inImage1.getWidth(), 0, null);
-		}
+            BufferedImage bi2 = fromRenderedToBuffered(inImage2);
+            g.drawImage(bi2, 0, inImage1.getHeight(), null);
+        } else if (mode == MergingMode.HORIZONTALLY) {
+            // get first image and draw at at coordinate 0/0
+            BufferedImage bi1 = fromRenderedToBuffered(inImage1);
+            g.drawImage(bi1, 0, 0, null);
 
-		return (RenderedImage) targetBImage;
-	}
+            BufferedImage bi2 = fromRenderedToBuffered(inImage2);
+            g.drawImage(bi2, inImage1.getWidth(), 0, null);
+        }
 
-	/************************************************************************************
-	 * Scale an image with the Interpolation.INTERP_NEAREST algorithm
-	 * 
-	 * @param inImage
-	 *            the source {@link RenderedImage}
-	 * @param scalex
-	 *            Scaling for x
-	 * @param scaley
-	 *            Scaling for y
-	 * @return the manipulated {@link RenderedImage}
-	 ************************************************************************************/
-	public static RenderedImage scaleNextNeighbor(RenderedImage inImage, float scalex,
-			float scaley) {
-		RenderedOp outImage;
+        return targetBImage;
+    }
 
-		// set all parameters for scaling
-		ParameterBlock params = new ParameterBlock();
+    /************************************************************************************
+     * Scale an image with the Interpolation.INTERP_NEAREST algorithm
+     * 
+     * @param inImage the source {@link RenderedImage}
+     * @param scalex Scaling for x
+     * @param scaley Scaling for y
+     * @return the manipulated {@link RenderedImage}
+     ************************************************************************************/
+    public static RenderedImage scaleNextNeighbor(RenderedImage inImage, float scalex, float scaley) {
+        RenderedOp outImage;
 
-		params.addSource(inImage);
-		params.add(scalex);
-		params.add(scaley);
-		params.add(0.0F);
-		params.add(0.0F);
-		params.add(new InterpolationBilinear()); // interpolationmethod
-		// for scaling
-		params.add(Interpolation.getInstance(Interpolation.INTERP_NEAREST));
-		outImage = JAI.create("scale", params);
-		// get renderedImage
-		return outImage.createInstance();
-	}
+        // set all parameters for scaling
+        ParameterBlock params = new ParameterBlock();
 
-	/************************************************************************************
-	 * draw boxes with given coordinates an color on image
-	 * 
-	 * @param inImage
-	 *            the incoming {@link RenderedImage}
-	 * @param coordinates
-	 *            the list of coordinates, where to draw the boxes
-	 * @param color
-	 *            the drawing {@link Color}
-	 * @return the {@link RenderedImage} with boxes on it
-	 * @throws ImageManipulatorException
-	 ************************************************************************************/
-	public static RenderedImage drawBoxes(RenderedImage inImage,
-			List<String> coordinates, Color color)
-			throws ImageManipulatorException {
+        params.addSource(inImage);
+        params.add(scalex);
+        params.add(scaley);
+        params.add(0.0F);
+        params.add(0.0F);
+        params.add(new InterpolationBilinear()); // interpolationmethod
+        // for scaling
+        params.add(Interpolation.getInstance(Interpolation.INTERP_NEAREST));
+        outImage = JAI.create("scale", params);
+        // get renderedImage
+        return outImage.createInstance();
+    }
 
-		// create a BufferedImage from the RenderedImage
-		BufferedImage bufImage = fromRenderedToBuffered(inImage);
+    /************************************************************************************
+     * draw boxes with given coordinates an color on image
+     * 
+     * @param inImage the incoming {@link RenderedImage}
+     * @param coordinates the list of coordinates, where to draw the boxes
+     * @param color the drawing {@link Color}
+     * @return the {@link RenderedImage} with boxes on it
+     * @throws ImageManipulatorException
+     ************************************************************************************/
+    public static RenderedImage drawBoxes(RenderedImage inImage, List<String> coordinates, Color color) throws ImageManipulatorException {
 
-		// convert to RGB; this is important as we want to draw in RGB.
-		// greyscale image are converted
-		BufferedImage result = new BufferedImage(bufImage.getWidth(), bufImage
-				.getHeight(), BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = result.createGraphics();
-		g.drawRenderedImage(bufImage, null);
-		g.dispose();
-		// darken image a bit - needs to be as dark as greyscale image
-		float scaleFactor = 1f;
-		RescaleOp op = new RescaleOp(scaleFactor, 0, null);
-		bufImage = op.filter(result, null);
-		Graphics2D g2d = bufImage.createGraphics();
+        // create a BufferedImage from the RenderedImage
+        BufferedImage bufImage = fromRenderedToBuffered(inImage);
 
-		// set the color
-		g2d.setColor(color);
+        // convert to RGB; this is important as we want to draw in RGB.
+        // greyscale image are converted
+        BufferedImage result = new BufferedImage(bufImage.getWidth(), bufImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = result.createGraphics();
+        g.drawRenderedImage(bufImage, null);
+        g.dispose();
+        // darken image a bit - needs to be as dark as greyscale image
+        float scaleFactor = 1f;
+        RescaleOp op = new RescaleOp(scaleFactor, 0, null);
+        bufImage = op.filter(result, null);
+        Graphics2D g2d = bufImage.createGraphics();
 
-		// Iterate over list of coordinates
-		for (String singlebox : coordinates) {
-			String numbers[] = singlebox.split(","); // split between ","
-			if (numbers.length != 4) {// invalid format of the string, throw
-				// exception
-				g2d.dispose();
-				throw new ImageManipulatorException(
-						"Wrong format of coordinates, format must be x1,y1,x2,y2");
-			}
-			try {
-				// check if all x,y values are integers
-				Integer x1 = Integer.parseInt(numbers[0]);
-				Integer y1 = Integer.parseInt(numbers[1]);
-				Integer x2 = Integer.parseInt(numbers[2]);
-				Integer y2 = Integer.parseInt(numbers[3]);
+        // set the color
+        g2d.setColor(color);
 
-				// draw the box, 0.4f sets it to transparent
-				AlphaComposite ac = AlphaComposite.getInstance(
-						AlphaComposite.SRC_OVER, 0.4f);
-				g2d.setComposite(ac);
-				g2d.fill(new Rectangle2D.Float(x1, y1, (x2 - x1), (y2 - y1)));
-			} catch (Exception e) {
-				// numbers have the wrong format, throw exception
-				g2d.dispose();
-				throw new ImageManipulatorException(
-						"Coordinates value is wrong; maybe not an integer value",
-						e);
-			}
-		} // end of foreach
-		g2d.dispose(); // throw it away, result is now in buffered image
+        // Iterate over list of coordinates
+        Rectangle2D.Float rectangle = new Rectangle2D.Float();
+        for (String singlebox : coordinates) {
+            String numbers[] = singlebox.split(","); // split between ","
+            if (numbers.length != 4) {// invalid format of the string, throw
+                // exception
+                g2d.dispose();
+                throw new ImageManipulatorException("Wrong format of coordinates, format must be x1,y1,x2,y2");
+            }
+            try {
+                // check if all x,y values are integers
+                Integer x1 = Integer.parseInt(numbers[0]);
+                Integer y1 = Integer.parseInt(numbers[1]);
+                Integer x2 = Integer.parseInt(numbers[2]);
+                Integer y2 = Integer.parseInt(numbers[3]);
 
-		return bufImage; // buffered image implements the RenderedImage
-		// interface
-	}
+                // draw the box, 0.4f sets it to transparent
+                AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f);
+                g2d.setComposite(ac);
+                rectangle.setFrame(x1, y1, (x2 - x1), (y2 - y1));
+                g2d.fill(rectangle);
+            } catch (Exception e) {
+                // numbers have the wrong format, throw exception
+                g2d.dispose();
+                throw new ImageManipulatorException("Coordinates value is wrong; maybe not an integer value", e);
+            }
+        } // end of foreach
+        g2d.dispose(); // throw it away, result is now in buffered image
 
-	/**************************************************************************************
-	 * Rotates a RenderedImage
-	 * 
-	 * @param inImage
-	 * @param angle
-	 *            in degrees
-	 * @param quality
-	 *            interpolation method, can be set to "nearest", "bicubic" or
-	 *            "bilinear"
-	 * @return
-	 * @throws ImageManipulatorException
-	 **************************************************************************************/
-	public static RenderedImage rotate(RenderedImage inImage, double angle,
-			String quality) throws ImageManipulatorException {
+        return bufImage; // buffered image implements the RenderedImage
+        // interface
+    }
 
-		RenderedImage rotatedImage = null; // target image
-		Interpolation interpolationMethod = null; // interpolation method used
-		double rangle = Math.toRadians(angle); // convert degrees to radians
-		double x = inImage.getWidth() / 2; // find center of image
-		double y = inImage.getHeight() / 2;
+    /**************************************************************************************
+     * Rotates a RenderedImage
+     * 
+     * @param inImage
+     * @param angle in degrees
+     * @param quality interpolation method, can be set to "nearest", "bicubic" or "bilinear"
+     * @return
+     * @throws ImageManipulatorException
+     **************************************************************************************/
+    public static RenderedImage rotate(RenderedImage inImage, double angle, String quality) throws ImageManipulatorException {
 
-		// transpose optimized rotation for right angles
-		TransposeType rotOp = null;
-		if (Math.abs(angle - 0) < 1e-5) {
-			// 0 degree
-			return inImage;
-		} else if (Math.abs(angle - 90) < 1e-5) {
-			// 90 degree
-			rotOp = TransposeDescriptor.ROTATE_90;
-		} else if (Math.abs(angle - 180) < 1e-5) {
-			// 180 degree
-			rotOp = TransposeDescriptor.ROTATE_180;
-		} else if (Math.abs(angle - 270) < 1e-5) {
-			// 270 degree
-			rotOp = TransposeDescriptor.ROTATE_270;
-		} else if (Math.abs(angle - 360) < 1e-5) {
-			// 360 degree
-			return inImage;
-		}
-		if (rotOp != null) {
-			// transpose
-			ParameterBlock pb = new ParameterBlock();
-			pb.addSource(inImage);
-			pb.add(rotOp);
-			rotatedImage = JAI.create("transpose", pb);
-		} else {
-			// it's not a right angle, so rotate
-			ParameterBlock param = new ParameterBlock();
-			param.addSource(inImage);
-			param.add((float) x);
-			param.add((float) y);
-			param.add((float) rangle);
-			if (quality.equals("bicubic")) {
-				interpolationMethod = Interpolation
-						.getInstance(Interpolation.INTERP_BICUBIC);
-			} else if (quality.equals("bilinear")) {
-				interpolationMethod = Interpolation
-						.getInstance(Interpolation.INTERP_BILINEAR);
-			} else if (quality.equals("nearest")) {
-				interpolationMethod = Interpolation
-						.getInstance(Interpolation.INTERP_NEAREST);
-			} else {
-				throw new ImageManipulatorException(
-						"Unknown interpolation method. Must either be bicubic,bilinear or nearest.");
-			}
-			param.add(interpolationMethod);
+        RenderedImage rotatedImage = null; // target image
+        Interpolation interpolationMethod = null; // interpolation method used
+        double rangle = Math.toRadians(angle); // convert degrees to radians
+        double x = inImage.getWidth() / 2; // find center of image
+        double y = inImage.getHeight() / 2;
 
-			rotatedImage = JAI.create("rotate", param);
-		}
+        // transpose optimized rotation for right angles
+        TransposeType rotOp = null;
+        if (Math.abs(angle - 0) < 1e-5) {
+            // 0 degree
+            return inImage;
+        } else if (Math.abs(angle - 90) < 1e-5) {
+            // 90 degree
+            rotOp = TransposeDescriptor.ROTATE_90;
+        } else if (Math.abs(angle - 180) < 1e-5) {
+            // 180 degree
+            rotOp = TransposeDescriptor.ROTATE_180;
+        } else if (Math.abs(angle - 270) < 1e-5) {
+            // 270 degree
+            rotOp = TransposeDescriptor.ROTATE_270;
+        } else if (Math.abs(angle - 360) < 1e-5) {
+            // 360 degree
+            return inImage;
+        }
+        if (rotOp != null) {
+            // transpose
+            ParameterBlock pb = new ParameterBlock();
+            pb.addSource(inImage);
+            pb.add(rotOp);
+            rotatedImage = JAI.create("transpose", pb);
+        } else {
+            // it's not a right angle, so rotate
+            ParameterBlock param = new ParameterBlock();
+            param.addSource(inImage);
+            param.add((float) x);
+            param.add((float) y);
+            param.add((float) rangle);
+            if ("bicubic".equals(quality)) {
+                interpolationMethod = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
+            } else if ("bilinear".equals(quality)) {
+                interpolationMethod = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+            } else if ("nearest".equals(quality)) {
+                interpolationMethod = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
+            } else {
+                throw new ImageManipulatorException("Unknown interpolation method. Must either be bicubic,bilinear or nearest.");
+            }
+            param.add(interpolationMethod);
 
-		if (rotatedImage == null) {
-			throw new ImageManipulatorException("Can't create rotated image");
-		}
+            rotatedImage = JAI.create("rotate", param);
+        }
 
-		return rotatedImage;
-	}
+        if (rotatedImage == null) {
+            throw new ImageManipulatorException("Can't create rotated image");
+        }
 
-	/**************************************************************************************
-	 * scales a list of coordinates. The coordinates are a simple string
-	 * containing the pixel coordinates of a polygone or a rectangle in the form
-	 * "x1,y1,x2,y2,....,xn,yn".
-	 * 
-	 * @param inCoordinates
-	 * @param scalex
-	 * @param scaley
-	 * @return
-	 * @throws ImageManipulatorException
-	 **************************************************************************************/
-	public static List<String> scaleCoordinates(List<String> inCoordinates,
-			float scalex, float scaley) throws ImageManipulatorException {
+        return rotatedImage;
+    }
 
-		LinkedList<String> result = new LinkedList<String>();
+    /**************************************************************************************
+     * scales a list of coordinates. The coordinates are a simple string containing the pixel coordinates of a polygone or a rectangle in the form
+     * "x1,y1,x2,y2,....,xn,yn".
+     * 
+     * @param inCoordinates
+     * @param scalex
+     * @param scaley
+     * @return
+     * @throws ImageManipulatorException
+     **************************************************************************************/
+    public static List<String> scaleCoordinates(List<String> inCoordinates, float scalex, float scaley) throws ImageManipulatorException {
 
-		// iterate over all coordinates
-		for (String singleCoordinateset : inCoordinates) {
-			String numbers[] = singleCoordinateset.split(","); // split between
-			// ","
-			// there must be an even number of coordinates
-			if (numbers.length % 2 != 0) {
-				// it's an uneven number, can't be as we always need 2
-				// coordinates per pixel
-				throw new ImageManipulatorException("Invalid coordinate format");
-			}
+        LinkedList<String> result = new LinkedList<String>();
 
-			// get single integer values of the coordinates and scale them
-			boolean isX = true;
-			String new_coordinate = "";
-			for (String x : numbers) {
-				int new_x = 0;
-				int new_y = 0;
+        // iterate over all coordinates
+        for (String singleCoordinateset : inCoordinates) {
+            String numbers[] = singleCoordinateset.split(","); // split between
+            // ","
+            // there must be an even number of coordinates
+            if (numbers.length % 2 != 0) {
+                // it's an uneven number, can't be as we always need 2
+                // coordinates per pixel
+                throw new ImageManipulatorException("Invalid coordinate format");
+            }
 
-				Integer x_integer = Integer.parseInt(x);
-				if (isX) {
-					new_x = (int) (x_integer * scalex);
-					isX = false;
-					new_coordinate = new_coordinate + new_x + ",";
-				} else {
-					new_y = (int) (x_integer * scaley);
-					isX = true;
-					new_coordinate = new_coordinate + new_y + ",";
-				}
-			} // end of for
-			new_coordinate = new_coordinate.substring(0, new_coordinate
-					.length() - 1); // delete
-			// last
-			// comma
-			result.add(new_coordinate); // add it to list of of coordinates
+            // get single integer values of the coordinates and scale them
+            boolean isX = true;
+            String new_coordinate = "";
+            for (String x : numbers) {
+                int new_x = 0;
+                int new_y = 0;
 
-		}
-		if (result.size() == 0) {
-			throw new ImageManipulatorException(
-					"No conversion results. Error when calculating new coordinates");
-		}
-		return result;
-	}
+                Integer x_integer = Integer.parseInt(x);
+                if (isX) {
+                    new_x = (int) (x_integer * scalex);
+                    isX = false;
+                    new_coordinate = new_coordinate + new_x + ",";
+                } else {
+                    new_y = (int) (x_integer * scaley);
+                    isX = true;
+                    new_coordinate = new_coordinate + new_y + ",";
+                }
+            } // end of for
+            new_coordinate = new_coordinate.substring(0, new_coordinate.length() - 1); // delete
+            // last
+            // comma
+            result.add(new_coordinate); // add it to list of of coordinates
 
-	/**************************************************************************************
-	 * converts a {@link RenderedImage} into a {@link BufferedImage}
-	 * 
-	 * @param img
-	 *            the {@link RenderedImage} to convert
-	 * @return the converted {@link BufferedImage}
-	 **************************************************************************************/
-	public static BufferedImage fromRenderedToBuffered(RenderedImage img) {
-		if (img instanceof BufferedImage) {
-			return (BufferedImage) img;
-		}
-		
-		//BufferedImage ret = new RenderedImageAdapter(img).getAsBufferedImage();
+        }
+        if (result.isEmpty()) {
+            throw new ImageManipulatorException("No conversion results. Error when calculating new coordinates");
+        }
+        return result;
+    }
 
-		ColorModel cm = img.getColorModel();
-		int w = img.getWidth();
-		int h = img.getHeight();
-		WritableRaster raster = cm.createCompatibleWritableRaster(w, h);
-		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-		Hashtable<String, Object> props = new Hashtable<String, Object>();
-		String[] keys = img.getPropertyNames();
+    /**************************************************************************************
+     * converts a {@link RenderedImage} into a {@link BufferedImage}
+     * 
+     * @param img the {@link RenderedImage} to convert
+     * @return the converted {@link BufferedImage}
+     **************************************************************************************/
+    public static BufferedImage fromRenderedToBuffered(RenderedImage img) {
+        if (img instanceof BufferedImage) {
+            return (BufferedImage) img;
+        }
 
-		if (keys != null) {
-			for (int i = 0; i < keys.length; i++) {
-				try{
-				props.put(keys[i], img.getProperty(keys[i]));
-				}catch (ClassCastException e) {}
-			}
-		}
-		BufferedImage ret = new BufferedImage(cm, raster, isAlphaPremultiplied,
-				props);
-		img.copyData(raster);
-		return ret;
-	}
+        // BufferedImage ret = new RenderedImageAdapter(img).getAsBufferedImage();
 
-	public static BufferedImage fromRenderedToBufferedNoAlpha(RenderedImage img) {
+        ColorModel cm = img.getColorModel();
+        int w = img.getWidth();
+        int h = img.getHeight();
+        WritableRaster raster = cm.createCompatibleWritableRaster(w, h);
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        Hashtable<String, Object> props = new Hashtable<String, Object>();
+        String[] keys = img.getPropertyNames();
 
-		ColorModel cm = img.getColorModel();
-		int w = img.getWidth();
-		int h = img.getHeight();
-		WritableRaster raster = cm.createCompatibleWritableRaster(w, h);
-		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-		Hashtable<String, Object> props = new Hashtable<String, Object>();
-		String[] keys = img.getPropertyNames();
+        if (keys != null) {
+            for (String key : keys) {
+                props.put(key, img.getProperty(key));
+            }
+        }
+        BufferedImage ret = new BufferedImage(cm, raster, isAlphaPremultiplied, props);
+        img.copyData(raster);
+        return ret;
+    }
 
-		if (keys != null) {
-			for (int i = 0; i < keys.length; i++) {
-//				if (!keys[i].equals("ROI"))
-				try{
-				props.put(keys[i], img.getProperty(keys[i]));
-				}catch (ClassCastException e) {}
-			}
-		}
+    public static BufferedImage fromRenderedToBufferedNoAlpha(RenderedImage img) {
 
-		BufferedImage ret = new BufferedImage(cm, raster, isAlphaPremultiplied,
-				props);
-		img.copyData(raster);
+        ColorModel cm = img.getColorModel();
+        int w = img.getWidth();
+        int h = img.getHeight();
+        WritableRaster raster = cm.createCompatibleWritableRaster(w, h);
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        Hashtable<String, Object> props = new Hashtable<String, Object>();
+        String[] keys = img.getPropertyNames();
 
-		BufferedImage ret2 = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-		// draw image into BufferedImage
-		Graphics2D g2d = ret2.createGraphics();
-		g2d.drawImage(ret, 0, 0, null);
-		return ret2;
-	}
+        if (keys != null) {
+            for (String key : keys) {
+                // if (!keys[i].equals("ROI"))
+                props.put(key, img.getProperty(key));
+            }
+        }
+
+        BufferedImage ret = new BufferedImage(cm, raster, isAlphaPremultiplied, props);
+        img.copyData(raster);
+
+        BufferedImage ret2 = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        // draw image into BufferedImage
+        Graphics2D g2d = ret2.createGraphics();
+        g2d.drawImage(ret, 0, 0, null);
+        return ret2;
+    }
 }

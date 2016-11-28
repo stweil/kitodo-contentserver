@@ -33,20 +33,20 @@ import java.io.IOException;
  */
 public interface Image {
 
-	/**
-	 * Gets the rendered image.
-	 * 
-	 * @return the rendered image
-	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	abstract RenderedImage getRenderedImage () throws IOException;
-	
-	/**
-	 * Gets the page number.
-	 * 
-	 * @return the page number
-	 */
-	abstract Integer getPageNumber ();
-	
+    /**
+     * Gets the rendered image.
+     * 
+     * @return the rendered image
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    abstract RenderedImage getRenderedImage() throws IOException;
+
+    /**
+     * Gets the page number.
+     * 
+     * @return the page number
+     */
+    abstract Integer getPageNumber();
+
 }

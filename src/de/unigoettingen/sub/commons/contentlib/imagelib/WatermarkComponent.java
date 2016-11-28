@@ -41,106 +41,102 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
  ************************************************************************************/
 public class WatermarkComponent {
 
-	protected int id;
-	Integer x = 0; // coordinates in pixels
-	Integer y = 0; // coordinates in pixels
-	BufferedImage targetImage; // the canvas on which the component is rendered
+    protected int id;
+    Integer x = 0; // coordinates in pixels
+    Integer y = 0; // coordinates in pixels
+    BufferedImage targetImage; // the canvas on which the component is rendered
 
-	Watermark parent_watermark = null;
+    Watermark parentWatermark = null;
 
-	/*************************************************************************************
-	 * empty Constructor
-	 ************************************************************************************/
-	public WatermarkComponent(int id) {
-		this.id = id;
-	}
+    /*************************************************************************************
+     * empty Constructor
+     ************************************************************************************/
+    public WatermarkComponent(int id) {
+        this.id = id;
+    }
 
-	public WatermarkComponent(Node configNode) throws WatermarkException {
-		try {
-			this.id = Integer.valueOf(configNode.getAttributes().getNamedItem("id").getNodeValue());
-		} catch (Exception e) {
-			throw new WatermarkException("Can't find id for Watermark Component");
-		}
-	}
+    public WatermarkComponent(Node configNode) throws WatermarkException {
+        try {
+            this.id = Integer.valueOf(configNode.getAttributes().getNamedItem("id").getNodeValue());
+        } catch (Exception e) {
+            throw new WatermarkException("Can't find id for Watermark Component");
+        }
+    }
 
-	/*************************************************************************************
-	 * Getter for x
-	 * 
-	 * @return the x
-	 *************************************************************************************/
-	public Integer getX() {
-		return x;
-	}
+    /*************************************************************************************
+     * Getter for x
+     * 
+     * @return the x
+     *************************************************************************************/
+    public Integer getX() {
+        return x;
+    }
 
-	/**************************************************************************************
-	 * Setter for x
-	 * 
-	 * @param x
-	 *            the x to set
-	 **************************************************************************************/
-	public void setX(Integer x) {
-		this.x = x;
-	}
+    /**************************************************************************************
+     * Setter for x
+     * 
+     * @param x the x to set
+     **************************************************************************************/
+    public void setX(Integer x) {
+        this.x = x;
+    }
 
-	/*************************************************************************************
-	 * Getter for y
-	 * 
-	 * @return the y
-	 *************************************************************************************/
-	public Integer getY() {
-		return y;
-	}
+    /*************************************************************************************
+     * Getter for y
+     * 
+     * @return the y
+     *************************************************************************************/
+    public Integer getY() {
+        return y;
+    }
 
-	/**************************************************************************************
-	 * Setter for y
-	 * 
-	 * @param y
-	 *            the y to set
-	 **************************************************************************************/
-	public void setY(Integer y) {
-		this.y = y;
-	}
+    /**************************************************************************************
+     * Setter for y
+     * 
+     * @param y the y to set
+     **************************************************************************************/
+    public void setY(Integer y) {
+        this.y = y;
+    }
 
-	/*************************************************************************************
-	 * Getter for targetImage
-	 * 
-	 * @return the targetImage
-	 *************************************************************************************/
-	public BufferedImage getTargetImage() {
-		return targetImage;
-	}
+    /*************************************************************************************
+     * Getter for targetImage
+     * 
+     * @return the targetImage
+     *************************************************************************************/
+    public BufferedImage getTargetImage() {
+        return targetImage;
+    }
 
-	/**************************************************************************************
-	 * Setter for targetImage
-	 * 
-	 * @param targetImage
-	 *            the targetImage to set
-	 **************************************************************************************/
-	public void setTargetImage(BufferedImage targetImage) {
-		this.targetImage = targetImage;
-	}
+    /**************************************************************************************
+     * Setter for targetImage
+     * 
+     * @param targetImage the targetImage to set
+     **************************************************************************************/
+    public void setTargetImage(BufferedImage targetImage) {
+        this.targetImage = targetImage;
+    }
 
-	/**
-	 * @return the parent_watermark
-	 */
-	protected Watermark getParent_watermark() {
-		return parent_watermark;
-	}
+    /**
+     * @return the parent_watermark
+     */
+    protected Watermark getParent_watermark() {
+        return parentWatermark;
+    }
 
-	/**
-	 * @param parent_watermark
-	 *            the parent_watermark to set
-	 */
-	protected void setParent_watermark(Watermark parent_watermark) {
-		this.parent_watermark = parent_watermark;
-	}
+    /**
+     * @param parent_watermark the parent_watermark to set
+     */
+    protected void setParent_watermark(Watermark parent_watermark) {
+        this.parentWatermark = parent_watermark;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public int getId() {
+        return id;
+    }
 
 }

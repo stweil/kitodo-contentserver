@@ -32,71 +32,69 @@ package de.unigoettingen.sub.commons.contentlib.pdflib;
  * @author Markus Enders
  ************************************************************************************/
 public class PDFTitlePageParagraph {
-	String content = "";
-	int fontsize = 12;
-	String fonttype = "Helvetica";
+    String content = "";
+    int fontsize = 12;
+    String fonttype = "Helvetica";
 
-	/************************************************************************************
-	 * public constructor
-	 ************************************************************************************/
-	public PDFTitlePageParagraph() {
-	}
+    /************************************************************************************
+     * public constructor
+     ************************************************************************************/
+    public PDFTitlePageParagraph() {
+        // may be used for subclassing
+    }
 
-	/*************************************************************************************
-	 * Getter for content
-	 * 
-	 * @return the content
-	 *************************************************************************************/
-	public String getContent() {
-		return content;
-	}
+    /*************************************************************************************
+     * Getter for content
+     * 
+     * @return the content
+     *************************************************************************************/
+    public String getContent() {
+        return content;
+    }
 
-	/**************************************************************************************
-	 * Setter for content
-	 * 
-	 * @param content
-	 *            the content to set
-	 **************************************************************************************/
-	public void setContent(String content) {
-		this.content = content;
-	}
+    /**************************************************************************************
+     * Setter for content
+     * 
+     * @param content the content to set
+     **************************************************************************************/
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-	/*************************************************************************************
-	 * Getter for fontsize
-	 * 
-	 * @return the fontsize
-	 *************************************************************************************/
-	public int getFontsize() {
-		return fontsize;
-	}
+    /*************************************************************************************
+     * Getter for fontsize
+     * 
+     * @return the fontsize
+     *************************************************************************************/
+    public int getFontsize() {
+        return fontsize;
+    }
 
-	/**************************************************************************************
-	 * Setter for fontsize
-	 * 
-	 * @param fontsize
-	 *            the fontsize to set
-	 **************************************************************************************/
-	public void setFontsize(int fontsize) {
-		this.fontsize = fontsize;
-	}
+    /**************************************************************************************
+     * Setter for fontsize
+     * 
+     * @param fontsize the fontsize to set
+     **************************************************************************************/
+    public void setFontsize(int fontsize) {
+        this.fontsize = fontsize;
+    }
 
-	/*************************************************************************************
-	 * Getter for fonttype
-	 * 
-	 * @return the fonttype
-	 *************************************************************************************/
-	public String getFonttype() {
-		return fonttype;
-	}
+    /*************************************************************************************
+     * Getter for fonttype
+     * 
+     * @return the fonttype
+     *************************************************************************************/
+    public String getFonttype() {
+        return fonttype;
+    }
 
-	/**************************************************************************************
-	 * Setter for fonttype
-	 * 
-	 * @param fonttype
-	 *            the fonttype to set
-	 **************************************************************************************/
-	public void setFonttype(String fonttype) {
-		this.fonttype = fonttype;
-	}
+    /**************************************************************************************
+     * Setter for fonttype
+     * 
+     * @param fonttype the fonttype to set
+     **************************************************************************************/
+    public void setFonttype(String fonttype) {
+        this.fonttype = fonttype;
+    }
 
 }

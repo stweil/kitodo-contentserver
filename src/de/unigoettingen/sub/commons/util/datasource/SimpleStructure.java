@@ -26,22 +26,22 @@
 package de.unigoettingen.sub.commons.util.datasource;
 
 public class SimpleStructure extends AbstractStructure<SimpleStructure> {
-	
-	/**
-	 * Instantiates a new simple structure.
-	 */
-	public SimpleStructure() {
 
-	}
-		
-	/**************************************************************************************
-	 * Constructor which create a new bookmark with pagename and content
-	 * 
-	 * @param pagename as Integer
-	 * @param content as String
-	 **************************************************************************************/
-	public SimpleStructure(Integer pagename, String content) {
-		super(pagename, content);
-	}
+    /**
+     * Instantiates a new simple structure.
+     */
+    public SimpleStructure() {
+        // may be empty for subclassing
+    }
+
+    /**************************************************************************************
+     * Constructor which create a new bookmark with pagename and content
+     * 
+     * @param pagename as Integer
+     * @param content as String
+     **************************************************************************************/
+    public SimpleStructure(Integer pagename, String content) {
+        super(pagename, content);
+    }
 
 }

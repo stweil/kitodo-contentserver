@@ -38,8 +38,9 @@ import java.util.Comparator;
  ************************************************************************************/
 public class DivComparatorDecreasing implements Comparator<DivType> {
 
-	public int compare(DivType arg0, DivType arg1) {
-		return new DivComparatorIncreasing().compare(arg0, arg1) * -1;
-	}
+    @Override
+    public int compare(DivType arg0, DivType arg1) {
+        return new DivComparatorIncreasing().compare(arg0, arg1) * -1;
+    }
 
 }

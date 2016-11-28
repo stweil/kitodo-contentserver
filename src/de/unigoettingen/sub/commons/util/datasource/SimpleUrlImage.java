@@ -28,42 +28,43 @@ package de.unigoettingen.sub.commons.util.datasource;
 import java.net.URL;
 
 public class SimpleUrlImage extends AbstractUrlImage implements UrlImage {
-	
-	/**
-	 * Instantiates a new simple url image.
-	 * 
-	 * @param pageNumber the page number
-	 * @param url the url
-	 */
-	public SimpleUrlImage (Integer pageNumber, URL url) {
-		this.pagenumber = pageNumber;
-		this.url = url;
-	}
-	
-	/**
-	 * Instantiates a new simple url image.
-	 */
-	public SimpleUrlImage () {
-		
-	}
-	
-	/**************************************************************************************
-	 * Setter for url
-	 *
-	 * @param url the imageurl to set
-	 **************************************************************************************/
-	public void setURL(URL imageurl) {
-		this.url = imageurl;
-	}
-	
-	/**************************************************************************************
-	 * Setter for pdfpagenumber
-	 *
-	 * @param pagenumber the pdfpagenumber to set
-	 **************************************************************************************/
-	public void setPageNumber(Integer pagenumber) {
-		this.pagenumber = pagenumber;
-	}
-	
+
+    /**
+     * Instantiates a new simple url image.
+     * 
+     * @param pageNumber the page number
+     * @param url the url
+     */
+    public SimpleUrlImage(Integer pageNumber, URL url) {
+        this.pagenumber = pageNumber;
+        this.url = url;
+    }
+
+    /**
+     * Instantiates a new simple url image.
+     */
+    public SimpleUrlImage() {
+        // may be empty for subclassing
+    }
+
+    /**************************************************************************************
+     * Setter for url
+     * 
+     * @param url the imageurl to set
+     **************************************************************************************/
+    @Override
+    public void setURL(URL imageurl) {
+        this.url = imageurl;
+    }
+
+    /**************************************************************************************
+     * Setter for pdfpagenumber
+     * 
+     * @param pagenumber the pdfpagenumber to set
+     **************************************************************************************/
+    @Override
+    public void setPageNumber(Integer pagenumber) {
+        this.pagenumber = pagenumber;
+    }
 
 }

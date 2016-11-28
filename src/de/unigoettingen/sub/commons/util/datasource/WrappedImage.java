@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package de.unigoettingen.sub.commons.util.datasource;
 
 import java.awt.image.RenderedImage;
@@ -26,36 +25,42 @@ import java.io.IOException;
  * The Class WrappedImage is a simple wrapper for java.awt.image.RenderedImage instances.
  */
 public class WrappedImage implements Image {
-	
-	/** The page nr. */
-	protected Integer pageNr = -1;
-	
-	/** The image. */
-	protected RenderedImage image = null;
-	
-	/**
-	 * Instantiates a new wrapped image.
-	 * 
-	 * @param pagenr the page number
-	 * @param image the RenderedImage
-	 */
-	public WrappedImage (Integer pagenr, RenderedImage image) {
-		this.pageNr = pagenr;
-		this.image = image;
-	}
 
-	/* (non-Javadoc)
-	 * @see de.unigoettingen.sub.commons.util.datasource.Image#getPageNumber()
-	 */
-	public Integer getPageNumber() {
-		return pageNr;
-	}
+    /** The page nr. */
+    protected Integer pageNr = -1;
 
-	/* (non-Javadoc)
-	 * @see de.unigoettingen.sub.commons.util.datasource.Image#getRenderedImage()
-	 */
-	public RenderedImage getRenderedImage() throws IOException {
-		return image;
-	}
+    /** The image. */
+    protected RenderedImage image = null;
+
+    /**
+     * Instantiates a new wrapped image.
+     * 
+     * @param pagenr the page number
+     * @param image the RenderedImage
+     */
+    public WrappedImage(Integer pagenr, RenderedImage image) {
+        this.pageNr = pagenr;
+        this.image = image;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.unigoettingen.sub.commons.util.datasource.Image#getPageNumber()
+     */
+    @Override
+    public Integer getPageNumber() {
+        return pageNr;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.unigoettingen.sub.commons.util.datasource.Image#getRenderedImage()
+     */
+    @Override
+    public RenderedImage getRenderedImage() throws IOException {
+        return image;
+    }
 
 }

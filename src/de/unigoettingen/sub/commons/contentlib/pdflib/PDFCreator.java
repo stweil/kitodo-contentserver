@@ -69,344 +69,344 @@ import de.unigoettingen.sub.commons.util.datasource.UrlImage;
 
 public class PDFCreator {
 
-	private static final Logger logger = Logger.getLogger(PDFCreator.class);
+    private static final Logger LOGGER = Logger.getLogger(PDFCreator.class);
 
-	public void createPDF(OutputStream out, LinkedList<DocumentPart> metsparts, PDFConfiguration pdfconfig,
-			MetadataExtractor inMetadataExtractor, StructureMetadataExtractor inBookmarkExtractor, Watermark myWatermark)
-			throws ImageManagerException, FileNotFoundException, IOException, PDFManagerException,
-			ImageInterpreterException, URISyntaxException, MetsException {
-		PDFManager pdfmanager = null;
+    public void createPDF(OutputStream out, List<DocumentPart> metsparts, PDFConfiguration pdfconfig, MetadataExtractor inMetadataExtractor,
+            StructureMetadataExtractor inBookmarkExtractor, Watermark myWatermark) throws ImageManagerException, FileNotFoundException, IOException,
+            PDFManagerException, ImageInterpreterException, URISyntaxException, MetsException {
+        PDFManager pdfmanager = null;
 
-		String creator = "";
-		String title = "";
-		String keywords = "";
+        String creator = "";
+        String title = "";
+        String keywords = "";
 
-		int documentpartcounter = 0;
-		LinkedList<METSParser> allMetsParser = new LinkedList<METSParser>();
-		HashMap<Integer, UrlImage> allPages = new HashMap<Integer, UrlImage>();
-		HashMap<Integer, String> allPageNames = new HashMap<Integer, String>();
-		HashMap<Integer, PDFTitlePage> allTitlePages = new HashMap<Integer, PDFTitlePage>();
-		List<PDFBookmark> allRootBookmarks = new LinkedList<PDFBookmark>();
+        int documentpartcounter = 0;
+        LinkedList<METSParser> allMetsParser = new LinkedList<METSParser>();
+        HashMap<Integer, UrlImage> allPages = new HashMap<Integer, UrlImage>();
+        HashMap<Integer, String> allPageNames = new HashMap<Integer, String>();
+        HashMap<Integer, PDFTitlePage> allTitlePages = new HashMap<Integer, PDFTitlePage>();
+        List<PDFBookmark> allRootBookmarks = new LinkedList<PDFBookmark>();
 
-		// iterate over all DocumentParts
-		for (DocumentPart dp : metsparts) {
+        // iterate over all DocumentParts
+        for (DocumentPart dp : metsparts) {
 
-			documentpartcounter++;
-			String pdfdivid = null;
-			Map<Integer, UrlImage> documentpartPages = null;
+            documentpartcounter++;
+            String pdfdivid = null;
+            Map<Integer, UrlImage> documentpartPages = null;
 
-			if (dp.getType() == DocumentPartType.METS) {
-				// read the METS file and handle all the images
-				//TODO: Do not invoke the METS Parser direct, use the interface instead
-				METSParser metsparser = new METSParser(dp.getUrl(), true);
+            if (dp.getType() == DocumentPartType.METS) {
+                // read the METS file and handle all the images
+                // TODO: Do not invoke the METS Parser direct, use the interface instead
+                METSParser metsparser = new METSParser(dp.getUrl(), true);
 
-				// set METSParser configuration
-				metsparser.setMetadataextractor(inMetadataExtractor);
-				metsparser.setStructureMetadataExtractor(inBookmarkExtractor);
-				if (dp.getMetsFileGroup() != null) {
-					metsparser.setFilegroupsuseattributevalue(dp.getMetsFileGroup());
-				}
-				
-				if (dp.getDivid() == null) {
-					pdfdivid = metsparser.getUppermostDivIDForPDF();
-				} else {
-					pdfdivid = dp.getDivid();
-				}
+                // set METSParser configuration
+                metsparser.setMetadataextractor(inMetadataExtractor);
+                metsparser.setStructureMetadataExtractor(inBookmarkExtractor);
+                if (dp.getMetsFileGroup() != null) {
+                    metsparser.setFilegroupsuseattributevalue(dp.getMetsFileGroup());
+                }
 
-				// calculate metadata
-				inMetadataExtractor.calculatePDFMetadata(pdfdivid, metsparser);
+                if (dp.getDivid() == null) {
+                    pdfdivid = metsparser.getUppermostDivIDForPDF();
+                } else {
+                    pdfdivid = dp.getDivid();
+                }
 
-				String title1 = inMetadataExtractor.getPdftitle();
-				String creator1 = inMetadataExtractor.getPdfcreator();
-				String keywords1 = inMetadataExtractor.getPdfkeywords();
+                // calculate metadata
+                inMetadataExtractor.calculatePDFMetadata(pdfdivid, metsparser);
 
-				if (title1 != null) {
-					if (title.equals("")) {
-						title = title1;
-					} else {
-						title = title + "; " + title1;
-					}
-				}
+                String title1 = inMetadataExtractor.getPdftitle();
+                String creator1 = inMetadataExtractor.getPdfcreator();
+                String keywords1 = inMetadataExtractor.getPdfkeywords();
 
-				if (creator1 != null) {
-					if (creator.equals("")) {
-						creator = creator1;
-					} else {
-						creator = creator + "; " + creator1;
-					}
-				}
+                if (title1 != null) {
+                    if (title.equals("")) {
+                        title = title1;
+                    } else {
+                        title = title + "; " + title1;
+                    }
+                }
 
-				if (keywords1 != null) {
-					if (keywords.equals("")) {
-						keywords = keywords1;
-					} else {
-						keywords = keywords + "; " + keywords1;
-					}
-				}
+                if (creator1 != null) {
+                    if (creator.equals("")) {
+                        creator = creator1;
+                    } else {
+                        creator = creator + "; " + creator1;
+                    }
+                }
 
-				logger.debug("Title1: " + title1);
-				logger.debug("Creator1: " + creator1);
-				logger.debug("Keywords1: " + keywords1);
+                if (keywords1 != null) {
+                    if (keywords.equals("")) {
+                        keywords = keywords1;
+                    } else {
+                        keywords = keywords + "; " + keywords1;
+                    }
+                }
 
-				metsparser.getAllFilesForRelatedDivs(pdfdivid); // get page
+                LOGGER.debug("Title1: " + title1);
+                LOGGER.debug("Creator1: " + creator1);
+                LOGGER.debug("Keywords1: " + keywords1);
 
-				// names
-				Map<Integer, String> myPageNames = metsparser.getPageNames();
+                metsparser.getAllFilesForRelatedDivs(pdfdivid); // get page
 
-				// get list of files and pagenames
-				documentpartPages = metsparser.getImageMap();
+                // names
+                Map<Integer, String> myPageNames = metsparser.getPageNames();
 
-				if (documentpartPages.size() == 0) {
-					// nothing in here; probably METS file has no pages
-					// don't add METS file to list
-					logger.error("No page files / page urls available!");
-				} else {
-					// change page names to make them unique
-					// within the PDF, different METSparsers
-					// will have same pageName
+                // get list of files and pagenames
+                documentpartPages = metsparser.getImageMap();
 
-					for (Integer i : documentpartPages.keySet()) {
-						UrlImage page = documentpartPages.get(i);
-						String pagename = myPageNames.get(i);
-						// calculate new integer
-						int dpc = (documentpartcounter * 1000) + i;
+                if (documentpartPages.isEmpty()) {
+                    // nothing in here; probably METS file has no pages
+                    // don't add METS file to list
+                    LOGGER.error("No page files / page urls available!");
+                } else {
+                    // change page names to make them unique
+                    // within the PDF, different METSparsers
+                    // will have same pageName
 
-						logger.debug("adding page " + dpc + " to list");
+                    for (Integer i : documentpartPages.keySet()) {
+                        UrlImage page = documentpartPages.get(i);
+                        String pagename = myPageNames.get(i);
+                        // calculate new integer
+                        int dpc = (documentpartcounter * 1000) + i;
 
-						// add to new HashMaps
-						allPages.put(dpc, page);
-						allPageNames.put(dpc, pagename);
-					}
+                        LOGGER.debug("adding page " + dpc + " to list");
 
-					// handle all bookmarks
-					// need to change page number as well
-					List<PDFBookmark> bookmarks;
-					bookmarks = PDFBookmark.convertList(metsparser.getStructureList());
-					for (PDFBookmark b : bookmarks) {
-						// change page numbers
-						changeBookmarksPagenumber(b, documentpartcounter);
-						allRootBookmarks.add(b);
-					}
+                        // add to new HashMaps
+                        allPages.put(dpc, page);
+                        allPageNames.put(dpc, pagename);
+                    }
 
-					// add METSParser to list
-					allMetsParser.add(metsparser);
-				}
-			} else if (dp.getType() == DocumentPartType.PDF) {
-				// handle the PDF part
-				PdfReader pdfreader = new PdfReader(dp.getUrl());
+                    // handle all bookmarks
+                    // need to change page number as well
+                    List<PDFBookmark> bookmarks;
+                    bookmarks = PDFBookmark.convertList(metsparser.getStructureList());
+                    for (PDFBookmark b : bookmarks) {
+                        // change page numbers
+                        changeBookmarksPagenumber(b, documentpartcounter);
+                        allRootBookmarks.add(b);
+                    }
 
-				int numberofpages = pdfreader.getNumberOfPages();
-				for (Integer i = 1; i < numberofpages + 1; i++) {
-					PDFPage pdfpage = new PDFPage();
-					pdfpage.setPdfreader(pdfreader);
-					pdfpage.setPageNumber(i);
+                    // add METSParser to list
+                    allMetsParser.add(metsparser);
+                }
+            } else if (dp.getType() == DocumentPartType.PDF) {
+                // handle the PDF part
+                PdfReader pdfreader = new PdfReader(dp.getUrl());
 
-					int dpc = (documentpartcounter * 1000) + (i);
-					logger.debug("adding page " + dpc + " to list");
+                int numberofpages = pdfreader.getNumberOfPages();
+                for (Integer i = 1; i < numberofpages + 1; i++) {
+                    PDFPage pdfpage = new PDFPage();
+                    pdfpage.setPdfreader(pdfreader);
+                    pdfpage.setPageNumber(i);
 
-					// add page to allPages
-					allPages.put(dpc, pdfpage);
+                    int dpc = (documentpartcounter * 1000) + (i);
+                    LOGGER.debug("adding page " + dpc + " to list");
 
-					// adding page labales
-					String labels[] = PdfPageLabels.getPageLabels(pdfreader);
-					if ((labels != null) && (i < labels.length)) {
-						logger.debug("adding Page label (" + i + "):" + labels[i - 1]);
-						allPageNames.put(dpc, labels[i - 1].substring(0, labels[i - 1].length() - 1));
-					}
-				}
+                    // add page to allPages
+                    allPages.put(dpc, pdfpage);
 
-				// add Bookmarks
-				allRootBookmarks = extractBookmarksFromPDF(pdfreader, allRootBookmarks, documentpartcounter);
-			}
-			// handle the title page of this DocumentPart
-			if (dp.getTitlepage() != null) {
-				// title page is available
-				// set the layout of the content file
+                    // adding page labales
+                    String labels[] = PdfPageLabels.getPageLabels(pdfreader);
+                    if ((labels != null) && (i < labels.length)) {
+                        LOGGER.debug("adding Page label (" + i + "):" + labels[i - 1]);
+                        allPageNames.put(dpc, labels[i - 1].substring(0, labels[i - 1].length() - 1));
+                    }
+                }
 
-				// set structType
-				if (inMetadataExtractor.getStructType() != null) {
-					dp.getTitlepage().setStructuretype(inMetadataExtractor.getStructType());
-				}
+                // add Bookmarks
+                allRootBookmarks = extractBookmarksFromPDF(pdfreader, allRootBookmarks, documentpartcounter);
+            }
+            // handle the title page of this DocumentPart
+            if (dp.getTitlepage() != null) {
+                // title page is available
+                // set the layout of the content file
 
-				dp.getTitlepage().deleteTitleLines();
+                // set structType
+                if (inMetadataExtractor.getStructType() != null) {
+                    dp.getTitlepage().setStructuretype(inMetadataExtractor.getStructType());
+                }
 
-				// set Lines
-				if (inMetadataExtractor.getPdf_titlepage_line1() != null) {
-					PDFTitlePageLine ptl = new PDFTitlePageLine(inMetadataExtractor.getPdf_titlepage_line1());
-					ptl.setLinetype(2);
-					ptl.setFontsize(14);
-					dp.getTitlepage().addPDFTitlePageLine(ptl);
-				}
+                dp.getTitlepage().deleteTitleLines();
 
-				if (inMetadataExtractor.getPdf_titlepage_line2() != null) {
-					PDFTitlePageLine ptl = new PDFTitlePageLine(inMetadataExtractor.getPdf_titlepage_line2());
-					ptl.setLinetype(2);
-					ptl.setFontsize(10);
-					dp.getTitlepage().addPDFTitlePageLine(ptl);
-				}
+                // set Lines
+                if (inMetadataExtractor.getPdfTitlepageLine1() != null) {
+                    PDFTitlePageLine ptl = new PDFTitlePageLine(inMetadataExtractor.getPdfTitlepageLine1());
+                    ptl.setContent(inMetadataExtractor.getPdfTitlepageLine1());
+                    ptl.setLinetype(2);
+                    ptl.setFontsize(14);
+                    dp.getTitlepage().addPDFTitlePageLine(ptl);
+                }
 
-				if (inMetadataExtractor.getPdf_titlepage_line3() != null) {
-					PDFTitlePageLine ptl = new PDFTitlePageLine(inMetadataExtractor.getPdf_titlepage_line3());
-					ptl.setLinetype(2);
-					ptl.setFontsize(10);
-					dp.getTitlepage().addPDFTitlePageLine(ptl);
-				}
+                if (inMetadataExtractor.getPdfTitlepageLine2() != null) {
+                    PDFTitlePageLine ptl = new PDFTitlePageLine(inMetadataExtractor.getPdfTitlepageLine2());
+                    ptl.setLinetype(2);
+                    ptl.setFontsize(10);
+                    dp.getTitlepage().addPDFTitlePageLine(ptl);
+                }
 
-				if (inMetadataExtractor.getPdf_titlepage_line4() != null) {
-					PDFTitlePageLine ptl = new PDFTitlePageLine(inMetadataExtractor.getPdf_titlepage_line4());
-					ptl.setLinetype(2);
-					ptl.setFontsize(10);
-					dp.getTitlepage().addPDFTitlePageLine(ptl);
-				}
+                if (inMetadataExtractor.getPdfTitlepageLine3() != null) {
+                    PDFTitlePageLine ptl = new PDFTitlePageLine(inMetadataExtractor.getPdfTitlepageLine3());
+                    ptl.setLinetype(2);
+                    ptl.setFontsize(10);
+                    dp.getTitlepage().addPDFTitlePageLine(ptl);
+                }
 
-				// get name of the first page
-				if (documentpartPages != null) {
-					Map<Integer, UrlImage> sortedMap = new TreeMap<Integer, UrlImage>(documentpartPages);
-					Iterator<Integer> it2 = sortedMap.keySet().iterator();
-					Integer firstpagename = 0;
-					//TODO: GDZ: Should this just get the first element? - yes
-					// I tried to find a more elegant way but my google didn't work #googleneverlikedme
-					while (it2.hasNext()) {
-						firstpagename =  it2.next();
-						firstpagename = (documentpartcounter * 1000) + firstpagename;
-						logger.debug("Adding PDFTitlePage at page " + firstpagename);
-						break;
-					}
-					allTitlePages.put(firstpagename, dp.getTitlepage());
-				}
-			}
-		} // end of while over all document parts
+                if (inMetadataExtractor.getPdfTitlepageLine4() != null) {
+                    PDFTitlePageLine ptl = new PDFTitlePageLine(inMetadataExtractor.getPdfTitlepageLine4());
+                    ptl.setLinetype(2);
+                    ptl.setFontsize(10);
+                    dp.getTitlepage().addPDFTitlePageLine(ptl);
+                }
 
-		// setting for PDFManager
-		pdfmanager = new PDFManager(allPages);
-		pdfmanager.setAlwaysUseRenderedImage(pdfconfig.isPdfDefaultAlwaysUseRenderedImage());
-		pdfmanager.setAlwaysCompressToJPEG(pdfconfig.isPdfDefaultAlwaysCompressToJPEG());
-		pdfmanager.setPdfa(pdfconfig.isWriteAsPdfA());
-		
-		// set pages
-		logger.debug(allPages.size() + " pages for PDFManager set");
-		pdfmanager.setImageURLs(allPages);
-		pdfmanager.setImageNames(allPageNames);
-		pdfmanager.setStructureList(allRootBookmarks);
-		pdfmanager.setPdftitlepages(allTitlePages);
+                // get name of the first page
+                if (documentpartPages != null) {
+                    Map<Integer, UrlImage> sortedMap = new TreeMap<Integer, UrlImage>(documentpartPages);
+                    Iterator<Integer> it2 = sortedMap.keySet().iterator();
+                    Integer firstpagename = 0;
+                    // TODO: GDZ: Should this just get the first element? - yes
+                    // I tried to find a more elegant way but my google didn't work #googleneverlikedme
+                    while (it2.hasNext()) {
+                        firstpagename = it2.next();
+                        firstpagename = (documentpartcounter * 1000) + firstpagename;
+                        LOGGER.debug("Adding PDFTitlePage at page " + firstpagename);
+                        break;
+                    }
+                    allTitlePages.put(firstpagename, dp.getTitlepage());
+                }
+            }
+        } // end of while over all document parts
 
-		// set metadata
-		if (!title.equals("")) {
-			pdfmanager.setTitle(title);
-		}
-		if (!creator.equals("")) {
-			pdfmanager.setCreator(creator);
-			pdfmanager.setAuthor(creator);
-		}
-		if (!keywords.equals("")) {
-			pdfmanager.setKeyword(keywords);
-		}
+        // setting for PDFManager
+        pdfmanager = new PDFManager(allPages);
+        pdfmanager.setAlwaysUseRenderedImage(pdfconfig.isPdfDefaultAlwaysUseRenderedImage());
+        pdfmanager.setAlwaysCompressToJPEG(pdfconfig.isPdfDefaultAlwaysCompressToJPEG());
+        pdfmanager.setPdfa(pdfconfig.isWriteAsPdfA());
 
-		// set an ICC profile
-		if (pdfconfig.getIccinputfilename() != null) {
-			ICC_Profile iccprofile = ICC_Profile.getInstance(pdfconfig.getIccinputfilename());
-			pdfmanager.setIccprofile(iccprofile);
-		}	
-	
-		pdfmanager.createPDF(out, pdfconfig.getPagesize(), myWatermark);
-	}
+        // set pages
+        LOGGER.debug(allPages.size() + " pages for PDFManager set");
+        pdfmanager.setImageURLs(allPages);
+        pdfmanager.setImageNames(allPageNames);
+        pdfmanager.setStructureList(allRootBookmarks);
+        pdfmanager.setPdftitlepages(allTitlePages);
 
-	private void changeBookmarksPagenumber(PDFBookmark b, Integer i) {
-		int imagenumber = b.getImageNumber();
+        // set metadata
+        if (!title.equals("")) {
+            pdfmanager.setTitle(title);
+        }
+        if (!creator.equals("")) {
+            pdfmanager.setCreator(creator);
+            pdfmanager.setAuthor(creator);
+        }
+        if (!keywords.equals("")) {
+            pdfmanager.setKeyword(keywords);
+        }
 
-		int newimagenumber = (i * 1000) + imagenumber;
-		b.setImageNumber(newimagenumber);
-		
-		List<PDFBookmark> children = b.getChildren();
-		if ((children != null) && (children.size() > 0)) {
-			changeBookmarksPagenumber(children.get(0), i);
-		}
-	}
+        // set an ICC profile
+        if (pdfconfig.getIccinputfilename() != null) {
+            ICC_Profile iccprofile = ICC_Profile.getInstance(pdfconfig.getIccinputfilename());
+            pdfmanager.setIccprofile(iccprofile);
+        }
 
-	private List<PDFBookmark> extractBookmarksFromPDF(PdfReader pdfreader, List<PDFBookmark> pDFBookmarks, int documentpartnumber) {
-		// add Bookmarks
-		List<?> list = SimpleBookmark.getBookmark(pdfreader);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		if (list != null) {
-			try {
-				//TODO: GDZ: Do we really need this XML step here?
-				SimpleBookmark.exportToXML(list, baos, "UTF8", false);
-				String bms = baos.toString();
-				logger.debug(bms);
-				// parse the xml, find Title elements
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder builder = factory.newDocumentBuilder();
-				Document doc = builder.parse(new InputSource(new StringReader(bms)));
+        pdfmanager.createPDF(out, pdfconfig.getPagesize(), myWatermark);
+    }
 
-				Element e = doc.getDocumentElement();
-				NodeList nl = e.getChildNodes();
-				for (int i = 0; i < nl.getLength(); i++) {
-					Node n = nl.item(i);
-					if ((n.getNodeType() == Node.ELEMENT_NODE) && (n.getNodeName().equals("Title"))) {
-						// found the right node, get title and pagenumber
-						PDFBookmark bm = parseTitleNode(n, documentpartnumber);
-						// this is the uppermost bookmark, add it to rootbookmark list
-						pDFBookmarks.add(bm);
-					}
-				}
-			} catch (IOException e) {
-				logger.error("IOExeption occured", e);
-			} catch (ParserConfigurationException e) {
-				logger.error("ParserConfigurationException occured", e);
-			} catch (SAXException e) {
-				logger.error("SAXException occured", e);
-			}
-		}
-		return pDFBookmarks;
-	}
+    private void changeBookmarksPagenumber(PDFBookmark b, Integer i) {
+        int imagenumber = b.getImageNumber();
 
-	/**
-	 * parses a single <title> element and its child elements
-	 * @param inTitleNode
-	 * @param documentpartcounter
-	 * @return a Bookmark element with content and pagenumber
-	 */
-	private PDFBookmark parseTitleNode(Node inTitleNode, int documentpartcounter) {
-		String bookmarktitle = getElementValue(inTitleNode);
-		NamedNodeMap nnm = inTitleNode.getAttributes();
-		Node pageattribute = nnm.getNamedItem("Page");
-		String pagenumber[] = pageattribute.getNodeValue().split(" ");
+        int newimagenumber = (i * 1000) + imagenumber;
+        b.setImageNumber(newimagenumber);
 
-		PDFBookmark bm = new PDFBookmark();
-		bm.setContent(bookmarktitle);
-		try {
-			int pagenumber_int = Integer.parseInt(pagenumber[0]);
-			// calculate new pagenumber
-			int dpc = (documentpartcounter * 1000) + pagenumber_int;
-			bm.setImageNumber(dpc);
-		} catch (Exception e) {
-			// bookmark doesn't contain a pagenumber
-			// should never happen
-		}
+        List<PDFBookmark> children = b.getChildren();
+        if ((children != null) && !children.isEmpty()) {
+            changeBookmarksPagenumber(children.get(0), i);
+        }
+    }
 
-		// check if this bookmark has further children
-		NodeList nl = inTitleNode.getChildNodes();
-		for (int i = 0; i < nl.getLength(); i++) {
-			Node childnode = nl.item(i);
-			if ((childnode.getNodeType() == Node.ELEMENT_NODE) && (childnode.getNodeName().equals("Title"))) {
-				PDFBookmark childbookmark = parseTitleNode(childnode, documentpartcounter);
-				bm.addChildBookmark(childbookmark);
-			}
-		}
+    private List<PDFBookmark> extractBookmarksFromPDF(PdfReader pdfreader, List<PDFBookmark> pDFBookmarks, int documentpartnumber) {
+        // add Bookmarks
+        List<?> list = SimpleBookmark.getBookmark(pdfreader);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        if (list != null) {
+            try {
+                // TODO: GDZ: Do we really need this XML step here?
+                SimpleBookmark.exportToXML(list, baos, "UTF8", false);
+                String bms = baos.toString();
+                LOGGER.debug(bms);
+                // parse the xml, find Title elements
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.parse(new InputSource(new StringReader(bms)));
 
-		return bm;
-	}
+                Element e = doc.getDocumentElement();
+                NodeList nl = e.getChildNodes();
+                for (int i = 0; i < nl.getLength(); i++) {
+                    Node n = nl.item(i);
+                    if ((n.getNodeType() == Node.ELEMENT_NODE) && (n.getNodeName().equals("Title"))) {
+                        // found the right node, get title and pagenumber
+                        PDFBookmark bm = parseTitleNode(n, documentpartnumber);
+                        // this is the uppermost bookmark, add it to rootbookmark list
+                        pDFBookmarks.add(bm);
+                    }
+                }
+            } catch (IOException e) {
+                LOGGER.error("IOExeption occured", e);
+            } catch (ParserConfigurationException e) {
+                LOGGER.error("ParserConfigurationException occured", e);
+            } catch (SAXException e) {
+                LOGGER.error("SAXException occured", e);
+            }
+        }
+        return pDFBookmarks;
+    }
 
-	private String getElementValue(Node inNode) {
-		NodeList nl = inNode.getChildNodes();
-		for (int i = 0; i < nl.getLength(); i++) {
-			Node n = nl.item(i);
-			if (n.getNodeType() == Node.TEXT_NODE) {
-				String value = n.getNodeValue();
-				return value.trim();
-			}
-		}
-		return null;
-	}
+    /**
+     * parses a single <title> element and its child elements
+     * 
+     * @param inTitleNode
+     * @param documentpartcounter
+     * @return a Bookmark element with content and pagenumber
+     */
+    private PDFBookmark parseTitleNode(Node inTitleNode, int documentpartcounter) {
+        String bookmarktitle = getElementValue(inTitleNode);
+        NamedNodeMap nnm = inTitleNode.getAttributes();
+        Node pageattribute = nnm.getNamedItem("Page");
+        String pagenumber[] = pageattribute.getNodeValue().split(" ");
+
+        PDFBookmark bm = new PDFBookmark();
+        bm.setContent(bookmarktitle);
+        try {
+            int pagenumber_int = Integer.parseInt(pagenumber[0]);
+            // calculate new pagenumber
+            int dpc = (documentpartcounter * 1000) + pagenumber_int;
+            bm.setImageNumber(dpc);
+        } catch (Exception e) {
+            LOGGER.error("Bookmark does not contain a page number");
+        }
+
+        // check if this bookmark has further children
+        NodeList nl = inTitleNode.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node childnode = nl.item(i);
+            if ((childnode.getNodeType() == Node.ELEMENT_NODE) && (childnode.getNodeName().equals("Title"))) {
+                PDFBookmark childbookmark = parseTitleNode(childnode, documentpartcounter);
+                bm.addChildBookmark(childbookmark);
+            }
+        }
+
+        return bm;
+    }
+
+    private String getElementValue(Node inNode) {
+        NodeList nl = inNode.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node n = nl.item(i);
+            if (n.getNodeType() == Node.TEXT_NODE) {
+                String value = n.getNodeValue();
+                return value.trim();
+            }
+        }
+        return null;
+    }
 
 }

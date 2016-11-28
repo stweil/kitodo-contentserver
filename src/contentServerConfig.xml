@@ -78,7 +78,7 @@
     * configuration if watermark should be used and url for watermark content configuration file
     * sample: <watermark use="true" configFile="file:/home/goobi/config/watermarkconfig.xml" />
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-	<watermark use="true" scale = "false" configFile="file:///home/florian/workspace/intrandaContentServer/src/watermark_example_config.xml" />
+	<watermark use="false" scale = "false" configFile="file:///home/florian/workspace/intrandaContentServer/src/watermark_example_config.xml" />
   
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     * configuration for the error watermark if message should not be shown on jsp echo page 
@@ -111,7 +111,7 @@
     *
     * sample: <defaultRepositoryPath value="file:/home/goobi/config/pdftitlepage.xml" /> 
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <pdfTitlePage use="true"
+    <pdfTitlePage use="false"
         configFile="file:///home/florian/workspace/intrandaContentServer/src/pdftitlepage.xml" />	
 
      <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -126,5 +126,5 @@
     *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <contentCache useCache="true" path="/opt/digiverso/viewer/cache/content" size="30000" useShortFileNames="false"/>
     <thumbnailCache useCache="true" path="/opt/digiverso/viewer/cache/thumbnails" size="30000" useShortFileNames="false"/>
-    <pdfCache useCache="true" path="/opt/digiverso/viewer/cache/pdf" size="30000" useShortFileNames="false"/>
+    <pdfCache useCache="false" path="/opt/digiverso/viewer/cache/pdf" size="30000" useShortFileNames="false"/>
 </config>

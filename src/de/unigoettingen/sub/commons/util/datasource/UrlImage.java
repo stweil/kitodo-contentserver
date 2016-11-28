@@ -34,28 +34,26 @@ import java.net.URL;
  * 
  */
 public interface UrlImage extends Image {
-	/**
-	 * Gets the URL.
-	 * 
-	 * @return the URL
-	 */
-	abstract URL getURL();
+    /**
+     * Gets the URL.
+     * 
+     * @return the URL
+     */
+    abstract URL getURL();
 
-	/**************************************************************************************
-	 * Setter for url
-	 * 
-	 * @param url
-	 *            the imageurl to set
-	 **************************************************************************************/
-	public void setURL(URL url);
+    /**************************************************************************************
+     * Setter for url
+     * 
+     * @param url the imageurl to set
+     **************************************************************************************/
+    public void setURL(URL url);
 
-	/**
-	 * Open stream.
-	 * 
-	 * @return the input stream
-	 * 
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
-	abstract InputStream openStream() throws IOException;
+    /**
+     * Open stream.
+     * 
+     * @return the input stream
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    abstract InputStream openStream() throws IOException;
 }

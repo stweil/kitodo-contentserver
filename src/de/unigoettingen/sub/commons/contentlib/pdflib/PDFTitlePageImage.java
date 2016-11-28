@@ -32,86 +32,81 @@ package de.unigoettingen.sub.commons.contentlib.pdflib;
  * @author Markus Enders
  ************************************************************************************/
 public class PDFTitlePageImage {
-	float xCoordinate = 0f;
-	float yCoordinate = 0f;
+    float xCoordinate = 0f;
+    float yCoordinate = 0f;
 
-	String filename = null;
-	int scalefactor = 1;
+    String filename = null;
+    int scalefactor = 1;
 
-	/************************************************************************************
-	 * public constructor
-	 ************************************************************************************/
-	public PDFTitlePageImage() {
-	}
+    /************************************************************************************
+     * public constructor
+     ************************************************************************************/
+    public PDFTitlePageImage() {
+    }
 
-	/************************************************************************************
-	 * public constructor with file name
-	 * 
-	 * @param in
-	 *            String with FileName
-	 ************************************************************************************/
-	public PDFTitlePageImage(String in) {
-		this.filename = in;
-	}
+    /************************************************************************************
+     * public constructor with file name
+     * 
+     * @param in String with FileName
+     ************************************************************************************/
+    public PDFTitlePageImage(String in) {
+        this.filename = in;
+    }
 
-	/**
-	 * @return the xCoordinate
-	 */
-	public float getXCoordinate() {
-		return this.xCoordinate;
-	}
+    /**
+     * @return the xCoordinate
+     */
+    public float getXCoordinate() {
+        return this.xCoordinate;
+    }
 
-	/**
-	 * @param coordinate
-	 *            the xCoordinate to set
-	 */
-	public void setXCoordinate(float coordinate) {
-		this.xCoordinate = coordinate;
-	}
+    /**
+     * @param coordinate the xCoordinate to set
+     */
+    public void setXCoordinate(float coordinate) {
+        this.xCoordinate = coordinate;
+    }
 
-	/**
-	 * @return the yCoordinate
-	 */
-	public float getYCoordinate() {
-		return this.yCoordinate;
-	}
+    /**
+     * @return the yCoordinate
+     */
+    public float getYCoordinate() {
+        return this.yCoordinate;
+    }
 
-	/**
-	 * @param coordinate
-	 *            the yCoordinate to set
-	 */
-	public void setYCoordinate(float coordinate) {
-		this.yCoordinate = coordinate;
-	}
+    /**
+     * @param coordinate the yCoordinate to set
+     */
+    public void setYCoordinate(float coordinate) {
+        this.yCoordinate = coordinate;
+    }
 
-	/**
-	 * @return the filename
-	 */
-	public String getFilename() {
-		return this.filename;
-	}
+    /**
+     * @return the filename
+     */
+    public String getFilename() {
+        return this.filename;
+    }
 
-	/**
-	 * @param filename
-	 *            the filename to set
-	 */
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
+    /**
+     * @param filename the filename to set
+     */
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
 
-	/**
-	 * @return the scalefactor
-	 */
-	public int getScalefactor() {
-		return this.scalefactor;
-	}
+    /**
+     * @return the scalefactor
+     */
+    public int getScalefactor() {
+        return this.scalefactor;
+    }
 
-	/**
-	 * @param scalefactor
-	 *            the scalefactor to set
-	 */
-	public void setScalefactor(int scalefactor) {
-		this.scalefactor = scalefactor;
-	}
+    /**
+     * @param scalefactor the scalefactor to set
+     */
+    public void setScalefactor(int scalefactor) {
+        this.scalefactor = scalefactor;
+    }
 
 }

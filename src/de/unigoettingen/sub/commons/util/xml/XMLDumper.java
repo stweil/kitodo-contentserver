@@ -38,16 +38,16 @@ import org.w3c.dom.Node;
 
 public class XMLDumper {
 
-	public static String NodeToString(Node node) {
-		StringWriter writer = new StringWriter();
-		try {
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "true");
-			transformer.transform(new DOMSource(node), new StreamResult(writer));
-		} catch (TransformerException t) {
-			throw new IllegalStateException(t);
-		}
-		return writer.toString();
-	}
-	
+    public static String nodeToString(Node node) {
+        StringWriter writer = new StringWriter();
+        try {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "true");
+            transformer.transform(new DOMSource(node), new StreamResult(writer));
+        } catch (TransformerException t) {
+            throw new IllegalStateException(t);
+        }
+        return writer.toString();
+    }
+
 }

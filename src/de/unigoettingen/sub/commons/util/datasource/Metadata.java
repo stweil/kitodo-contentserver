@@ -31,31 +31,31 @@ package de.unigoettingen.sub.commons.util.datasource;
  */
 public interface Metadata {
 
-	/**
-	 * Gets the title.
-	 * 
-	 * @return the title
-	 */
-	abstract String getTitle();
-	
-	/**
-	 * Gets the creator.
-	 * 
-	 * @return the creator
-	 */
-	abstract String getCreator();
-	
-	/**
-	 * Gets the keywords.
-	 * 
-	 * @return the keywords
-	 */
-	abstract String getKeywords();
-	
-	/**
-	 * Gets the subject.
-	 * 
-	 * @return the subject
-	 */
-	abstract String getSubject();
+    /**
+     * Gets the title.
+     * 
+     * @return the title
+     */
+    abstract String getTitle();
+
+    /**
+     * Gets the creator.
+     * 
+     * @return the creator
+     */
+    abstract String getCreator();
+
+    /**
+     * Gets the keywords.
+     * 
+     * @return the keywords
+     */
+    abstract String getKeywords();
+
+    /**
+     * Gets the subject.
+     * 
+     * @return the subject
+     */
+    abstract String getSubject();
 }

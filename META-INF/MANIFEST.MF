@@ -16,6 +16,6 @@ Export-Package: de.unigoettingen.sub.commons.contentlib.exceptions,
  de.unigoettingen.sub.commons.util.file,
  de.unigoettingen.sub.commons.util.stream,
  de.unigoettingen.sub.commons.util.xml,
- org.goobi.presentation.contentServlet.controller
+ org.goobi.presentation.contentservlet.controller
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

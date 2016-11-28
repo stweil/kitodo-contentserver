@@ -27,122 +27,119 @@ package de.unigoettingen.sub.commons.contentlib.pdflib;
 
 import de.unigoettingen.sub.commons.contentlib.pdflib.PDFManager.PdfPageSize;
 
-
 //TODO: GDZ: Merge with configuration for other PDF classes
 public class PDFConfiguration {
 
-	private boolean PdfDefaultAlwaysCompressToJPEG = true;
-	private boolean PdfDefaultAlwaysUseRenderedImage = true;
-	private boolean writeAsPdfA = true;
-	private String iccinputfilename = null;
-	private PdfPageSize pagesize = PdfPageSize.ORIGINAL;
-	private PDFTitlePage pdftitlepage = null;
+    private boolean pdfDefaultAlwaysCompressToJPEG = true;
+    private boolean pdfDefaultAlwaysUseRenderedImage = true;
+    private boolean writeAsPdfA = true;
+    private String iccinputfilename = null;
+    private PdfPageSize pagesize = PdfPageSize.ORIGINAL;
+    private PDFTitlePage pdftitlepage = null;
 
-	/**************************************************************************************
-	 * simple public constructor
-	 **************************************************************************************/
-	public PDFConfiguration() {
+    /**************************************************************************************
+     * simple public constructor
+     **************************************************************************************/
+    public PDFConfiguration() {
+        // may be used to instantiate subclasses
+    }
 
-	}
+    /*************************************************************************************
+     * Getter for pdfDefaultAlwaysCompressToJPEG
+     * 
+     * @return the pdfDefaultAlwaysCompressToJPEG
+     *************************************************************************************/
+    public boolean isPdfDefaultAlwaysCompressToJPEG() {
+        return pdfDefaultAlwaysCompressToJPEG;
+    }
 
-	/*************************************************************************************
-	 * Getter for pdfDefaultAlwaysCompressToJPEG
-	 *
-	 * @return the pdfDefaultAlwaysCompressToJPEG
-	 *************************************************************************************/
-	public boolean isPdfDefaultAlwaysCompressToJPEG() {
-		return PdfDefaultAlwaysCompressToJPEG;
-	}
+    /**************************************************************************************
+     * Setter for pdfDefaultAlwaysCompressToJPEG
+     * 
+     * @param pdfDefaultAlwaysCompressToJPEG the pdfDefaultAlwaysCompressToJPEG to set
+     **************************************************************************************/
+    public void setPdfDefaultAlwaysCompressToJPEG(boolean pdfDefaultAlwaysCompressToJPEG) {
+        this.pdfDefaultAlwaysCompressToJPEG = pdfDefaultAlwaysCompressToJPEG;
+    }
 
-	/**************************************************************************************
-	 * Setter for pdfDefaultAlwaysCompressToJPEG
-	 *
-	 * @param pdfDefaultAlwaysCompressToJPEG the pdfDefaultAlwaysCompressToJPEG to set
-	 **************************************************************************************/
-	public void setPdfDefaultAlwaysCompressToJPEG(boolean pdfDefaultAlwaysCompressToJPEG) {
-		PdfDefaultAlwaysCompressToJPEG = pdfDefaultAlwaysCompressToJPEG;
-	}
+    /*************************************************************************************
+     * Getter for pdfDefaultAlwaysUseRenderedImage
+     * 
+     * @return the pdfDefaultAlwaysUseRenderedImage
+     *************************************************************************************/
+    public boolean isPdfDefaultAlwaysUseRenderedImage() {
+        return pdfDefaultAlwaysUseRenderedImage;
+    }
 
-	/*************************************************************************************
-	 * Getter for pdfDefaultAlwaysUseRenderedImage
-	 *
-	 * @return the pdfDefaultAlwaysUseRenderedImage
-	 *************************************************************************************/
-	public boolean isPdfDefaultAlwaysUseRenderedImage() {
-		return PdfDefaultAlwaysUseRenderedImage;
-	}
+    /**************************************************************************************
+     * Setter for pdfDefaultAlwaysUseRenderedImage
+     * 
+     * @param pdfDefaultAlwaysUseRenderedImage the pdfDefaultAlwaysUseRenderedImage to set
+     **************************************************************************************/
+    public void setPdfDefaultAlwaysUseRenderedImage(boolean pdfDefaultAlwaysUseRenderedImage) {
+        this.pdfDefaultAlwaysUseRenderedImage = pdfDefaultAlwaysUseRenderedImage;
+    }
 
-	/**************************************************************************************
-	 * Setter for pdfDefaultAlwaysUseRenderedImage
-	 *
-	 * @param pdfDefaultAlwaysUseRenderedImage the pdfDefaultAlwaysUseRenderedImage to set
-	 **************************************************************************************/
-	public void setPdfDefaultAlwaysUseRenderedImage(boolean pdfDefaultAlwaysUseRenderedImage) {
-		PdfDefaultAlwaysUseRenderedImage = pdfDefaultAlwaysUseRenderedImage;
-	}
+    /*************************************************************************************
+     * Getter for writeAsPdfA
+     * 
+     * @return the writeAsPdfA
+     *************************************************************************************/
+    public boolean isWriteAsPdfA() {
+        return writeAsPdfA;
+    }
 
-	/*************************************************************************************
-	 * Getter for writeAsPdfA
-	 *
-	 * @return the writeAsPdfA
-	 *************************************************************************************/
-	public boolean isWriteAsPdfA() {
-		return writeAsPdfA;
-	}
+    /**************************************************************************************
+     * Setter for writeAsPdfA
+     * 
+     * @param writeAsPdfA the writeAsPdfA to set
+     **************************************************************************************/
+    public void setWriteAsPdfA(boolean writeAsPdfA) {
+        this.writeAsPdfA = writeAsPdfA;
+    }
 
-	/**************************************************************************************
-	 * Setter for writeAsPdfA
-	 *
-	 * @param writeAsPdfA the writeAsPdfA to set
-	 **************************************************************************************/
-	public void setWriteAsPdfA(boolean writeAsPdfA) {
-		this.writeAsPdfA = writeAsPdfA;
-	}
+    /*************************************************************************************
+     * Getter for iccinputfilename
+     * 
+     * @return the iccinputfilename
+     *************************************************************************************/
+    public String getIccinputfilename() {
+        return iccinputfilename;
+    }
 
-	/*************************************************************************************
-	 * Getter for iccinputfilename
-	 *
-	 * @return the iccinputfilename
-	 *************************************************************************************/
-	public String getIccinputfilename() {
-		return iccinputfilename;
-	}
+    /**************************************************************************************
+     * Setter for iccinputfilename
+     * 
+     * @param iccinputfilename the iccinputfilename to set
+     **************************************************************************************/
+    public void setIccinputfilename(String iccinputfilename) {
+        this.iccinputfilename = iccinputfilename;
+    }
 
-	/**************************************************************************************
-	 * Setter for iccinputfilename
-	 *
-	 * @param iccinputfilename the iccinputfilename to set
-	 **************************************************************************************/
-	public void setIccinputfilename(String iccinputfilename) {
-		this.iccinputfilename = iccinputfilename;
-	}
+    /*************************************************************************************
+     * Getter for pdftitlepage
+     * 
+     * @return the pdftitlepage
+     *************************************************************************************/
+    public PDFTitlePage getPdftitlepage() {
+        return pdftitlepage;
+    }
 
+    /**************************************************************************************
+     * Setter for pdftitlepage
+     * 
+     * @param pdftitlepage the pdftitlepage to set
+     **************************************************************************************/
+    public void setPdftitlepage(PDFTitlePage pdftitlepage) {
+        this.pdftitlepage = pdftitlepage;
+    }
 
+    public void setPagesize(PdfPageSize pagesize) {
+        this.pagesize = pagesize;
+    }
 
-	/*************************************************************************************
-	 * Getter for pdftitlepage
-	 *
-	 * @return the pdftitlepage
-	 *************************************************************************************/
-	public PDFTitlePage getPdftitlepage() {
-		return pdftitlepage;
-	}
-
-	/**************************************************************************************
-	 * Setter for pdftitlepage
-	 *
-	 * @param pdftitlepage the pdftitlepage to set
-	 **************************************************************************************/
-	public void setPdftitlepage(PDFTitlePage pdftitlepage) {
-		this.pdftitlepage = pdftitlepage;
-	}
-
-	public void setPagesize(PdfPageSize pagesize) {
-		this.pagesize = pagesize;
-	}
-
-	public PdfPageSize getPagesize() {
-		return pagesize;
-	}
+    public PdfPageSize getPagesize() {
+        return pagesize;
+    }
 
 }

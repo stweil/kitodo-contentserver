@@ -25,51 +25,50 @@
  */
 package de.unigoettingen.sub.commons.contentlib.exceptions;
 
-
 /************************************************************************************
  * CacheException.
  * 
  * @version 15.01.2009 
  * @author Steffen Hankiewicz
- * @author Igor Toker
- * ******************************************************************************** */
+ * @author Igor Toker ********************************************************************************
+ */
 public class CacheException extends Exception {
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -8063045883493803853L;
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID = -8063045883493803853L;
 
-	/**
-	 * Instantiates a new cache exception.
-	 */
-	public CacheException() {
-		super();
-	}
+    /**
+     * Instantiates a new cache exception.
+     */
+    public CacheException() {
+        super();
+    }
 
-	/**
-	 * Instantiates a new cache exception.
-	 * 
-	 * @param inMessage the in message
-	 */
-	public CacheException(String inMessage) {
-		super(inMessage);
-	}
+    /**
+     * Instantiates a new cache exception.
+     * 
+     * @param inMessage the in message
+     */
+    public CacheException(String inMessage) {
+        super(inMessage);
+    }
 
-	/**
-	 * Instantiates a new cache exception.
-	 * 
-	 * @param incause the incause
-	 */
-	public CacheException(Throwable incause) {
-		super(incause);
-	}
+    /**
+     * Instantiates a new cache exception.
+     * 
+     * @param incause the incause
+     */
+    public CacheException(Throwable incause) {
+        super(incause);
+    }
 
-	/**
-	 * Instantiates a new cache exception.
-	 * 
-	 * @param inMessage the in message
-	 * @param incause the incause
-	 */
-	public CacheException(String inMessage, Throwable incause) {
-		super(inMessage, incause);
-	}
+    /**
+     * Instantiates a new cache exception.
+     * 
+     * @param inMessage the in message
+     * @param incause the incause
+     */
+    public CacheException(String inMessage, Throwable incause) {
+        super(inMessage, incause);
+    }
 
 }

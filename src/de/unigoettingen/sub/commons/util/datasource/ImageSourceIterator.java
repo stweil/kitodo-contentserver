@@ -26,58 +26,69 @@ import java.util.NoSuchElementException;
 //import org.apache.log4j.Logger;
 
 public class ImageSourceIterator implements Iterator<Image>, Iterable<Image> {
-	//protected static Logger logger = Logger.getLogger(ImageSourceIterator.class);
+    // protected static Logger logger = Logger.getLogger(ImageSourceIterator.class);
 
-	ImageSource is = null;
-	Integer pageNr = -1;
+    ImageSource is = null;
+    Integer pageNr = -1;
 
-	/**
-	 * Instantiates a new image source iterator.
-	 * 
-	 * @param is the ImageSource
-	 */
-	public ImageSourceIterator(ImageSource is) {
-		this.is = is;
-	}
+    /**
+     * Instantiates a new image source iterator.
+     * 
+     * @param is the ImageSource
+     */
+    public ImageSourceIterator(ImageSource is) {
+        this.is = is;
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Iterator#hasNext()
-	 */
-	public boolean hasNext() {
-		if (pageNr < is.getNumberOfPages()) {
-			return true;
-		}
-		return false;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.util.Iterator#hasNext()
+     */
+    @Override
+    public boolean hasNext() {
+        if (pageNr < is.getNumberOfPages()) {
+            return true;
+        }
+        return false;
+    }
 
-	/* (non-Javadoc)
-	 * @see java.util.Iterator#next()
-	 */
-	public Image next() {
-		pageNr++;
-		if (!hasNext()) {
-			throw new NoSuchElementException();
-		}
-		
-		try {
-			return is.getImage(pageNr);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.util.Iterator#next()
+     */
+    @Override
+    public Image next() {
+        pageNr++;
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
 
-	/* (non-Javadoc)
-	 * @see java.util.Iterator#remove()
-	 */
-	public void remove() {
-		throw new UnsupportedOperationException();
-	}
+        try {
+            return is.getImage(pageNr);
+        } catch (IOException e) {
+            return null;
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Iterable#iterator()
-	 */
-	public Iterator<Image> iterator() {
-		return this;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.util.Iterator#remove()
+     */
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Iterable#iterator()
+     */
+    @Override
+    public Iterator<Image> iterator() {
+        return this;
+    }
 }

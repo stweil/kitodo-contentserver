@@ -39,99 +39,117 @@ import java.util.Map;
  * The Class DirectoryListingUrlImageSource.
  */
 public class DirectoryListingUrlImageSource implements ImageSource {
-	
-	/** The dir. */
-	protected File dir = null;
-	
-	/** The files. */
-	private List<File> files = null;
-	
-	/**
-	 * Instantiates a new directory listing url image source.
-	 * 
-	 * @param dir the dir
-	 */
-	public DirectoryListingUrlImageSource (File dir) {
-		this.dir = dir;
-	}
 
-	/* (non-Javadoc)
-	 * @see de.unigoettingen.sub.commons.util.datasource.ImageSource#getImage(java.lang.Integer)
-	 */
-	public Image getImage(Integer pageNr) throws IOException {
-		init();
-		SimpleUrlImage img = new SimpleUrlImage();
-		img.setPageNumber(pageNr);
-		img.setURL(files.get(pageNr).toURI().toURL());
-		return img;
-	}
+    /** The dir. */
+    protected File dir = null;
 
-	/* (non-Javadoc)
-	 * @see de.unigoettingen.sub.commons.util.datasource.ImageSource#getImageList()
-	 */
-	public List<? extends Image> getImageList() throws IOException {
-		init();
-		List<SimpleUrlImage> images = new ArrayList<SimpleUrlImage>();
-		for (int i = 0; i < files.size(); i++) {
-			SimpleUrlImage img = new SimpleUrlImage();
-			img.setPageNumber(i + 1);
-			img.setURL(files.get(i).toURI().toURL());
-			images.add(img);
-		}
-		return images;
-	}
+    /** The files. */
+    private List<File> files = null;
 
-	/* (non-Javadoc)
-	 * @see de.unigoettingen.sub.commons.util.datasource.ImageSource#getImageMap()
-	 */
-	public Map<Integer, ? extends Image> getImageMap() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Instantiates a new directory listing url image source.
+     * 
+     * @param dir the dir
+     */
+    public DirectoryListingUrlImageSource(File dir) {
+        this.dir = dir;
+    }
 
-	/* (non-Javadoc)
-	 * @see de.unigoettingen.sub.commons.util.datasource.ImageSource#getNumberOfPages()
-	 */
-	public Integer getNumberOfPages() {
-		try {
-			init();
-		} catch (IOException e) {
-			return 0;
-		}
-		return files.size();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.unigoettingen.sub.commons.util.datasource.ImageSource#getImage(java.lang.Integer)
+     */
+    @Override
+    public Image getImage(Integer pageNr) throws IOException {
+        init();
+        SimpleUrlImage img = new SimpleUrlImage();
+        img.setPageNumber(pageNr);
+        img.setURL(files.get(pageNr).toURI().toURL());
+        return img;
+    }
 
-	/* (non-Javadoc)
-	 * @see de.unigoettingen.sub.commons.util.datasource.DataSource#close()
-	 */
-	public void close() throws IOException {
-		//Do nothing
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.unigoettingen.sub.commons.util.datasource.ImageSource#getImageList()
+     */
+    @Override
+    public List<? extends Image> getImageList() throws IOException {
+        init();
+        List<SimpleUrlImage> images = new ArrayList<SimpleUrlImage>();
+        for (int i = 0; i < files.size(); i++) {
+            SimpleUrlImage img = new SimpleUrlImage();
+            img.setPageNumber(i + 1);
+            img.setURL(files.get(i).toURI().toURL());
+            images.add(img);
+        }
+        return images;
+    }
 
-	/* (non-Javadoc)
-	 * @see de.unigoettingen.sub.commons.util.datasource.DataSource#getUrl()
-	 */
-	public URL getUrl() {
-		try {
-			return dir.toURI().toURL();
-		} catch (MalformedURLException e) {
-			return null;
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.unigoettingen.sub.commons.util.datasource.ImageSource#getImageMap()
+     */
+    @Override
+    public Map<Integer, ? extends Image> getImageMap() throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	/**
-	 * Checks the given directory and add its contens as list
-	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	private void init () throws IOException {
-		if (files == null) {
-			if (!dir.isDirectory()) {
-				throw new IOException("Given File is not a directory");
-			}
-			files = Arrays.asList(dir.listFiles());
-			//TODO: Filter for supported Filetypes
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.unigoettingen.sub.commons.util.datasource.ImageSource#getNumberOfPages()
+     */
+    @Override
+    public Integer getNumberOfPages() {
+        try {
+            init();
+        } catch (IOException e) {
+            return 0;
+        }
+        return files.size();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.unigoettingen.sub.commons.util.datasource.DataSource#close()
+     */
+    @Override
+    public void close() throws IOException {
+        // Do nothing
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.unigoettingen.sub.commons.util.datasource.DataSource#getUrl()
+     */
+    @Override
+    public URL getUrl() {
+        try {
+            return dir.toURI().toURL();
+        } catch (MalformedURLException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Checks the given directory and add its contens as list
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    private void init() throws IOException {
+        if (files == null) {
+            if (!dir.isDirectory()) {
+                throw new IOException("Given File is not a directory");
+            }
+            files = Arrays.asList(dir.listFiles());
+            // TODO: Filter for supported Filetypes
+        }
+    }
 
 }

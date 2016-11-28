@@ -39,30 +39,31 @@ import java.util.Comparator;
  ************************************************************************************/
 public class DivComparatorIncreasing implements Comparator<DivType> {
 
-	public int compare(DivType arg0, DivType arg1) {
+    @Override
+    public int compare(DivType arg0, DivType arg1) {
 
-		BigInteger x = arg0.getORDER();
-		BigInteger y = arg1.getORDER();
+        BigInteger x = arg0.getORDER();
+        BigInteger y = arg1.getORDER();
 
-		if ((x == null) && (y == null)) {
-			return 0;
-		}
-		if (x == null) {
-			return 1;
-		}
-		if (y == null) {
-			return -1;
-		}
+        if ((x == null) && (y == null)) {
+            return 0;
+        }
+        if (x == null) {
+            return 1;
+        }
+        if (y == null) {
+            return -1;
+        }
 
-		if (x.compareTo(y) == -1) {
-			// x < y
-			return -1;
-		} else if (x.compareTo(y) == 1) {
-			// x > y
-			return 1;
-		} else {
-			return 0;
-		}
+        if (x.compareTo(y) == -1) {
+            // x < y
+            return -1;
+        } else if (x.compareTo(y) == 1) {
+            // x > y
+            return 1;
+        } else {
+            return 0;
+        }
 
-	}
+    }
 }

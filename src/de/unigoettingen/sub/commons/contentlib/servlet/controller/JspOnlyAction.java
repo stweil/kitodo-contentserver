@@ -45,69 +45,63 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
  * @author Steffen Hankiewicz
  ************************************************************************************/
 public class JspOnlyAction implements Action {
-	private static final Logger logger = Logger.getLogger(JspOnlyAction.class);
-	private String url;
+    private static final Logger LOGGER = Logger.getLogger(JspOnlyAction.class);
+    private String url;
 
-	/************************************************************************************
-	 * Default Constructor sets the jsp url to echo
-	 ************************************************************************************/
-	public JspOnlyAction() {
-		this.url = "/" + "echo.jsp";
-	}
+    /************************************************************************************
+     * Default Constructor sets the jsp url to echo
+     ************************************************************************************/
+    public JspOnlyAction() {
+        this.url = "/" + "echo.jsp";
+    }
 
-	/************************************************************************************
-	 * Constructor for setting the action string directly
-	 * 
-	 * @param actionString
-	 *            {@link String} Name of jsp file (without file extension and
-	 *            path)
-	 ************************************************************************************/
-	public JspOnlyAction(String actionString) {
-		this.url = "/" + actionString + ".jsp";
-	}
+    /************************************************************************************
+     * Constructor for setting the action string directly
+     * 
+     * @param actionString {@link String} Name of jsp file (without file extension and path)
+     ************************************************************************************/
+    public JspOnlyAction(String actionString) {
+        this.url = "/" + actionString + ".jsp";
+    }
 
-	/************************************************************************************
-	 * Setter for the url of the jsp file
-	 * 
-	 * @param url
-	 *            {@link String} Name of jsp file (without file extension and
-	 *            path)
-	 ************************************************************************************/
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    /************************************************************************************
+     * Setter for the url of the jsp file
+     * 
+     * @param url {@link String} Name of jsp file (without file extension and path)
+     ************************************************************************************/
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	/************************************************************************************
-	 * Action to forward response to requested jsp file
-	 * 
-	 * @param request
-	 *            {@link HttpServletRequest} of ServletRequest
-	 * @param response
-	 *            {@link HttpServletResponse} for writing to response output
-	 *            stream
-	 * @throws IOException
-	 * @throws ServletException
-	 * @throws ContentLibException
-	 ************************************************************************************/
-	public void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentLibException {
-		logger.debug("jspOnlyAction: " + url);
-		// forward request to jsp
-		RequestDispatcher dispatcher = servletContext.getRequestDispatcher(url);
-		dispatcher.forward(request, response);
-	}
+    /************************************************************************************
+     * Action to forward response to requested jsp file
+     * 
+     * @param request {@link HttpServletRequest} of ServletRequest
+     * @param response {@link HttpServletResponse} for writing to response output stream
+     * @throws IOException
+     * @throws ServletException
+     * @throws ContentLibException
+     ************************************************************************************/
+    @Override
+    public void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        LOGGER.debug("jspOnlyAction: " + url);
+        // forward request to jsp
+        RequestDispatcher dispatcher = servletContext.getRequestDispatcher(url);
+        dispatcher.forward(request, response);
+    }
 
-	/************************************************************************************
-	 * validate correct url for jsp file
-	 * 
-	 * @param request
-	 *            {@link HttpServletRequest} of ServletRequest
-	 * @throws IllegalArgumentException
-	 ************************************************************************************/
-	public void validateParameters(HttpServletRequest request) throws IllegalArgumentException {
-		/* validate if url is valid */
-		String[] jspfiles = new String[] { "echo", "help", "about" };
-		if (!Arrays.asList(jspfiles).contains(url)) {
-			throw new IllegalArgumentException("requested file url unknown");
-		}
-	}
+    /************************************************************************************
+     * validate correct url for jsp file
+     * 
+     * @param request {@link HttpServletRequest} of ServletRequest
+     * @throws IllegalArgumentException
+     ************************************************************************************/
+    @Override
+    public void validateParameters(HttpServletRequest request) throws IllegalArgumentException {
+        /* validate if url is valid */
+        String[] jspfiles = new String[] { "echo", "help", "about" };
+        if (!Arrays.asList(jspfiles).contains(url)) {
+            throw new IllegalArgumentException("requested file url unknown");
+        }
+    }
 }

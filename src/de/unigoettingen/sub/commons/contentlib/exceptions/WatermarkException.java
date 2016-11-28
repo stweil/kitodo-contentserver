@@ -25,6 +25,8 @@
  */
 package de.unigoettingen.sub.commons.contentlib.exceptions;
 
+import de.unigoettingen.sub.commons.contentlib.imagelib.Watermark;
+
 /************************************************************************************
  * Exception for watermark handling by {@link Watermark}.
  * 
@@ -34,45 +36,41 @@ package de.unigoettingen.sub.commons.contentlib.exceptions;
  * *********************************************************************************/
 public class WatermarkException extends ContentLibPdfException {
 
-	private static final long serialVersionUID = 20081101L;
+    private static final long serialVersionUID = 20081101L;
 
-	/**
-	 * Instantiates a new watermark exception.
-	 */
-	public WatermarkException() {
-		super();
-	}
+    /**
+     * Instantiates a new watermark exception.
+     */
+    public WatermarkException() {
+        super();
+    }
 
-	/**
-	 * Instantiates a new watermark exception.
-	 * 
-	 * @param inMessage
-	 *            the in message
-	 */
-	public WatermarkException(final String inMessage) {
-		super(inMessage);
-	}
+    /**
+     * Instantiates a new watermark exception.
+     * 
+     * @param inMessage the in message
+     */
+    public WatermarkException(final String inMessage) {
+        super(inMessage);
+    }
 
-	/**
-	 * Instantiates a new watermark exception.
-	 * 
-	 * @param incause
-	 *            the incause
-	 */
-	public WatermarkException(final Throwable incause) {
-		super(incause);
-	}
+    /**
+     * Instantiates a new watermark exception.
+     * 
+     * @param incause the incause
+     */
+    public WatermarkException(final Throwable incause) {
+        super(incause);
+    }
 
-	/**
-	 * Instantiates a new watermark exception.
-	 * 
-	 * @param inMessage
-	 *            the in message
-	 * @param incause
-	 *            the incause
-	 */
-	public WatermarkException(final String inMessage, final Throwable incause) {
-		super(inMessage, incause);
-	}
+    /**
+     * Instantiates a new watermark exception.
+     * 
+     * @param inMessage the in message
+     * @param incause the incause
+     */
+    public WatermarkException(final String inMessage, final Throwable incause) {
+        super(inMessage, incause);
+    }
 
 }

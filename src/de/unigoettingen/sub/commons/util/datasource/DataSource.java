@@ -33,18 +33,18 @@ import java.net.URL;
  * The Interface DataSource.
  */
 public interface DataSource {
-	
-	/**
-	 * Gets the URL.
-	 * 
-	 * @return the URL
-	 */
-	abstract URL getUrl ();
 
-	/**
-	 * Close.
-	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	abstract void close () throws IOException;
+    /**
+     * Gets the URL.
+     * 
+     * @return the URL
+     */
+    abstract URL getUrl();
+
+    /**
+     * Close.
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    abstract void close() throws IOException;
 }

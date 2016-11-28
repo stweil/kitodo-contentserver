@@ -33,40 +33,38 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.unigoettingen.sub.commons.contentlib.exceptions.CacheException;
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
+import de.unigoettingen.sub.commons.simplemets.exceptions.MetsException;
 
 /************************************************************************************
- * interface for all current and future actions of the image servlet currently
- * there are only two important methods to implement: run and validateParameters
+ * interface for all current and future actions of the image servlet currently there are only two important methods to implement: run and
+ * validateParameters
  * 
  * @version 02.01.2009 
  * @author Steffen Hankiewicz
  ************************************************************************************/
 public interface Action {
 
-	/************************************************************************************
-	 * exectute execute the Action method and write response to response stream
-	 * 
-	 * @param request
-	 *            {@link HttpServletRequest} of ServletRequest
-	 * @param response
-	 *            {@link HttpServletResponse} for writing to response output
-	 *            stream
-	 * @throws IOException
-	 * @throws ServletException
-	 * @throws ContentLibException
-	 * @throws URISyntaxException
-	 ************************************************************************************/
-	abstract void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws Exception;
+    /************************************************************************************
+     * exectute execute the Action method and write response to response stream
+     * 
+     * @param request {@link HttpServletRequest} of ServletRequest
+     * @param response {@link HttpServletResponse} for writing to response output stream
+     * @throws IOException
+     * @throws ServletException
+     * @throws ContentLibException
+     * @throws URISyntaxException
+     ************************************************************************************/
+    abstract void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws IOException,
+            URISyntaxException, ServletException, ContentLibException, MetsException, CacheException;
 
-	/************************************************************************************
-	 * validate all parameters of request, throws exception if one request
-	 * parameter is not valid
-	 * 
-	 * @param request
-	 *            {@link HttpServletRequest} of ServletRequest
-	 * @throws IllegalArgumentException
-	 ************************************************************************************/
-	abstract void validateParameters(HttpServletRequest request) throws IllegalArgumentException;
+    /************************************************************************************
+     * validate all parameters of request, throws exception if one request parameter is not valid
+     * 
+     * @param request {@link HttpServletRequest} of ServletRequest
+     * @throws IllegalArgumentException
+     ************************************************************************************/
+    abstract void validateParameters(HttpServletRequest request) throws IllegalArgumentException;
 
 }

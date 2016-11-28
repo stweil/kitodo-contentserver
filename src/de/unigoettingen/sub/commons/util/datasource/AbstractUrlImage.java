@@ -32,68 +32,74 @@ import java.net.URL;
 
 public abstract class AbstractUrlImage implements UrlImage {
 
-	protected URL url;
-	protected Integer pagenumber;
+    protected URL url;
+    protected Integer pagenumber;
 
-	/*************************************************************************************
-	 * Getter for pagenumber
-	 *
-	 * @return the pagenumber
-	 *************************************************************************************/
-	public Integer getPageNumber() {
-		if (pagenumber == null) {
-			return 1;
-		}
-		return pagenumber;
-	}
+    /*************************************************************************************
+     * Getter for pagenumber
+     * 
+     * @return the pagenumber
+     *************************************************************************************/
+    @Override
+    public Integer getPageNumber() {
+        if (pagenumber == null) {
+            return 1;
+        }
+        return pagenumber;
+    }
 
-	/*************************************************************************************
-	 * Getter for url
-	 *
-	 * @return the url
-	 *************************************************************************************/
-	public URL getURL() {
-		return url;
-	}
-	
+    /*************************************************************************************
+     * Getter for url
+     * 
+     * @return the url
+     *************************************************************************************/
+    @Override
+    public URL getURL() {
+        return url;
+    }
 
-	/**************************************************************************************
-	 * Setter for url
-	 *
-	 * @param url the imageurl to set
-	 **************************************************************************************/
-	public void setURL(URL imageurl) {
-		this.url = imageurl;
-	}
-	
-	/**************************************************************************************
-	 * Setter for pagenumber
-	 *
-	 * @param pagenumber the pagenumber to set
-	 **************************************************************************************/
-	public void setPageNumber(Integer pagenumber) {
-		this.pagenumber = pagenumber;
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.unigoettingen.commons.util.datasource.Image#openStream()
-	 */
-	public InputStream openStream() throws IOException {
-		if (url == null) {
-			throw new IllegalStateException("URL is null");
-		}
-		return url.openStream();
-	}
-	
-	/**
-	 * Get rendered image. (Throws a UnsupportedOperationException)
-	 * 
-	 * @see de.unigoettingen.sub.commons.util.datasource.Image#getRenderedImage()
-	 * 
-	 * @return the rendered image
-	 */
-	public RenderedImage getRenderedImage () {
-		throw new UnsupportedOperationException("Method getRenderedImage() not implemented in AbstractUrlImage!");
-	}
+    /**************************************************************************************
+     * Setter for url
+     * 
+     * @param url the imageurl to set
+     **************************************************************************************/
+    @Override
+    public void setURL(URL imageurl) {
+        this.url = imageurl;
+    }
+
+    /**************************************************************************************
+     * Setter for pagenumber
+     * 
+     * @param pagenumber the pagenumber to set
+     **************************************************************************************/
+    public void setPageNumber(Integer pagenumber) {
+        this.pagenumber = pagenumber;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.unigoettingen.commons.util.datasource.Image#openStream()
+     */
+    @Override
+    public InputStream openStream() throws IOException {
+        if (url == null) {
+            throw new IllegalStateException("URL is null");
+        }
+        return url.openStream();
+    }
+
+    /**
+     * Get rendered image. (Throws a UnsupportedOperationException)
+     * 
+     * @see de.unigoettingen.sub.commons.util.datasource.Image#getRenderedImage()
+     * 
+     * @return the rendered image
+     */
+    @Override
+    public RenderedImage getRenderedImage() {
+        throw new UnsupportedOperationException("Method getRenderedImage() not implemented in AbstractUrlImage!");
+    }
 
 }

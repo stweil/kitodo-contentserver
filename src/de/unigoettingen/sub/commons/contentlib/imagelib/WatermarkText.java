@@ -50,300 +50,290 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.WatermarkException;
  * @author Igor Toker
  ************************************************************************************/
 public class WatermarkText extends WatermarkComponent {
-	private static final Logger logger = Logger.getLogger(WatermarkText.class);
+    private static final Logger LOGGER = Logger.getLogger(WatermarkText.class);
 
-	String content = null;
-	String font = null;
-	int fontstyle = Font.PLAIN;
-	Color fontcolor = new Color(1f, 1f, 1f);
-	int fontsize = 12;
-	String origin = "left"; // origin of the coordinate system
+    String content = null;
+    String font = null;
+    int fontstyle = Font.PLAIN;
+    Color fontcolor = new Color(1f, 1f, 1f);
+    int fontsize = 12;
+    String origin = "left"; // origin of the coordinate system
 
+    /*************************************************************************************
+     * Constructor with inContent as {@link String} for content
+     ************************************************************************************/
+    public WatermarkText(int id, String inContent) {
+        super(id);
+        content = inContent;
+    }
 
-	/*************************************************************************************
-	 * Constructor with inContent as {@link String} for content
-	 ************************************************************************************/
-	public WatermarkText(int id, String inContent) {
-		super(id);
-		content = inContent;
-	}
+    public WatermarkText(Node configNode) throws WatermarkException {
+        super(configNode);
+        NamedNodeMap nnm = configNode.getAttributes();
+        if (nnm != null) {
+            Node fontnamenode = nnm.getNamedItem("fontname");
+            Node fontsizenode = nnm.getNamedItem("fontsize");
+            // Node fontstylenode = nnm.getNamedItem("fontstyle");
+            Node colornode = nnm.getNamedItem("fontcolor");
 
-	public WatermarkText(Node configNode) throws WatermarkException {
-		super(configNode);
-		NamedNodeMap nnm = configNode.getAttributes();
-		if (nnm != null) {
-			Node fontnamenode = nnm.getNamedItem("fontname");
-			Node fontsizenode = nnm.getNamedItem("fontsize");
-			// Node fontstylenode = nnm.getNamedItem("fontstyle");
-			Node colornode = nnm.getNamedItem("fontcolor");
+            Node xnode = nnm.getNamedItem("x");
+            Node ynode = nnm.getNamedItem("y");
 
-			Node xnode = nnm.getNamedItem("x");
-			Node ynode = nnm.getNamedItem("y");
+            Node originnode = nnm.getNamedItem("origin");
 
-			Node originnode = nnm.getNamedItem("origin");
+            // read x and y
+            // x coordinate
+            if (xnode != null) {
+                String value = xnode.getNodeValue();
+                try {
+                    this.x = Integer.parseInt(value);
+                } catch (Exception e) {
+                    LOGGER.error("Invalid value for x-coordinate for Watermark Text");
+                    throw new WatermarkException("Invalid value for x-coordinate for Watermark Text", e);
+                }
+            } else {
+                this.x = 0;
+            }
 
-			// read x and y
-			// x coordinate
-			if (xnode != null) {
-				String value = xnode.getNodeValue();
-				try {
-					this.x = Integer.parseInt(value);
-				} catch (Exception e) {
-					logger.error("Invalid value for x-coordinate for Watermark Text");
-					throw new WatermarkException("Invalid value for x-coordinate for Watermark Text", e);
-				}
-			} else {
-				this.x = 0;
-			}
+            // y coordinate
+            if (ynode != null) {
+                String value = ynode.getNodeValue();
+                try {
+                    this.y = Integer.parseInt(value);
+                } catch (Exception e) {
+                    LOGGER.error("Invalid value for y-coordinate for Watermark Text");
+                    throw new WatermarkException("Invalid value for y-coordinate for Watermark Text", e);
+                }
+            } else {
+                this.y = 0;
+            }
 
-			// y coordinate
-			if (ynode != null) {
-				String value = ynode.getNodeValue();
-				try {
-					this.y = Integer.parseInt(value);
-				} catch (Exception e) {
-					logger.error("Invalid value for y-coordinate for Watermark Text");
-					throw new WatermarkException("Invalid value for y-coordinate for Watermark Text", e);
-				}
-			} else {
-				this.y = 0;
-			}
+            if (originnode != null) {
+                String value = originnode.getNodeValue();
+                if ((!value.equalsIgnoreCase("left")) && (!value.equalsIgnoreCase("right")) && (!value.equalsIgnoreCase("center"))) {
+                    LOGGER.error("origin node has invalid value for Watermark Image");
+                    throw new WatermarkException("origin node has invalid value for Watermark Image");
+                } else {
+                    origin = value;
+                }
+            }
 
-			if (originnode != null) {
-				String value = originnode.getNodeValue();
-				if ((!value.equalsIgnoreCase("left")) && (!value.equalsIgnoreCase("right")) && (!value.equalsIgnoreCase("center"))) {
-					logger.error("origin node has invalid value for Watermark Image");
-					throw new WatermarkException("origin node has invalid value for Watermark Image");
-				} else {
-					origin = value;
-				}
-			}
+            // read font information
+            if (fontnamenode != null) {
+                font = fontnamenode.getNodeValue();
+                if (!isFontKnown(font)) {
+                    LOGGER.error("Unknown font for text (" + font + ")");
+                    throw new WatermarkException("Unknown font for text (" + font + ")");
+                }
+            } else {
+                font = "Serif";
+            }
 
-			// read font information
-			if (fontnamenode != null) {
-				font = fontnamenode.getNodeValue();
-				if (!isFontKnown(font)) {
-					logger.error("Unknown font for text (" + font + ")");
-					throw new WatermarkException("Unknown font for text (" + font + ")");
-				}
-			} else {
-				font = "Serif";
-			}
+            // read font size
+            if (fontsizenode != null) {
+                String fontsize_str = fontsizenode.getNodeValue();
+                try {
+                    fontsize = Integer.parseInt(fontsize_str);
+                } catch (Exception e) {
+                    LOGGER.error("Invalid value for fontsize for Watermark Text");
+                    throw new WatermarkException("Invalid value for fontsize for Watermark Text", e);
+                }
+            }
 
-			// read font size
-			if (fontsizenode != null) {
-				String fontsize_str = fontsizenode.getNodeValue();
-				try {
-					fontsize = Integer.parseInt(fontsize_str);
-				} catch (Exception e) {
-					logger.error("Invalid value for fontsize for Watermark Text");
-					throw new WatermarkException("Invalid value for fontsize for Watermark Text", e);
-				}
-			}
+            // read the color
+            if (colornode != null) {
+                String colorstring = colornode.getNodeValue();
+                // split string into compontents
+                String r = colorstring.substring(0, 2);
+                String g = colorstring.substring(2, 4);
+                String b = colorstring.substring(4, 6);
 
-			// read the color
-			if (colornode != null) {
-				String colorstring = colornode.getNodeValue();
-				// split string into compontents
-				if (colorstring.length() < 6) {
-					// invalid string
-				}
-				String r = colorstring.substring(0, 2);
-				String g = colorstring.substring(2, 4);
-				String b = colorstring.substring(4, 6);
+                // convert hexadecimals into decimals
 
-				// convert hexadecimals into decimals
+                try {
+                    int r_int = Integer.parseInt(r, 16);
+                    int g_int = Integer.parseInt(g, 16);
+                    int b_int = Integer.parseInt(b, 16);
 
-				try {
-					int r_int = Integer.parseInt(r, 16);
-					int g_int = Integer.parseInt(g, 16);
-					int b_int = Integer.parseInt(b, 16);
+                    fontcolor = new Color(r_int, g_int, b_int);
+                } catch (Exception e) {
+                    LOGGER.error("Invalid value for fontsize for Watermark Text");
+                    throw new WatermarkException("Invalid value for fontsize for Watermark Text", e);
+                }
 
-					fontcolor = new Color(r_int, g_int, b_int);
-				} catch (Exception e) {
-					logger.error("Invalid value for fontsize for Watermark Text");
-					throw new WatermarkException("Invalid value for fontsize for Watermark Text", e);
-				}
+            }
+        }
+        // read the content
 
-			}
-		}
-		// read the content
+        NodeList nl = configNode.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node n = nl.item(i);
+            if (n.getNodeType() == Node.TEXT_NODE) {
+                this.content = n.getNodeValue();
+                break; // get out of loop, we found the content
+            }
+        }
 
-		NodeList nl = configNode.getChildNodes();
-		for (int i = 0; i < nl.getLength(); i++) {
-			Node n = nl.item(i);
-			if (n.getNodeType() == Node.TEXT_NODE) {
-				this.content = n.getNodeValue();
-				break; // get out of loop, we found the content
-			}
-		}
+        if (content == null) {
+            LOGGER.error("No content for Watermark Text");
+            throw new WatermarkException("No content for Watermark Text");
+        }
+    }
 
-		if (content == null) {
-			logger.error("No content for Watermark Text");
-			throw new WatermarkException("No content for Watermark Text");
-		}
-	}
+    /**
+     * find if font is known and available
+     * 
+     * @TODO needs to be rewritten using the getAllAvailableFontFamilyNames method
+     * @param font
+     * @return true if font is known
+     */
+    private boolean isFontKnown(String font) {
 
-	/**
-	 * find if font is known and available
-	 * 
-	 * @TODO needs to be rewritten using the getAllAvailableFontFamilyNames
-	 *       method
-	 * @param font
-	 * @return true if font is known
-	 */
-	private boolean isFontKnown(String font) {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        String fontNames[] = ge.getAvailableFontFamilyNames();
+        for (String fontName : fontNames) {
+            if (fontName.equals(font)) {
+                return true;
+            }
+        }
 
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		String fontNames[] = ge.getAvailableFontFamilyNames();
-		for (int i = 0; i < fontNames.length; i++) {
-			if (fontNames[i].equals(font)) {
-				return true;
-			}
-		}
+        return false;
+    }
 
-		return false;
-	}
+    /**************************************************************************************
+     * Renders the text in the bufferedImage of the Watermark object.
+     *************************************************************************************/
+    public void render() {
 
-	/**************************************************************************************
-	 * Renders the text in the bufferedImage of the Watermark object.
-	 *************************************************************************************/
-	public void render() {
+        int actual_x = 0;
+        int actual_y = 0;
 
-		int actual_x = 0;
-		int actual_y = 0;
+        if (this.getParent_watermark() == null) {
+            LOGGER.warn("WatermarkText is not included in any Watermark; can't render WatermarkText");
+            return;
+        }
 
-		if (this.getParent_watermark() == null) {
-			logger.warn("WatermarkText is not included in any Watermark; can't render WatermarkText");
-			return;
-		}
+        BufferedImage bImage = this.getParent_watermark().getWatermarkImage(); // gets
 
-		BufferedImage bImage = this.getParent_watermark().getWatermarkImage(); // gets
+        // create graphics to render the text
+        Graphics2D g = bImage.createGraphics();
 
-		// create graphics to render the text
-		Graphics2D g = bImage.createGraphics();
+        // get color for string
+        g.setColor(this.fontcolor);
+        g.setPaint(this.fontcolor);
 
-		// get color for string
-		g.setColor(this.fontcolor);
-		g.setPaint(this.fontcolor);
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        // set font for the text
 
-		// set font for the text
+        g.setFont(new Font(font, this.fontstyle, this.fontsize));
+        FontMetrics fontMetrics = g.getFontMetrics();
+        Rectangle2D rect = fontMetrics.getStringBounds(this.content, g); // dimensions
 
-		g.setFont(new Font(font, this.fontstyle, this.fontsize));
-		FontMetrics fontMetrics = g.getFontMetrics();
-		Rectangle2D rect = fontMetrics.getStringBounds(this.content, g); // dimensions
-	
-		// calculate the actual coordinates
-		if (origin.equalsIgnoreCase("LEFT")) {
-			actual_x = this.getX();
-			actual_y = this.getY();
-		} else if (origin.equalsIgnoreCase("RIGHT")) {
-			actual_y = this.getY();
-			actual_x = this.getParent_watermark().getWidth() - ((int) rect.getWidth()) - this.getX();
-		} else if (origin.equalsIgnoreCase("CENTER")) {
-			actual_y = this.getY();
-			actual_x = (this.getParent_watermark().getWidth() - ((int) rect.getWidth())) / 2;
-		}
+        // calculate the actual coordinates
+        if (origin.equalsIgnoreCase("LEFT")) {
+            actual_x = this.getX();
+            actual_y = this.getY();
+        } else if (origin.equalsIgnoreCase("RIGHT")) {
+            actual_y = this.getY();
+            actual_x = this.getParent_watermark().getWidth() - ((int) rect.getWidth()) - this.getX();
+        } else if (origin.equalsIgnoreCase("CENTER")) {
+            actual_y = this.getY();
+            actual_x = (this.getParent_watermark().getWidth() - ((int) rect.getWidth())) / 2;
+        }
 
-		// draw the string
-		g.drawString(this.content, actual_x, actual_y);
-	}
+        // draw the string
+        g.drawString(this.content, actual_x, actual_y);
+    }
 
-	/*************************************************************************************
-	 * Getter for content
-	 * 
-	 * @return the content
-	 *************************************************************************************/
-	public String getContent() {
-		return content;
-	}
+    /*************************************************************************************
+     * Getter for content
+     * 
+     * @return the content
+     *************************************************************************************/
+    public String getContent() {
+        return content;
+    }
 
-	/**************************************************************************************
-	 * Setter for content
-	 * 
-	 * @param content
-	 *            the content to set
-	 **************************************************************************************/
-	public void setContent(String content) {
-		this.content = content;
-	}
+    /**************************************************************************************
+     * Setter for content
+     * 
+     * @param content the content to set
+     **************************************************************************************/
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-	/*************************************************************************************
-	 * Getter for font
-	 * 
-	 * @return the font
-	 *************************************************************************************/
-	public String getFont() {
-		return font;
-	}
+    /*************************************************************************************
+     * Getter for font
+     * 
+     * @return the font
+     *************************************************************************************/
+    public String getFont() {
+        return font;
+    }
 
-	/**************************************************************************************
-	 * Setter for font
-	 * 
-	 * @param font
-	 *            the font to set
-	 **************************************************************************************/
-	public void setFont(String font) {
-		this.font = font;
-	}
+    /**************************************************************************************
+     * Setter for font
+     * 
+     * @param font the font to set
+     **************************************************************************************/
+    public void setFont(String font) {
+        this.font = font;
+    }
 
-	/*************************************************************************************
-	 * Getter for fontstyle
-	 * 
-	 * @return the fontstyle
-	 *************************************************************************************/
-	public int getFontstyle() {
-		return fontstyle;
-	}
+    /*************************************************************************************
+     * Getter for fontstyle
+     * 
+     * @return the fontstyle
+     *************************************************************************************/
+    public int getFontstyle() {
+        return fontstyle;
+    }
 
-	/**************************************************************************************
-	 * Setter for fontstyle
-	 * 
-	 * @param fontstyle
-	 *            the fontstyle to set
-	 **************************************************************************************/
-	public void setFontstyle(int fontstyle) {
-		this.fontstyle = fontstyle;
-	}
+    /**************************************************************************************
+     * Setter for fontstyle
+     * 
+     * @param fontstyle the fontstyle to set
+     **************************************************************************************/
+    public void setFontstyle(int fontstyle) {
+        this.fontstyle = fontstyle;
+    }
 
-	/*************************************************************************************
-	 * Getter for fontsize
-	 * 
-	 * @return the fontsize
-	 *************************************************************************************/
-	public int getFontsize() {
-		return fontsize;
-	}
+    /*************************************************************************************
+     * Getter for fontsize
+     * 
+     * @return the fontsize
+     *************************************************************************************/
+    public int getFontsize() {
+        return fontsize;
+    }
 
-	/**************************************************************************************
-	 * Setter for fontsize
-	 * 
-	 * @param fontsize
-	 *            the fontsize to set
-	 **************************************************************************************/
-	public void setFontsize(int fontsize) {
-		this.fontsize = fontsize;
-	}
+    /**************************************************************************************
+     * Setter for fontsize
+     * 
+     * @param fontsize the fontsize to set
+     **************************************************************************************/
+    public void setFontsize(int fontsize) {
+        this.fontsize = fontsize;
+    }
 
-	/*************************************************************************************
-	 * Getter for fontcolor
-	 * 
-	 * @return the fontcolor
-	 *************************************************************************************/
-	public Color getFontcolor() {
-		return fontcolor;
-	}
+    /*************************************************************************************
+     * Getter for fontcolor
+     * 
+     * @return the fontcolor
+     *************************************************************************************/
+    public Color getFontcolor() {
+        return fontcolor;
+    }
 
-	/**************************************************************************************
-	 * Setter for fontcolor
-	 * 
-	 * @param fontcolor
-	 *            the fontcolor to set
-	 **************************************************************************************/
-	public void setFontcolor(Color fontcolor) {
-		this.fontcolor = fontcolor;
-	}
+    /**************************************************************************************
+     * Setter for fontcolor
+     * 
+     * @param fontcolor the fontcolor to set
+     **************************************************************************************/
+    public void setFontcolor(Color fontcolor) {
+        this.fontcolor = fontcolor;
+    }
 
 }

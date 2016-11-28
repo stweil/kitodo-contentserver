@@ -33,11 +33,10 @@ import java.util.List;
  */
 public interface StructureSource extends DataSource {
 
-
-	/**
-	 * Gets the structure list.
-	 * 
-	 * @return the structure list
-	 */
-	abstract List<? extends Structure> getStructureList ();
+    /**
+     * Gets the structure list.
+     * 
+     * @return the structure list
+     */
+    abstract List<? extends Structure> getStructureList();
 }

@@ -33,41 +33,41 @@ import java.util.Map;
  * The Interface ImageSource.
  */
 public interface ImageSource extends DataSource {
-	
-	/**
-	 * Gets the image.
-	 * 
-	 * @param pageNr the page nr
-	 * 
-	 * @return the image
-	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	abstract Image getImage (Integer pageNr) throws IOException;
-	
-	/**
-	 * Gets the images.
-	 * 
-	 * @return the images
-	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	abstract List<? extends Image> getImageList () throws IOException;
-	
-	/**
-	 * Gets the images.
-	 * 
-	 * @return the images
-	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	abstract Map<Integer, ? extends Image> getImageMap () throws IOException;
-	
-	/**
-	 * Gets the number of pages.
-	 * 
-	 * @return the number of pages
-	 */
-	abstract Integer getNumberOfPages ();
-		
+
+    /**
+     * Gets the image.
+     * 
+     * @param pageNr the page nr
+     * 
+     * @return the image
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    abstract Image getImage(Integer pageNr) throws IOException;
+
+    /**
+     * Gets the images.
+     * 
+     * @return the images
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    abstract List<? extends Image> getImageList() throws IOException;
+
+    /**
+     * Gets the images.
+     * 
+     * @return the images
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    abstract Map<Integer, ? extends Image> getImageMap() throws IOException;
+
+    /**
+     * Gets the number of pages.
+     * 
+     * @return the number of pages
+     */
+    abstract Integer getNumberOfPages();
+
 }

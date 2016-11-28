@@ -39,6 +39,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibException;
+import de.unigoettingen.sub.commons.contentlib.exceptions.ContentLibPdfException;
+import de.unigoettingen.sub.commons.contentlib.exceptions.ImageInterpreterException;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageFileFormat;
 import de.unigoettingen.sub.commons.contentlib.imagelib.ImageInterpreter;
 import de.unigoettingen.sub.commons.contentlib.servlet.ServletWatermark;
@@ -52,66 +54,63 @@ import de.unigoettingen.sub.commons.contentlib.servlet.model.ContentServerConfig
  * @author Steffen Hankiewicz
  * @author Igor Toker
  ************************************************************************************/
-public class GetErrorReportAction extends GetAction {
-	private static final Logger logger = Logger.getLogger(GetErrorReportAction.class);
+public class GetErrorReportAction extends AbstractGetAction {
+    private static final Logger LOGGER = Logger.getLogger(GetErrorReportAction.class);
 
-	/************************************************************************************
-	 * Create image with error-watermark an send it to output stream of the
-	 * servlet, after setting correct mime type
-	 * 
-	 * @param request
-	 *            {@link HttpServletRequest} of ServletRequest
-	 * @param response
-	 *            {@link HttpServletResponse} for writing to response output
-	 *            stream
-	 * @throws IOException
-	 * @throws ServletException
-	 * @throws ContentLibException
-	 * @throws URISyntaxException
-	 ************************************************************************************/
-	public void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ContentLibException,
-			URISyntaxException {
-		super.run(servletContext, request, response);
+    /************************************************************************************
+     * Create image with error-watermark an send it to output stream of the servlet, after setting correct mime type
+     * 
+     * @param request {@link HttpServletRequest} of ServletRequest
+     * @param response {@link HttpServletResponse} for writing to response output stream
+     * @throws IOException
+     * @throws ImageInterpreterException 
+     * @throws ServletException
+     * @throws ContentLibException
+     * @throws URISyntaxException
+     * @throws ContentLibPdfException 
+     ************************************************************************************/
+    @Override
+    public void run(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws IOException, URISyntaxException,
+            ContentLibException {
+        super.run(servletContext, request, response);
 
-		/* get central configuration */
-		ContentServerConfiguration config = ContentServerConfiguration.getInstance();
+        /* get central configuration */
+        ContentServerConfiguration config = ContentServerConfiguration.getInstance();
 
-		/* get error string */
-		String errorString = (String) request.getAttribute("error");
+        /* get error string */
+        String errorString = (String) request.getAttribute("error");
 
-		/*----------------------------------
-		 * check errorReport
-		 *----------------------------------*/
+        /*----------------------------------
+         * check errorReport
+         *----------------------------------*/
 
-		/* jpg image */
-		String jpgfile = new File(Util.getBaseFolderAsFile(), "errorfile.jpg").getAbsolutePath();
-		logger.debug("errorfile to use: " + jpgfile);
+        /* jpg image */
+        String jpgfile = new File(Util.getBaseFolderAsFile(), "errorfile.jpg").getAbsolutePath();
+        LOGGER.debug("errorfile to use: " + jpgfile);
 
-		/*---------------------------------
-		 * Generate Watermark
-		 *---------------------------------*/
-		FileInputStream inputFileStream = new FileInputStream(jpgfile);
-		RenderedImage ri = ServletWatermark.generateErrorWatermark(inputFileStream, errorString).getRenderedImage();
+        /*---------------------------------
+         * Generate Watermark
+         *---------------------------------*/
+        FileInputStream inputFileStream = new FileInputStream(jpgfile);
+        RenderedImage ri = ServletWatermark.generateErrorWatermark(inputFileStream, errorString).getRenderedImage();
 
-		/*
-		 * -------------------------------- prepare target and read created
-		 * image. --------------------------------
-		 */
-		ImageFileFormat targetFormat = ImageFileFormat.PNG;
-		ImageInterpreter wi = targetFormat.getInterpreter(ri); // read file
-		String targetFileName = "filename=error.png";
-		response.setHeader("Content-Disposition", targetFileName.toString());
-		response.setContentType(targetFormat.getMimeType());
+        /*
+         * -------------------------------- prepare target and read created image. --------------------------------
+         */
+        ImageFileFormat targetFormat = ImageFileFormat.PNG;
+        ImageInterpreter wi = targetFormat.getInterpreter(ri); // read file
+        String targetFileName = "filename=error.png";
+        response.setHeader("Content-Disposition", targetFileName.toString());
+        response.setContentType(targetFormat.getMimeType());
 
-		wi.setXResolution(config.getDefaultResolution());
-		wi.setYResolution(config.getDefaultResolution());
+        wi.setXResolution(config.getDefaultResolution());
+        wi.setYResolution(config.getDefaultResolution());
 
-		/*
-		 * -------------------------------- write target image to stream
-		 * --------------------------------
-		 */
-		wi.writeToStream(null, response.getOutputStream());
-		inputFileStream.close();
-	}
+        /*
+         * -------------------------------- write target image to stream --------------------------------
+         */
+        wi.writeToStream(null, response.getOutputStream());
+        inputFileStream.close();
+    }
 
 }

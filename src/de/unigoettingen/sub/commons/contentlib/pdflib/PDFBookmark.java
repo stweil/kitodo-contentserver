@@ -40,70 +40,67 @@ import de.unigoettingen.sub.commons.util.datasource.Structure;
  * @author Markus Enders
  ************************************************************************************/
 public class PDFBookmark extends AbstractStructure<PDFBookmark> {
-	protected PdfOutline pdfOutline;
-	
-	public PDFBookmark(Structure struct) {
-		super(struct);
-		//this(struct.getImageNumber(), struct.getContent());
-		if (struct instanceof PDFBookmark) {
-			pdfOutline = getPdfOutline();
-		}
-		
-		if (!struct.getChildren().isEmpty()) {
-			for (Structure s: struct.getChildren()) {
-				addChildBookmark(new PDFBookmark(s));
-			}
-		}
-		
-	}
-	
-	public PDFBookmark() {
-		super();
-	}
+    protected PdfOutline pdfOutline;
 
-	/**************************************************************************************
-	 * Constructor which create a new bookmark with pagename and content
-	 * 
-	 * @param pagename
-	 *            as Integer
-	 * @param content
-	 *            as String
-	 **************************************************************************************/
-	public PDFBookmark(Integer pagename, String content) {
-		super(pagename, content);
-	}
+    public PDFBookmark(Structure struct) {
+        super(struct);
+        // this(struct.getImageNumber(), struct.getContent());
+        if (struct instanceof PDFBookmark) {
+            pdfOutline = getPdfOutline();
+        }
 
-	/*************************************************************************************
-	 * Getter for pdfOutline
-	 * 
-	 * @return the pdfOutline
-	 *************************************************************************************/
-	public PdfOutline getPdfOutline() {
-		return pdfOutline;
-	}
+        if (!struct.getChildren().isEmpty()) {
+            for (Structure s : struct.getChildren()) {
+                addChildBookmark(new PDFBookmark(s));
+            }
+        }
 
-	/**************************************************************************************
-	 * Setter for pdfOutline
-	 * 
-	 * @param pdfOutline
-	 *            the pdfOutline to set
-	 **************************************************************************************/
-	public void setPdfOutline(PdfOutline pdfOutline) {
-		this.pdfOutline = pdfOutline;
-	}
+    }
 
-	/**
-	 * Convert list.
-	 * 
-	 * @param structList the struct list
-	 * 
-	 * @return the list< pdf bookmark>
-	 */
-	public static List<PDFBookmark> convertList(final List<? extends Structure> structList) {
-		List<PDFBookmark> returnList = new LinkedList<PDFBookmark>();
-		for (Structure struct: structList) {
-			returnList.add(new PDFBookmark(struct));
-		}
-		return returnList;
-	}
+    public PDFBookmark() {
+        super();
+    }
+
+    /**************************************************************************************
+     * Constructor which create a new bookmark with pagename and content
+     * 
+     * @param pagename as Integer
+     * @param content as String
+     **************************************************************************************/
+    public PDFBookmark(Integer pagename, String content) {
+        super(pagename, content);
+    }
+
+    /*************************************************************************************
+     * Getter for pdfOutline
+     * 
+     * @return the pdfOutline
+     *************************************************************************************/
+    public PdfOutline getPdfOutline() {
+        return pdfOutline;
+    }
+
+    /**************************************************************************************
+     * Setter for pdfOutline
+     * 
+     * @param pdfOutline the pdfOutline to set
+     **************************************************************************************/
+    public void setPdfOutline(PdfOutline pdfOutline) {
+        this.pdfOutline = pdfOutline;
+    }
+
+    /**
+     * Convert list.
+     * 
+     * @param structList the struct list
+     * 
+     * @return the list< pdf bookmark>
+     */
+    public static List<PDFBookmark> convertList(final List<? extends Structure> structList) {
+        List<PDFBookmark> returnList = new LinkedList<PDFBookmark>();
+        for (Structure struct : structList) {
+            returnList.add(new PDFBookmark(struct));
+        }
+        return returnList;
+    }
 }

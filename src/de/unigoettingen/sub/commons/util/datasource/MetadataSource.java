@@ -33,12 +33,11 @@ import java.util.List;
  */
 public interface MetadataSource extends DataSource {
 
-	/**
-	 * Gets the metadata.
-	 * 
-	 * @return the metadata
-	 */
-	abstract List<Metadata> getMetadata ();
+    /**
+     * Gets the metadata.
+     * 
+     * @return the metadata
+     */
+    abstract List<Metadata> getMetadata();
 
-	
 }

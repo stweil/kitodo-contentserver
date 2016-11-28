@@ -36,16 +36,14 @@ import gov.loc.mets.DivType;
  *************************************************************************************/
 public interface StructureMetadataExtractor {
 
-	/************************************************************************************
-	 * Retrieves the String which is used for displaying the Bookmark in the PDF
-	 * Reader. This value is stored in the content attribute of the Bookmark.
-	 * 
-	 * @param inDiv
-	 *            the div id to use
-	 * @param inParser
-	 *            the parser to use
-	 * @return String containing the Bookmark's content
-	 ***********************************************************************************/
-	public abstract String getStructureMetadata(DivType inDiv, METSParser inParser);
+    /************************************************************************************
+     * Retrieves the String which is used for displaying the Bookmark in the PDF Reader. This value is stored in the content attribute of the
+     * Bookmark.
+     * 
+     * @param inDiv the div id to use
+     * @param inParser the parser to use
+     * @return String containing the Bookmark's content
+     ***********************************************************************************/
+    public abstract String getStructureMetadata(DivType inDiv, METSParser inParser);
 
 }

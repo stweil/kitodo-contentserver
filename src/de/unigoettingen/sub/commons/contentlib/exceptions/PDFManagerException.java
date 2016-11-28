@@ -33,42 +33,42 @@ package de.unigoettingen.sub.commons.contentlib.exceptions;
  * @author Markus Enders
  * *********************************************************************************/
 public class PDFManagerException extends ContentLibPdfException {
-	
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 20081101L;
 
-	/**
-	 * Instantiates a new PDF manager exception.
-	 */
-	public PDFManagerException() {
-		super();
-	}
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID = 20081101L;
 
-	/**
-	 * Instantiates a new PDF manager exception.
-	 * 
-	 * @param inMessage the in message
-	 */
-	public PDFManagerException(final String inMessage) {
-		super(inMessage);
-	}
+    /**
+     * Instantiates a new PDF manager exception.
+     */
+    public PDFManagerException() {
+        super();
+    }
 
-	/**
-	 * Instantiates a new PDF manager exception.
-	 * 
-	 * @param incause the incause
-	 */
-	public PDFManagerException(final Throwable incause) {
-		super(incause);
-	}
+    /**
+     * Instantiates a new PDF manager exception.
+     * 
+     * @param inMessage the in message
+     */
+    public PDFManagerException(final String inMessage) {
+        super(inMessage);
+    }
 
-	/**
-	 * Instantiates a new PDF manager exception.
-	 * 
-	 * @param inMessage the in message
-	 * @param incause the incause
-	 */
-	public PDFManagerException(final String inMessage, final Throwable incause) {
-		super(inMessage, incause);
-	}
+    /**
+     * Instantiates a new PDF manager exception.
+     * 
+     * @param incause the incause
+     */
+    public PDFManagerException(final Throwable incause) {
+        super(incause);
+    }
+
+    /**
+     * Instantiates a new PDF manager exception.
+     * 
+     * @param inMessage the in message
+     * @param incause the incause
+     */
+    public PDFManagerException(final String inMessage, final Throwable incause) {
+        super(inMessage, incause);
+    }
 }

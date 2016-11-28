@@ -25,8 +25,8 @@
  */
 package de.unigoettingen.sub.commons.simplemets;
 
-import de.unigoettingen.sub.commons.simplemets.exceptions.MetsException;
 import gov.loc.mets.DivType;
+import de.unigoettingen.sub.commons.simplemets.exceptions.MetsException;
 
 /************************************************************************************
  * Interface for metadata extractors
@@ -35,69 +35,65 @@ import gov.loc.mets.DivType;
  * @author Steffen Hankiewicz
  * @author Markus Enders
  ************************************************************************************/
-//TODO: Remove underscores and "PDF"
+// TODO: Remove underscores and "PDF"
 public interface MetadataExtractor {
 
-	/**
-	 * calulate the metadata for the pdf file
-	 * 
-	 * @param inDiv
-	 *            as {@link DivType}
-	 * @param metsparser
-	 *            as {@link METSParser}
-	 * @throws MetsException
-	 */
-	public abstract void calculateMetadata(DivType inDiv, METSParser metsparser) throws MetsException;
+    /**
+     * calulate the metadata for the pdf file
+     * 
+     * @param inDiv as {@link DivType}
+     * @param metsparser as {@link METSParser}
+     * @throws MetsException
+     */
+    public abstract void calculateMetadata(DivType inDiv, METSParser metsparser) throws MetsException;
 
-	/**
-	 * calulate the metadata for the pdf file
-	 * 
-	 * @param inDivID
-	 *            as {@link String}
-	 * @param metsparser
-	 *            as {@link METSParser}
-	 * @throws MetsException
-	 */
-	public abstract void calculatePDFMetadata(String inDivID, METSParser metsparser) throws MetsException;
+    /**
+     * calulate the metadata for the pdf file
+     * 
+     * @param inDivID as {@link String}
+     * @param metsparser as {@link METSParser}
+     * @throws MetsException
+     */
+    public abstract void calculatePDFMetadata(String inDivID, METSParser metsparser) throws MetsException;
 
-	/************************************************************************************
-	 * @return the pdftitle
-	 ***********************************************************************************/
-	public abstract String getPdftitle();
+    /************************************************************************************
+     * @return the pdftitle
+     ***********************************************************************************/
+    public abstract String getPdftitle();
 
-	/*************************************************************************************
-	 * @return the pdfcreator
-	 ************************************************************************************/
-	public abstract String getPdfcreator();
+    /*************************************************************************************
+     * @return the pdfcreator
+     ************************************************************************************/
+    public abstract String getPdfcreator();
 
-	/*************************************************************************************
-	 * @return the pdfkeywords
-	 ************************************************************************************/
-	public abstract String getPdfkeywords();
+    /*************************************************************************************
+     * @return the pdfkeywords
+     ************************************************************************************/
+    public abstract String getPdfkeywords();
 
-	/*************************************************************************************
-	 * @return the pdf_titlepage_line1
-	 ************************************************************************************/
-	public abstract String getPdf_titlepage_line1();
+    /*************************************************************************************
+     * @return the pdf_titlepage_line1
+     ************************************************************************************/
+    public abstract String getPdfTitlepageLine1();
 
-	/*************************************************************************************
-	 * @return the pdf_titlepage_line2
-	 ************************************************************************************/
-	public abstract String getPdf_titlepage_line2();
+    /*************************************************************************************
+     * @return the pdf_titlepage_line2
+     ************************************************************************************/
+    public abstract String getPdfTitlepageLine2();
 
-	/*************************************************************************************
-	 * @return the pdf_titlepage_line3
-	 ************************************************************************************/
-	public abstract String getPdf_titlepage_line3();
+    /*************************************************************************************
+     * @return the pdf_titlepage_line3
+     ************************************************************************************/
+    public abstract String getPdfTitlepageLine3();
 
-	/*************************************************************************************
-	 * @return the pdf_titlepage_line4
-	 ************************************************************************************/
-	public abstract String getPdf_titlepage_line4();
+    /*************************************************************************************
+     * @return the pdf_titlepage_line4
+     ************************************************************************************/
+    public abstract String getPdfTitlepageLine4();
 
-	/*************************************************************************************
-	 * @return the structtype
-	 ************************************************************************************/
-	public String getStructType();
+    /*************************************************************************************
+     * @return the structtype
+     ************************************************************************************/
+    public String getStructType();
 
 }

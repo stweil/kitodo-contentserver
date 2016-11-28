@@ -25,30 +25,29 @@
  */
 package de.unigoettingen.sub.commons.util;
 
-
 /**
  * The Class ArrayUtils.
  */
 public class ArrayUtils {
 
-	/**
-	 * Checks if a array contains the given obeject
-	 * 
-	 * @param array the array to search
-	 * @param search the obeject to look after
-	 * 
-	 * @return true, if successful
-	 */
-	public static boolean contains(Object[] array, Object search)  {
-		if (array.getClass().isInstance(search)) {
-			throw new IllegalArgumentException();
-		}
-		for (Object o: array) {
-			if (o.equals(search)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
+    /**
+     * Checks if a array contains the given obeject
+     * 
+     * @param array the array to search
+     * @param search the obeject to look after
+     * 
+     * @return true, if successful
+     */
+    public static boolean contains(Object[] array, Object search) {
+        if (array.getClass().isInstance(search)) {
+            throw new IllegalArgumentException();
+        }
+        for (Object o : array) {
+            if (o.equals(search)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

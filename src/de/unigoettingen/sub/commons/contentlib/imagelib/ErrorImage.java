@@ -29,6 +29,7 @@ import java.awt.image.RenderedImage;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.List;
 
 import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManagerException;
 
@@ -38,62 +39,64 @@ import de.unigoettingen.sub.commons.contentlib.exceptions.ImageManagerException;
  * @version 02.05.2009 
  * @author Steffen Hankiewicz
  ************************************************************************************/
-//TODO: check if this is needed and if so let it implement the Image interface
+// TODO: check if this is needed and if so let it implement the Image interface
 public class ErrorImage {
 
-	private LinkedList<WatermarkText> allTexts = new LinkedList<WatermarkText>();
-	private URL uri;
+    private List<WatermarkText> allTexts = new LinkedList<WatermarkText>();
+    private URL uri;
 
-	/**
-	 * set url for error image
-	 * @param inuri the given url
-	 */
-	public ErrorImage(URL inuri) {
-		uri = inuri;
-	}
+    /**
+     * set url for error image
+     * 
+     * @param inuri the given url
+     */
+    public ErrorImage(URL inuri) {
+        uri = inuri;
+    }
 
-	/**
-	 * Add text to Watermark
-	 * @param wt the watermark to add 
-	 */
-	public void addWatermarkText(WatermarkText wt) {
-		allTexts.add(wt);
-	}
+    /**
+     * Add text to Watermark
+     * 
+     * @param wt the watermark to add
+     */
+    public void addWatermarkText(WatermarkText wt) {
+        allTexts.add(wt);
+    }
 
-	/**
-	 * Writes the whole Image as a JPEG Image!
-	 * 
-	 * @param ostream the outputstream to write to
-	 * @throws ImageManagerException 
-	 */
-	public void renderAsJPG(OutputStream ostream) throws ImageManagerException {
-		// get image 
-		ImageManager imagemanager = new ImageManager(uri);
-		ImageInterpreter myInterpreter = imagemanager.getMyInterpreter();
+    /**
+     * Writes the whole Image as a JPEG Image!
+     * 
+     * @param ostream the outputstream to write to
+     * @throws ImageManagerException
+     */
+    public void renderAsJPG(OutputStream ostream) throws ImageManagerException {
+        // get image
+        ImageManager imagemanager = new ImageManager(uri);
+        ImageInterpreter myInterpreter = imagemanager.getMyInterpreter();
 
-		RenderedImage backgroundImage = myInterpreter.getRenderedImage();
+        RenderedImage backgroundImage = myInterpreter.getRenderedImage();
 
-		Watermark newImage = new Watermark(backgroundImage.getHeight(), backgroundImage.getWidth());
+        Watermark newImage = new Watermark(backgroundImage.getHeight(), backgroundImage.getWidth());
 
-		// add BackgroundImage
-		WatermarkImage wi = new WatermarkImage(0,backgroundImage);
-		wi.setX(0);
-		wi.setY(0);
-		newImage.addWatermarkComponent(wi);
+        // add BackgroundImage
+        WatermarkImage wi = new WatermarkImage(0, backgroundImage);
+        wi.setX(0);
+        wi.setY(0);
+        newImage.addWatermarkComponent(wi);
 
-		// add all Text Components
-		newImage.setAllWatermarkComponents(new LinkedList<WatermarkComponent>(allTexts));
+        // add all Text Components
+        newImage.setAllWatermarkComponents(new LinkedList<WatermarkComponent>(allTexts));
 
-		// write the new image to output
+        // write the new image to output
 
-		RenderedImage ri = newImage.getRenderedImage();
+        RenderedImage ri = newImage.getRenderedImage();
 
-		JpegInterpreter ti = new JpegInterpreter(ri);
-		ti.setXResolution(72f);
-		ti.setYResolution(72f);
-		ti.setColordepth(8);
-		ti.setSamplesperpixel(3);
-		ti.writeToStream(null, ostream);
-	}
+        JpegInterpreter ti = new JpegInterpreter(ri);
+        ti.setXResolution(72f);
+        ti.setYResolution(72f);
+        ti.setColordepth(8);
+        ti.setSamplesperpixel(3);
+        ti.writeToStream(null, ostream);
+    }
 
 }

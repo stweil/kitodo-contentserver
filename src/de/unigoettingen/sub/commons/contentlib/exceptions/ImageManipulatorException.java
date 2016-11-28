@@ -25,51 +25,52 @@
  */
 package de.unigoettingen.sub.commons.contentlib.exceptions;
 
+import de.unigoettingen.sub.commons.contentlib.imagelib.ImageManipulator;
+
 /************************************************************************************
  * Exception for image handling by {@link ImageManipulator}.
  * 
  * @version 02.01.2009 
  * @author Steffen Hankiewicz
- * @author Markus Enders
- * **********************************************************************************
+ * @author Markus Enders **********************************************************************************
  */
 public class ImageManipulatorException extends ContentLibImageException {
-	
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 7907086127942804969L;
 
-	/**
-	 * Instantiates a new image manipulator exception.
-	 */
-	public ImageManipulatorException() {
-		super();
-	}
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID = 7907086127942804969L;
 
-	/**
-	 * Instantiates a new image manipulator exception.
-	 * 
-	 * @param inMessage the in message
-	 */
-	public ImageManipulatorException(final String inMessage) {
-		super(inMessage);
-	}
+    /**
+     * Instantiates a new image manipulator exception.
+     */
+    public ImageManipulatorException() {
+        super();
+    }
 
-	/**
-	 * Instantiates a new image manipulator exception.
-	 * 
-	 * @param incause the incause
-	 */
-	public ImageManipulatorException(final Throwable incause) {
-		super(incause);
-	}
+    /**
+     * Instantiates a new image manipulator exception.
+     * 
+     * @param inMessage the in message
+     */
+    public ImageManipulatorException(final String inMessage) {
+        super(inMessage);
+    }
 
-	/**
-	 * Instantiates a new image manipulator exception.
-	 * 
-	 * @param inMessage the in message
-	 * @param incause the incause
-	 */
-	public ImageManipulatorException(final String inMessage, final Throwable incause) {
-		super(inMessage, incause);
-	}
+    /**
+     * Instantiates a new image manipulator exception.
+     * 
+     * @param incause the incause
+     */
+    public ImageManipulatorException(final Throwable incause) {
+        super(incause);
+    }
+
+    /**
+     * Instantiates a new image manipulator exception.
+     * 
+     * @param inMessage the in message
+     * @param incause the incause
+     */
+    public ImageManipulatorException(final String inMessage, final Throwable incause) {
+        super(inMessage, incause);
+    }
 }

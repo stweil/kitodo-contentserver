@@ -26,8 +26,7 @@
 package de.unigoettingen.sub.commons.contentlib.exceptions;
 
 /************************************************************************************
- * general Exception thrown if the given parameter for the requests are not
- * valide.
+ * general Exception thrown if the given parameter for the requests are not valide.
  * 
  * @version 02.05.2009 
  * @author Steffen Hankiewicz
@@ -35,45 +34,41 @@ package de.unigoettingen.sub.commons.contentlib.exceptions;
  * *********************************************************************************/
 public class ParameterNotSupportedException extends ContentLibImageException {
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 12008110101L;
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID = 12008110101L;
 
-	/**
-	 * Instantiates a new parameter not supported exception.
-	 */
-	public ParameterNotSupportedException() {
-		super();
-	}
+    /**
+     * Instantiates a new parameter not supported exception.
+     */
+    public ParameterNotSupportedException() {
+        super();
+    }
 
-	/**
-	 * Instantiates a new parameter not supported exception.
-	 * 
-	 * @param inMessage
-	 *            the in message
-	 */
-	public ParameterNotSupportedException(String inMessage) {
-		super(inMessage);
-	}
+    /**
+     * Instantiates a new parameter not supported exception.
+     * 
+     * @param inMessage the in message
+     */
+    public ParameterNotSupportedException(String inMessage) {
+        super(inMessage);
+    }
 
-	/**
-	 * Instantiates a new parameter not supported exception.
-	 * 
-	 * @param incause
-	 *            the incause
-	 */
-	public ParameterNotSupportedException(Throwable incause) {
-		super(incause);
-	}
+    /**
+     * Instantiates a new parameter not supported exception.
+     * 
+     * @param incause the incause
+     */
+    public ParameterNotSupportedException(Throwable incause) {
+        super(incause);
+    }
 
-	/**
-	 * Instantiates a new parameter not supported exception.
-	 * 
-	 * @param inMessage
-	 *            the in message
-	 * @param incause
-	 *            the incause
-	 */
-	public ParameterNotSupportedException(String inMessage, Throwable incause) {
-		super(inMessage, incause);
-	}
+    /**
+     * Instantiates a new parameter not supported exception.
+     * 
+     * @param inMessage the in message
+     * @param incause the incause
+     */
+    public ParameterNotSupportedException(String inMessage, Throwable incause) {
+        super(inMessage, incause);
+    }
 }

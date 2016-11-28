@@ -33,24 +33,24 @@ import java.util.List;
  */
 public interface Structure {
 
-	/**
-	 * Gets the image number.
-	 * 
-	 * @return the image number
-	 */
-	abstract Integer getImageNumber ();
-	
-	/**
-	 * Gets the content.
-	 * 
-	 * @return the content
-	 */
-	abstract String getContent ();
-	
-	/**
-	 * Gets the children.
-	 * 
-	 * @return the children
-	 */
-	abstract List<? extends Structure> getChildren ();
+    /**
+     * Gets the image number.
+     * 
+     * @return the image number
+     */
+    abstract Integer getImageNumber();
+
+    /**
+     * Gets the content.
+     * 
+     * @return the content
+     */
+    abstract String getContent();
+
+    /**
+     * Gets the children.
+     * 
+     * @return the children
+     */
+    abstract List<? extends Structure> getChildren();
 }

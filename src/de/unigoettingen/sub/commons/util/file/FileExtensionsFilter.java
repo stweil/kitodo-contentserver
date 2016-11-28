@@ -29,92 +29,95 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Locale;
 
 //TODO: This is guaranted to work case insensive only if you add extensions as String
 /**
  * The Class FileExtensionsFilter implements a FileFilter. It can be used to filter files based on their extensions.
  */
 public class FileExtensionsFilter implements FileFilter {
-	
-	/** The extension. */
-	protected List<String> extensions = new ArrayList<String>();
-	
-	/**
-	 * Instantiates a new file extensions filter.
-	 * 
-	 * @param extension the extension
-	 */
-	public FileExtensionsFilter (String extension) {
-		this.extensions.add(extension.toLowerCase());
-	}
-	
-	/**
-	 * Instantiates a new file extensions filter.
-	 * 
-	 * @param extensions the extensions
-	 */
-	public FileExtensionsFilter (List<String> extensions) {
-		this.extensions = extensions;
-	};
-	
-	/**
-	 * Adds the extension.
-	 * 
-	 * @param extension the extension
-	 */
-	public void addExtension (String extension) {
-		this.extensions.add(extension.toLowerCase());
-	}
-	
-	/**
-	 * Sets the extension.
-	 * 
-	 * @param extensions the new extension
-	 */
-	public void setExtension (List<String> extensions) {
-		this.extensions = extensions;
-	}
-	
-	/**
-	 * Gets the extensions.
-	 * 
-	 * @return the extensions
-	 */
-	public List<String> getExtensions () {
-		return extensions;
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.io.FileFilter#accept(java.io.File)
-	 */
-	public boolean accept (File pathname) {
-		if (extensions.contains(FileUtils.getFileExtensionFromFile(pathname).toLowerCase())) {
-			return true;
-		}
-		return false;	
-	}
-	
-	/**
-	 * Utility Method to get the extension of a file
-	 * 
-	 * @param file the file
-	 * 
-	 * @return the extension
-	 */
-	public static String getExtension(String file) {
-		return file.substring(file.lastIndexOf(".") + 1).toLowerCase();
-	}
 
-	/**
-	 * Utility Method to get the extension of a file
-	 * 
-	 * @param file the file
-	 * 
-	 * @return the extension
-	 */
-	public static String getExtension(File file) {
-		return file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1).toLowerCase();
-	}
+    /** The extension. */
+    protected List<String> extensions = new ArrayList<String>();
+
+    /**
+     * Instantiates a new file extensions filter.
+     * 
+     * @param extension the extension
+     */
+    public FileExtensionsFilter(String extension) {
+        this.extensions.add(extension.toLowerCase(Locale.getDefault()));
+    }
+
+    /**
+     * Instantiates a new file extensions filter.
+     * 
+     * @param extensions the extensions
+     */
+    public FileExtensionsFilter(List<String> extensions) {
+        this.extensions = extensions;
+    };
+
+    /**
+     * Adds the extension.
+     * 
+     * @param extension the extension
+     */
+    public void addExtension(String extension) {
+        this.extensions.add(extension.toLowerCase(Locale.getDefault()));
+    }
+
+    /**
+     * Sets the extension.
+     * 
+     * @param extensions the new extension
+     */
+    public void setExtension(List<String> extensions) {
+        this.extensions = extensions;
+    }
+
+    /**
+     * Gets the extensions.
+     * 
+     * @return the extensions
+     */
+    public List<String> getExtensions() {
+        return extensions;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.io.FileFilter#accept(java.io.File)
+     */
+    @Override
+    public boolean accept(File pathname) {
+        if (extensions.contains(FileUtils.getFileExtensionFromFile(pathname).toLowerCase())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Utility Method to get the extension of a file
+     * 
+     * @param file the file
+     * 
+     * @return the extension
+     */
+    public static String getExtension(String file) {
+        return file.substring(file.lastIndexOf('.') + 1).toLowerCase();
+    }
+
+    /**
+     * Utility Method to get the extension of a file
+     * 
+     * @param file the file
+     * 
+     * @return the extension
+     */
+    public static String getExtension(File file) {
+        return file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1).toLowerCase();
+    }
 
 }
